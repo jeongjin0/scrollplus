@@ -1,0 +1,9 @@
+node_modules/
+.output/
+.wxt/
+dist-fixture/
+*.log
+.DS_Store
+playwright-report/
+test-results/
+qa/tmp/

@@ -1,0 +1,83 @@
+{
+  "extName": {
+    "message": "Kept"
+  },
+  "extDesc": {
+    "message": "Skip low-response YouTube Shorts, TikTok videos, and Instagram Reels."
+  },
+  "on": {
+    "message": "On"
+  },
+  "off": {
+    "message": "Off"
+  },
+  "lenient": {
+    "message": "Lenient"
+  },
+  "balanced": {
+    "message": "Balanced"
+  },
+  "strict": {
+    "message": "Strict"
+  },
+  "keepCreator": {
+    "message": "Keep this creator"
+  },
+  "star": {
+    "message": "Star on GitHub"
+  },
+  "signedOut": {
+    "message": "Instagram is signed out. Nothing is hidden."
+  },
+  "privacy": {
+    "message": "Kept stores settings and today's skip count on this device. It does not collect or transmit data."
+  },
+  "filterGrids": {
+    "message": "Filter grids"
+  },
+  "showChip": {
+    "message": "Show skip chip"
+  },
+  "reset": {
+    "message": "Reset"
+  },
+  "allowlist": {
+    "message": "Creators to keep"
+  },
+  "sampleFloor": {
+    "message": "Sample floor"
+  },
+  "cutoff": {
+    "message": "Cutoff %"
+  },
+  "advanced": {
+    "message": "Advanced cutoffs"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "skipped": {
+    "message": "Skipped"
+  },
+  "undo": {
+    "message": "Undo"
+  },
+  "paused": {
+    "message": "The next ones are under your bar."
+  },
+  "keepGoing": {
+    "message": "Keep going"
+  },
+  "lowerBar": {
+    "message": "Lower the bar"
+  },
+  "skippedToday": {
+    "message": "$COUNT$ skipped today",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "18"
+      }
+    }
+  }
+}

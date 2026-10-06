@@ -1,0 +1,23 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "types": [
+      "chrome",
+      "vite/client"
+    ],
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "src",
+    "wxt.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".output",
+    "dist-fixture"
+  ]
+}

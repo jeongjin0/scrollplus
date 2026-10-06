@@ -1,0 +1,83 @@
+{
+  "extName": {
+    "message": "Kept"
+  },
+  "extDesc": {
+    "message": "쇼츠, 릴스, 틱톡에서 반응이 약한 영상을 넘깁니다."
+  },
+  "on": {
+    "message": "켜짐"
+  },
+  "off": {
+    "message": "꺼짐"
+  },
+  "lenient": {
+    "message": "느슨"
+  },
+  "balanced": {
+    "message": "기본"
+  },
+  "strict": {
+    "message": "엄격"
+  },
+  "keepCreator": {
+    "message": "이 제작자는 유지"
+  },
+  "star": {
+    "message": "GitHub에 Star"
+  },
+  "signedOut": {
+    "message": "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다."
+  },
+  "privacy": {
+    "message": "설정과 오늘 넘긴 횟수만 이 기기에 저장합니다. 데이터는 수집하거나 전송하지 않습니다."
+  },
+  "filterGrids": {
+    "message": "그리드도 거르기"
+  },
+  "showChip": {
+    "message": "넘김 표시"
+  },
+  "reset": {
+    "message": "기본값으로"
+  },
+  "allowlist": {
+    "message": "유지할 제작자"
+  },
+  "sampleFloor": {
+    "message": "최소 조회"
+  },
+  "cutoff": {
+    "message": "기준 %"
+  },
+  "advanced": {
+    "message": "세부 기준"
+  },
+  "remove": {
+    "message": "제거"
+  },
+  "skipped": {
+    "message": "넘김"
+  },
+  "undo": {
+    "message": "되돌리기"
+  },
+  "paused": {
+    "message": "다음 영상도 기준 아래입니다."
+  },
+  "keepGoing": {
+    "message": "이어서 보기"
+  },
+  "lowerBar": {
+    "message": "기준 낮추기"
+  },
+  "skippedToday": {
+    "message": "오늘 $COUNT$개 넘김",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "18"
+      }
+    }
+  }
+}

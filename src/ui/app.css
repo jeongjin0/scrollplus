@@ -1,0 +1,31 @@
+html, body, #root { margin: 0; background: #10110F; color: #F4F1EA; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.popup { box-sizing: border-box; width: 320px; height: 420px; overflow: hidden; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 12px; font: 14px/1.3 ui-sans-serif, system-ui, sans-serif; }
+.top { display: flex; align-items: center; gap: 10px; }
+.top h1, .options h1 { margin: 0; font: 600 22px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.03em; }
+.mark { width: 12px; height: 18px; box-sizing: border-box; border: 2px solid #FF4D2E; border-bottom: 0; border-radius: 2px 2px 0 0; display: inline-block; }
+.master { height: 36px; border-radius: 8px; border: 1px solid #A8A396; background: #1A1B17; color: #A8A396; }
+.master.on { color: #FF4D2E; border-color: #FF4D2E; }
+.segment { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.segment button, .switch { border: 0; background: #1A1B17; color: #A8A396; border-radius: 8px; }
+.segment button { height: 32px; }
+.segment button.selected { color: #FF4D2E; }
+.platforms { display: flex; flex-direction: column; gap: 6px; }
+.switch { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; color: #F4F1EA; }
+.track { width: 28px; height: 16px; border-radius: 99px; border: 1px solid #A8A396; background: transparent; }
+.track.on { background: #FF4D2E; border-color: #FF4D2E; }
+.count, .note, .privacy, .star { color: #A8A396; }
+.count, .note, .privacy { margin: 0; }
+.note { font-size: 12px; }
+.text-button, .star { background: none; border: 0; padding: 0; text-decoration: none; text-align: left; }
+.star { margin-top: auto; }
+.options { min-height: 100vh; padding: 32px 20px 48px; font: 15px/1.4 ui-sans-serif, system-ui, sans-serif; }
+.sheet { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.panel { background: #1A1B17; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.allow { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+label { display: flex; flex-direction: column; gap: 4px; color: #A8A396; font-size: 12px; }
+input[type="number"] { background: #10110F; border: 1px solid #A8A396; border-radius: 8px; padding: 8px; color: #F4F1EA; }
+.check { display: flex; gap: 8px; align-items: center; color: #F4F1EA; }
