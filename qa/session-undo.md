@@ -29,4 +29,16 @@ An 807-like Short (`vStq3Y9i41o`) automatically advanced to `AkOsp2_8kus` and sh
 
 Raw report, three screenshots and actual recording stay in `qa/tmp/undo-session-035/live`, outside the public repository. This short signed-out run does not establish signed-in 0.3.5 Instagram/TikTok compatibility, a full 24-hour pass, or ordinary human day-use. The prior 0.3.4 long run also cannot establish unchanged stability for the new runtime. See [release readiness](release-readiness.md).
 
+## Official Google Chrome 154 check
+
+The same exact package was also checked through the native UI in official Google Chrome `154.0.8037.58` (ARM64) on Mini, without restarting the existing browser or changing its launch flags. A new task-owned window used the existing profile; YouTube showed its signed-out UI.
+
+At `2026-10-07T15:50:42.608Z`, the original Short `vStq3Y9i41o` had 986 likes and automatically advanced to `1Y6inizc2Ug` (displayed 130K likes). The reason chip read `넘김 · 좋아요 986`. Clicking its Undo restored the original. The fresh default settings still showed 5,000 likes, an empty creator allowlist and 4 skips: earlier visits had skipped the same original while attempts to capture the brief chip missed it.
+
+A normal refresh at `15:55:02.106Z` retained the original through `15:55:24.173Z`, now with 997 likes and visibly playing. Settings still showed 4 skips and no saved creators. Reset preserved the count at 4; on returning to YouTube, default filtering resumed, with a later 2.2K-like reason chip and a 7.8K-like current video. The intervening reset transitions were not fully sampled, so this is not an exact per-video reset trace.
+
+Instagram Reels in a separate task tab redirected to login. TikTok briefly loaded videos before showing sign-up/interests UI; no complete skip/Undo result or signed-in compatibility is claimed for either site here. No login, account creation or social engagement occurred in this native check.
+
+The temporary unpacked ScrollPlus installation was removed afterward, Developer Mode was restored to OFF, the pre-existing Google Docs Offline extension remained enabled, and only the task's window was closed. The original browser process and its three tabs remained. Local native observation notes are retained under `qa/tmp/undo-session-035/native-chrome-154`. AX/screenshot observations establish the behavior above; there was no native recording exported or page-error collector in this check. This is a short official-Chrome YouTube check, not ordinary day-use or a 24-hour pass.
+
 Artifact: `scrollplus-0.3.5-chrome.zip`, 125,829 bytes, SHA-256 `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`.
