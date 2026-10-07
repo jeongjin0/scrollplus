@@ -104,8 +104,11 @@
   "reset": {
     "message": "Reset to defaults"
   },
+  "resetFailed": {
+    "message": "Could not reset. Try again."
+  },
   "privacy": {
-    "message": "Settings and today's count stay on this device. Nothing is collected or sent."
+    "message": "Settings and today's count stay here. Undo is temporary. Nothing is collected or sent."
   },
   "chipLikes": {
     "message": "Skipped · $COUNT$ likes",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEngine, type EngineItem } from "./engine";
+import { createEngine, type EngineDeps, type EngineItem } from "./engine";
 import { DEFAULT_SETTINGS, presetRule, type Settings } from "../lib/score";
 
 function low(id: string): EngineItem {
@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep"> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -63,6 +63,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
       const index = tasks.findIndex((task) => task.id === id);
       if (index >= 0) tasks.splice(index, 1);
     },
+    ...undoDeps,
   });
 
   async function drain() {
@@ -183,6 +184,36 @@ describe("engine", () => {
 
   it("undo keeps the current video for the session", async () => {
     const box = harness();
+    box.show(low("a"));
+    await box.drain();
+    box.engine.undo();
+    await box.drain();
+    expect(box.retreats).toEqual(["a"]);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("commits Undo before a retreat can replace the document", async () => {
+    let commit!: () => void;
+    const saved: string[] = [];
+    const box = harness({}, true, undefined, { rememberUndo: id => {
+      saved.push(id);
+      return new Promise<void>(resolve => { commit = resolve; });
+    } });
+    box.show(low("a"));
+    await box.drain();
+    box.engine.undo();
+    await box.drain();
+    expect(saved).toEqual(["a"]);
+    expect(box.retreats).toEqual([]);
+    commit();
+    await box.drain();
+    expect(box.retreats).toEqual(["a"]);
+  });
+
+  it("a failed session write still restores and keeps the video in this document", async () => {
+    const box = harness({}, true, undefined, { rememberUndo: async () => { throw new Error("Worker unavailable"); } });
     box.show(low("a"));
     await box.drain();
     box.engine.undo();

@@ -1,5 +1,6 @@
 import { decide, DEFAULT_SETTINGS, normalizeSettings, STORAGE_SETTINGS, type ItemKind, type Metrics, type Platform, type Settings } from "../lib/score";
 import { incrementSkips, loadSettings, saveSettings } from "../lib/storage";
+import { loadUndoKeeps, rememberUndo, validVideoId, type UndoView } from "../lib/session-keep";
 import { createEngine, type EngineItem } from "./engine";
 import { mountChip } from "./chip";
 import type { ExtractedItem } from "../platforms/extract";
@@ -23,6 +24,9 @@ interface ItemMessage {
 export function startFilter(adapter: Adapter): void {
   let settings: Settings = DEFAULT_SETTINGS;
   let ready = false;
+  let settingsRevision = 0;
+  let sessionRevision = -1;
+  const sessionKeep = new Set<string>();
   const cache = new Map<string, ExtractedItem>();
   let pointerDown = false;
   const chip = mountChip({
@@ -46,7 +50,25 @@ export function startFilter(adapter: Adapter): void {
     render: (model) => chip.update(model),
     schedule: (fn, ms) => window.setTimeout(fn, ms),
     cancel: (id) => window.clearTimeout(id),
+    sessionKeep,
+    rememberUndo: async (id) => {
+      try { applySession(await rememberUndo(adapter.platform, id)); }
+      catch { sessionKeep.add(id); }
+    },
   });
+
+  function applySession(view: UndoView): void {
+    if (view.platform !== adapter.platform || !Number.isSafeInteger(view.revision) || view.revision < sessionRevision || !Array.isArray(view.ids)) return;
+    sessionRevision = view.revision;
+    sessionKeep.clear();
+    for (const id of view.ids) if (validVideoId(id)) sessionKeep.add(id);
+    if (view.reset && view.settings) {
+      settingsRevision++;
+      settings = normalizeSettings(view.settings);
+      engine.settingsChanged();
+    }
+    showActive();
+  }
 
   function context() {
     const active = adapter.readActive();
@@ -144,6 +166,9 @@ export function startFilter(adapter: Adapter): void {
   window.addEventListener("focusout", () => engine.poke(), true);
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type === "scrollplus:session" && _sender.id === chrome.runtime.id) {
+      applySession(message); sendResponse({ ok: true }); return false;
+    }
     if (message?.type === "scrollplus:context") {
       sendResponse(context());
       return false;
@@ -168,17 +193,26 @@ export function startFilter(adapter: Adapter): void {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local" || !changes[STORAGE_SETTINGS]) return;
+    settingsRevision++;
     settings = normalizeSettings(changes[STORAGE_SETTINGS].newValue);
     engine.settingsChanged();
     scanGrids();
   });
 
-  void loadSettings().then((next) => {
-    settings = next;
-    ready = true;
-    showActive();
-    scanGrids();
-  });
+  function initialize(): void {
+    const revision = settingsRevision;
+    void Promise.all([loadSettings(), loadUndoKeeps(adapter.platform)]).then(([next, view]) => {
+      if (revision === settingsRevision) settings = next;
+      applySession(view);
+      ready = true;
+      showActive();
+      scanGrids();
+    }).catch(() => {
+      // Unknown session state must not re-skip a remembered video. Keep while retrying.
+      window.setTimeout(initialize, 1000);
+    });
+  }
+  initialize();
   window.setInterval(() => {
     showActive();
     scanGrids();

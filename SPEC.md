@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.4 GitHub beta. Core signed-in Instagram Reels and TikTok For You paths were checked on 0.3.3 in Aside Chromium 153; 0.3.4 additionally fixes TikTok preview classification and checks actual video-page skipping and Undo. Long-duration QA, positive-path live Following QA and ordinary human day-use remain pending. See qa/signed-in-smoke.md, qa/tiktok-previews.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.3.5 beta. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Core signed-in Instagram Reels and TikTok For You paths were checked on 0.3.3 in Aside Chromium 153, with focused 0.3.4 TikTok checks. Those historical runs do not establish signed-in 0.3.5 compatibility. Long-duration QA, positive-path live Following QA and ordinary human day-use remain pending. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -33,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.4
+- Version: 0.3.5
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -126,7 +126,7 @@ This applies to the active vertical player only.
 
 When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way. Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button.
 
-A session keep-set is memory only. Do not persist video ids.
+A session keep-set is memory only, shared across reloads and tabs by platform. Use trusted-only chrome.storage.session through a background message broker, and commit before retreating. Do not persist video ids to disk. Browser restart, extension reload/update/disable and Reset clear the temporary choices. Older delayed messages must not restore choices cleared by Reset.
 
 ## Allowlist
 
@@ -164,7 +164,7 @@ Options, top to bottom:
 - Sites: the three site rows
 - Behavior: also filter lists and grids, and show the skip chip
 - Creators to keep: the list with a remove button, or an empty state
-- Reset to defaults, which keeps the allowlist, and the GitHub button
+- Reset to defaults, which clears temporary Undo choices and keeps the allowlist and today's count, and the GitHub button. Disable Reset while pending; report a failure inline rather than claiming success.
 - A one-line privacy statement
 
 Changes apply immediately. There is no save button. The toolbar icon has no number badge.
@@ -204,7 +204,7 @@ Permissions:
 
 No all-urls permission, and no tabs, cookies, webRequest, history, or identity permission.
 
-Persist only settings and a daily skip count in chrome.storage.local. Reset the count at local midnight. Do not persist watch history or video ids.
+Persist only settings and a daily skip count in chrome.storage.local. Reset the count at local midnight. Keep Undo video ids only in chrome.storage.session RAM, without exposing that storage area to content scripts. Do not persist watch history or video ids to disk.
 
 The background worker serializes counter writes across tabs. An open options page refreshes its counter at local midnight.
 

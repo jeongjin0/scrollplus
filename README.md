@@ -12,7 +12,7 @@ Installed means on. No account, no setup.</p>
 
 ## What it does
 
-Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why, with an Undo that lasts a few seconds.
+Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why. The Undo button appears for a few seconds; a video you restore stays for the browser session, including reloads and new tabs.
 
 The default is simple: **skip anything under 5,000 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
@@ -28,11 +28,11 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
-The default rule has been checked on real YouTube Shorts, signed-in TikTok For You, and signed-in Instagram Reels. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope.
+The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo through a reload. Signed-in TikTok For You and Instagram Reels were checked on earlier betas. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope. Session retention checks are in [session Undo QA](qa/session-undo.md).
 
 ## Install
 
-It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.4 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.4): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [GitHub beta releases page](https://github.com/jeongjin0/scrollplus/releases): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
 To build it yourself:
 
@@ -64,7 +64,7 @@ For a longer real-feed check in an isolated profile, see [long feed QA](qa/soak.
 
 ## Privacy
 
-ScrollPlus reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
+ScrollPlus reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage; Undo choices stay only in memory until browser restart or Reset. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
 
 ScrollPlus is not affiliated with YouTube, TikTok, or Instagram.
 
