@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_SETTINGS, STORAGE_DAILY, STORAGE_SETTINGS, normalizeSettings, type Platform, type Settings } from "../lib/score";
 import type { IconName } from "../lib/icons";
 import { readSkipCount, saveSettings } from "../lib/storage";
+import { resetFilterSettings } from "../lib/session-keep";
 
 export interface ActiveState {
   platform: Platform | null;
@@ -20,6 +21,8 @@ export function useFilterState() {
   const [ready, setReady] = useState(false);
   const [skips, setSkips] = useState(0);
   const [active, setActive] = useState<ActiveState | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [resetFailed, setResetFailed] = useState(false);
   const latest = useRef(settings);
 
   useEffect(() => {
@@ -76,7 +79,16 @@ export function useFilterState() {
     if (response?.ok !== true) throw new Error("Creator unavailable");
   }, []);
 
-  return { settings, ready, skips, active, update, allowCurrent };
+  const reset = useCallback(async () => {
+    setResetting(true); setResetFailed(false);
+    try {
+      const next = normalizeSettings(await resetFilterSettings());
+      latest.current = next; setSettings(next);
+    } catch { setResetFailed(true); }
+    finally { setResetting(false); }
+  }, []);
+
+  return { settings, ready, skips, active, update, allowCurrent, reset, resetting, resetFailed };
 }
 
 async function askActive(): Promise<ActiveState | null> {

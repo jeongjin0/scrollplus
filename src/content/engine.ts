@@ -24,6 +24,8 @@ export interface EngineDeps {
   render: (chip: ChipModel | null) => void;
   schedule: (fn: () => void, ms: number) => number;
   cancel: (id: number) => void;
+  sessionKeep?: Set<string>;
+  rememberUndo?: (id: string) => Promise<void>;
 }
 
 const METRIC_WAIT_MS = 700;
@@ -47,7 +49,7 @@ export function createEngine(deps: EngineDeps) {
   let lastSkippedId: string | null = null;
   let metricsReady = false;
   let skipQueuedFor: string | null = null;
-  const sessionKeep = new Set<string>();
+  const sessionKeep = deps.sessionKeep ?? new Set<string>();
   const finished = new Set<string>();
   let lastAdvanceAt = Number.NEGATIVE_INFINITY;
   let seenAt = Number.NEGATIVE_INFINITY;
@@ -226,8 +228,9 @@ export function createEngine(deps: EngineDeps) {
     },
     undo() {
       if (!lastSkippedId || advancing) return;
-      sessionKeep.add(lastSkippedId);
-      finished.delete(lastSkippedId);
+      const id = lastSkippedId;
+      sessionKeep.add(id);
+      finished.delete(id);
       lastSkippedId = null;
       clearWait();
       clearGap();
@@ -237,7 +240,8 @@ export function createEngine(deps: EngineDeps) {
       paused = false;
       deps.render(null);
       advancing = true;
-      void deps.retreat().catch(() => false).finally(() => { advancing = false; });
+      // Commit the memory-only choice before a site retreat can replace this document.
+      void (deps.rememberUndo?.(id) ?? Promise.resolve()).catch(() => {}).then(() => deps.retreat()).catch(() => false).finally(() => { advancing = false; });
     },
     keepGoing() {
       resumeCurrent();

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5 – 2026-10-08
+
+- Undo keeps restored videos through page reloads and new tabs for the browser session. Choices stay in trusted-only Chrome session RAM and are committed before moving back; video ids are never written to disk.
+- Reset clears temporary Undo choices across open tabs while preserving saved creators and today's count. Pending Reset is disabled, and a failed reset shows an inline message.
+- Built-browser regressions cover all five adapter routes, concurrent session writes, real browser restart and saved-state preservation. Defaults and permissions are unchanged. Historical signed-in checks and remaining release gates are scoped in [release readiness](qa/release-readiness.md).
+
 ## 0.3.4 – 2026-10-07
 
 - TikTok creator recommendation previews and profile/grid hover previews are no longer treated as active feed videos. This prevents next-video attempts and incorrect current-creator actions on those surfaces while grid filtering is off.

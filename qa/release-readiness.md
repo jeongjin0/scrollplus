@@ -1,19 +1,19 @@
-# Release readiness · 0.3.4
+# Release readiness · 0.3.5
 
-Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. The 0.3.4 package fixes TikTok preview classification. Core signed-in paths were verified on 0.3.3 in Aside Chromium 153, with focused 0.3.4 checks below; broader compatibility and ordinary day-use remain open. Chrome Web Store submission has not occurred.
+Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. An exact-ZIP real YouTube check passes; historical signed-in 0.3.3/0.3.4 checks below are not new 0.3.5 evidence. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
 | TypeScript | Pass | `npm run compile` |
-| Unit tests | 42 passed | `npm test`; rules, parsing, extraction, engine regressions |
-| Browser tests | 21 passed | `npm run test:e2e`; native fetch/XHR contracts, grid restoration, TikTok preview exclusion and Following/video-route coverage, actual built scripts on controlled fixtures, popup/settings, concurrent storage writes, navigation-safe QA and bounded feed recovery |
+| Unit tests | 44 passed | `npm test`; rules, parsing, extraction, engine regressions |
+| Browser tests | 23 passed | `npm run test:e2e`; native fetch/XHR contracts, grid restoration, TikTok preview exclusion and Following/video-route coverage, actual built scripts on controlled fixtures, popup/settings, concurrent storage writes, navigation-safe QA and bounded feed recovery; Undo reload/new-tab/Strict/Reset on five adapter routes, concurrent RAM writes and actual browser restart |
 | Grid restoration regression | Pass | [Before/after evidence](grid-filtering.md); cards return after lowering the minimum or disabling optional grid filtering; host-hidden cards are preserved |
 | Network observer regression | Pass | [Before/after evidence](network-observer.md); reused XHR no longer loses/duplicates responses; relative feed requests reach the built TikTok adapter |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage permission, three host permissions, localized strings, entry files, icon bytes and image dimensions |
 | Dependencies | Pass | `npm audit` reported 0 vulnerabilities; this version changes no dependency versions |
-| UI | Pass for the checked flows | [Screenshot audit](ui-audit.md) captured on 0.3.1; UI unchanged in 0.3.4. EN/KO, popup 1x/2x, narrow settings, keyboard editing |
+| UI | Pass for the checked flows | [Screenshot audit](ui-audit.md), plus fresh 0.3.5 EN/KO captures: popup 320×356 at 1x/2x, narrow settings without overflow, updated privacy footer; page errors empty |
 | YouTube default rule | Pass in one 0.3.2 live run | 17 Shorts in 90 seconds; four below 5,000 likes (703, 244, 2,668, 818), all skipped with reason chips; no page errors |
-| YouTube Undo | Pass in one 0.3.1 live run | A 523-like Short was skipped, then restored by the chip; stayed for four seconds; stored skip count was 1. Undo is unchanged and covered by 0.3.2 browser tests |
+| YouTube Undo and reload | Pass in one exact-0.3.5-ZIP live run | [Session regression](session-undo.md): 807-like Short skipped at 5,000, Undo restored it, fresh reload kept it for eight seconds, count stayed 1, empty creator allowlist and no page errors |
 | TikTok default rule, signed out | Limited pass on 0.3.2 | Six sampled items, three reason chips, one unambiguous automatic transition from the 1,790-like video. The sampler missed some short-lived items; a login overlay limited the run |
 | TikTok custom comments/views, Undo and kept creator | Pass for recorded 0.3.2 signed-out paths | [Live boundary checks](live-smoke.md); 686 comments and 3.6M views, equal minimum stays, below minimum skips, Undo restores, kept creator survives fresh page. Active-player code unchanged in 0.3.3 |
 | TikTok runtime error | Reproduced without extension | `a.init is not a function` at the same TikTok login-bundle location in a fresh 90-second no-extension control. It does not require the extension to occur; the site overlay still limits signed-out QA |
@@ -22,20 +22,20 @@ Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. The 0.3.4 packag
 | TikTok signed-in For You | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): 2,639-like default skip, Undo, creator, identified Strict skip and low-like ads kept; actual Aside Chromium 153 |
 | TikTok preview exclusion and video-page skip/Undo | Pass for recorded 0.3.4 paths | [Preview regression and live check](tiktok-previews.md): actual Following recommendation preview has no current creator and no skips; 2,660-like video skips at default, Undo restores the same video |
 | TikTok signed-in Following feed | Not established live | The existing account showed creator recommendations instead of a video feed. Positive feed paths are covered by built-script fixtures; no account engagement was used to create a feed |
-| 24-hour YouTube default-rule QA | Running, not passed | [Long feed QA](soak.md); new exact 0.3.4 ZIP/fresh profile, full duration unchanged. The earlier 0.3.3 attempt ended after 3h7m because its runner treated refresh as fatal; partial evidence retained. Navigation recovery now passes real browser and two-minute YouTube checks. Does not replace ordinary human day-use |
+| 24-hour YouTube default-rule QA | Exact 0.3.5 result pending | [Long feed QA](soak.md); historical 0.3.4 worker was stopped as superseded after about 2h1m, with explicit interrupted-report annotations. Its midnight rollover was observed. The exact 0.3.5 successor started October 8 at 00:11 KST and ends October 9 at 00:11 KST. No 24-hour pass or ordinary day-use claimed |
 | Chrome Web Store | Not submitted | [Listing and submission checklist](../store/submission-checklist.md) prepared |
 
 ## Artifact
 
-`scrollplus-0.3.4-chrome.zip`, 123,102 bytes.
+`scrollplus-0.3.5-chrome.zip`, 125,829 bytes.
 
-SHA-256: `f214c62f29c87788d935d5d935472c2fa3577a4fac10a954b31cd17c62f28626`.
+SHA-256: `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`.
 
 This identifies the local tested package. A separately built CI artifact can differ in ZIP metadata; do not substitute its checksum without checking it.
 
 ## Remaining release gates
 
-1. Review the final result of the running [24-hour YouTube check](soak.md), including errors, counters and continued movement. Duration alone is not a pass.
+1. Run and review the exact 0.3.5 [24-hour YouTube check](soak.md), including errors, counters and continued movement. The older version cannot establish stability for changed runtime scripts. Duration alone is not a pass.
 2. Check a genuine signed-in Following video feed when available; the recommendation-card check does not establish automatic skipping on that feed.
 3. Install this ZIP in a clean Chrome profile and use it on an ordinary feed for a day. Short signed-in runs in Aside establish working paths, not long-term reliability or signed-in Google Chrome compatibility with every experiment the sites run.
 4. After these checks, update this report and the listing's experimental-support wording. Store submission remains an owner decision.

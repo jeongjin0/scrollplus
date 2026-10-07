@@ -1,4 +1,4 @@
-import { COVERAGE, DEFAULT_SETTINGS, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
+import { COVERAGE, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
 import type { IconName } from "../lib/icons";
 import { t } from "../lib/i18n";
 import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile, Wordmark } from "./kit";
@@ -7,7 +7,7 @@ import { SITES, useFilterState } from "./state";
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
 
 export function OptionsApp() {
-  const { settings, ready, skips, update } = useFilterState();
+  const { settings, ready, skips, update, reset, resetting, resetFailed } = useFilterState();
   const preset = activePreset(settings.rule);
   const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
 
@@ -113,12 +113,13 @@ export function OptionsApp() {
 
         <footer className="end">
           <div className="end-row">
-            <button type="button" className="link" onClick={() => update((current) => ({ ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: current.allowlist }))}>
+            <button type="button" className="link" disabled={resetting} onClick={() => { void reset(); }}>
               <Icon name="reset" size={14} />
               {t("reset")}
             </button>
             <StarLink href={REPO_URL} />
           </div>
+          {resetFailed ? <p className="lead" role="alert">{t("resetFailed")}</p> : null}
           <p className="privacy">{t("privacy")}</p>
         </footer>
       </div>
