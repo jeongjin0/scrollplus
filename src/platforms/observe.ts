@@ -8,22 +8,20 @@ export function observeJsonResponses(match: (url: string) => boolean, ingest: (d
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const promise = originalFetch(input, init);
     try {
-      const url = readUrl(input);
-      if (match(url)) {
-        promise.then((response) => {
-          try {
-            response.clone().json().then((data) => {
-              try {
-                ingest(data);
-              } catch {
-                /* ignore malformed payloads */
-              }
-            }).catch(() => {});
-          } catch {
-            /* ignore clone failures */
-          }
-        }).catch(() => {});
-      }
+      promise.then((response) => {
+        if (!match(response.url)) return;
+        try {
+          response.clone().json().then((data) => {
+            try {
+              ingest(data);
+            } catch {
+              /* ignore malformed payloads */
+            }
+          }).catch(() => {});
+        } catch {
+          /* ignore clone failures */
+        }
+      }).catch(() => {});
     } catch {
       /* never break the host request */
     }
@@ -31,31 +29,25 @@ export function observeJsonResponses(match: (url: string) => boolean, ingest: (d
   };
 
   const originalOpen = XMLHttpRequest.prototype.open;
-  const originalSend = XMLHttpRequest.prototype.send;
+  const observedRequests = new WeakSet<XMLHttpRequest>();
   XMLHttpRequest.prototype.open = function (method: string, url: string | URL, async?: boolean, username?: string | null, password?: string | null): void {
-    (this as XMLHttpRequest & { __scrollplusUrl?: string }).__scrollplusUrl = String(url);
-    originalOpen.call(this, method, url, async ?? true, username, password);
-  };
-  XMLHttpRequest.prototype.send = function (body?: Document | XMLHttpRequestBodyInit | null): void {
-    this.addEventListener("load", () => {
-      try {
-        const url = (this as XMLHttpRequest & { __scrollplusUrl?: string }).__scrollplusUrl || "";
-        if (!match(url)) return;
-        if (this.responseType === "json") {
-          ingest(this.response);
-          return;
+    if (!observedRequests.has(this)) {
+      observedRequests.add(this);
+      this.addEventListener("readystatechange", () => {
+        // Snapshot the completed response before a page's load handler can reuse the XHR.
+        if (this.readyState !== XMLHttpRequest.DONE || this.status === 0) return;
+        try {
+          if (!match(this.responseURL)) return;
+          if (this.responseType === "json") {
+            ingest(this.response);
+            return;
+          }
+          if (this.responseType === "" || this.responseType === "text") ingest(JSON.parse(this.responseText));
+        } catch {
+          /* ignore */
         }
-        if (this.responseType === "" || this.responseType === "text") ingest(JSON.parse(this.responseText));
-      } catch {
-        /* ignore */
-      }
-    });
-    originalSend.call(this, body);
+      });
+    }
+    Reflect.apply(originalOpen, this, arguments);
   };
-}
-
-function readUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") return input;
-  if (input instanceof URL) return input.href;
-  return input.url;
 }

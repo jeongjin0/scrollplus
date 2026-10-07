@@ -20,11 +20,12 @@ function fixture(platform: typeof platforms[number]) {
   <div id="xgwrapper-0-${platform.ids[0]}"><video muted></video><a href="/@${platform.creator}">Creator</a></div>
   <div id="navigation-button-down"><button data-e2e="feed-navigation-next" aria-label="Next video">Next</button></div>
   <div id="navigation-button-up"><button data-e2e="feed-navigation-prev" aria-label="Previous video">Previous</button></div>
-  <script type="application/json" id="__UNIVERSAL_DATA_FOR_REHYDRATION__">${JSON.stringify({ items })}</script>
+  ${platform.name === "tiktok" ? "" : `<script type="application/json" id="__UNIVERSAL_DATA_FOR_REHYDRATION__">${JSON.stringify({ items })}</script>`}
   <script>
     const platform = ${JSON.stringify(platform)};
     const items = ${JSON.stringify(items)};
     let index = 0;
+    if (platform.name === "tiktok") fetch("/api/item_list").then(response => response.json()).then(data => { window.fixtureResponse = data; });
     window.fixtureMoves = 0;
     function show(next) {
       index = Math.max(0, Math.min(next, 1));
@@ -55,6 +56,10 @@ for (const platform of platforms) {
         await chrome.storage.local.set({ settings: { ...data.settings, enabled: false } });
       });
       await context.route(`https://www.${platform.name === "youtube" ? "youtube.com" : platform.name === "tiktok" ? "tiktok.com" : "instagram.com"}/**`, async (route) => {
+        if (platform.name === "tiktok" && new URL(route.request().url()).pathname === "/api/item_list") {
+          await route.fulfill({ contentType: "application/json", body: JSON.stringify({ items: platform.ids.map((id, index) => ({ id, author: { uniqueId: platform.creator }, stats: { diggCount: index ? 8000 : 10, playCount: 100000, commentCount: 100 } })) }) });
+          return;
+        }
         await route.fulfill({ contentType: "text/html", body: fixture(platform) });
       });
       const app = await open(context, id, "options.html");

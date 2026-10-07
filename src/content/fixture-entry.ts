@@ -1,6 +1,7 @@
 import { createEngine, type EngineItem } from "./engine";
 import { mountChip } from "./chip";
 import { DEFAULT_SETTINGS, presetRule, type Metrics, type Settings } from "../lib/score";
+import { observeJsonResponses } from "../platforms/observe";
 
 let settings: Settings = {
   ...DEFAULT_SETTINGS,
@@ -61,6 +62,7 @@ function show(partial: Partial<EngineItem> & { id: string; metrics: Metrics | nu
 
 declare global {
   interface Window {
+    __scrollplusObserverQa: typeof observeJsonResponses;
     __scrollplus: {
       show: typeof show;
       setBlockedMenu: (open: boolean) => void;
@@ -78,3 +80,4 @@ window.__scrollplus = {
   settings,
 };
 
+window.__scrollplusObserverQa = observeJsonResponses;

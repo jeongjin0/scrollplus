@@ -32,7 +32,7 @@ YouTube Shorts and logged-out TikTok have been checked on real feeds with the de
 
 ## Install
 
-It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.1 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.1): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.2 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.2): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
 To build it yourself:
 
