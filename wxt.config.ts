@@ -9,7 +9,8 @@ export default defineConfig({
     short_name: '__MSG_appName__',
     description: '__MSG_extDesc__',
     default_locale: 'en',
-    version: "0.3.0",
+    version: "0.3.1",
+    minimum_chrome_version: "120",
     permissions: ['storage'],
     host_permissions: [
       'https://www.youtube.com/*',

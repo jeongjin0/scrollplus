@@ -5,9 +5,9 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const build = path.join(root, ".output/chrome-mv3");
-const work = path.join(root, "qa/tmp/store");
-fs.rmSync(work, { recursive: true, force: true });
-fs.mkdirSync(work, { recursive: true });
+const workBase = path.join(root, "qa/tmp");
+fs.mkdirSync(workBase, { recursive: true });
+const work = fs.mkdtempSync(path.join(workBase, "store-"));
 
 const NAME = 'Scroll<span style="color:#FF4D2E">Plus</span>';
 const MARK = '<svg viewBox="0 0 24 24" width="SIZE" height="SIZE"><rect width="24" height="24" rx="6.5" fill="#FF4D2E"/><path d="M7 18.2V8.6A1.6 1.6 0 0 1 8.6 7h6.8A1.6 1.6 0 0 1 17 8.6v9.6" fill="none" stroke="#10110F" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="1.6" fill="#10110F"/></svg>';
@@ -16,18 +16,18 @@ const MARK = '<svg viewBox="0 0 24 24" width="SIZE" height="SIZE"><rect width="2
 const LANGS = {
   en: {
     ui: "en", locale: "en-US", dropKo: true,
-    shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"),
-    popup: ["Weak videos <em>skip themselves.</em>", "Set a like count once. It moves on for you."],
+    shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
+    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Adjust your like count anytime."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
     chip: ["Skipped. <em>Undo</em> in one tap.", "Every skip tells you why, and you can take it back."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>under your like count.</em>",
   },
   ko: {
     ui: "ko", locale: "ko-KR", dropKo: false,
-    shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"),
-    popup: ["약한 영상은 <em>알아서 넘어가요.</em>", "좋아요 기준을 한 번만 정하세요. 나머지는 알아서 넘겨 줘요."],
+    shots: path.join(root, "store/screenshots/ko"), tileFile: path.join(root, "store/tile-ko.png"), marqueeFile: path.join(root, "store/marquee-ko.png"),
+    popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 좋아요 기준은 언제든 바꿀 수 있어요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
-    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘길 때마다 이유가 보이고, 언제든 되돌릴 수 있어요."],
+    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘기는 이유가 보여요. 몇 초 동안 되돌릴 수 있어요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
   },
 };
@@ -44,9 +44,18 @@ async function capture(lang, cfg, dirOut) {
     viewport: { width: 760, height: 1100 },
     args: ["--disable-extensions-except=" + extension, "--load-extension=" + extension, "--no-first-run"],
   });
-  await context.addInitScript((ui) => {
-    try { chrome.i18n.getUILanguage = () => ui; } catch { /* page without chrome */ }
-  }, cfg.ui);
+  const messages = JSON.parse(fs.readFileSync(path.join(root, "public/_locales", lang, "messages.json"), "utf8"));
+  await context.addInitScript(({ ui, messages }) => {
+    if (!globalThis.chrome?.i18n) return;
+    chrome.i18n.getUILanguage = () => ui;
+    chrome.i18n.getMessage = (key, values = []) => {
+      const entry = messages[key];
+      if (!entry) return "";
+      let text = entry.message;
+      for (const [name, holder] of Object.entries(entry.placeholders || {})) text = text.split(`$${name.toUpperCase()}$`).join(values[Number(holder.content.slice(1)) - 1] || "");
+      return text;
+    };
+  }, { ui: cfg.ui, messages });
   const worker = context.serviceWorkers()[0] || await context.waitForEvent("serviceworker");
   const id = new URL(worker.url()).host;
   const popup = await context.newPage();
@@ -161,6 +170,10 @@ async function render(lang, cfg) {
   await tile.setViewportSize({ width: 440, height: 280 });
   await tile.setContent('<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0}html,body{width:440px;height:280px;background:radial-gradient(260px 200px at 90% 0%,rgba(255,77,46,.22),transparent 70%),#10110F;color:#F4F1EA;font-family:ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;-webkit-font-smoothing:antialiased}.t{position:absolute;left:32px;right:32px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:16px}h2{font-size:46px;line-height:1.02;font-weight:700;letter-spacing:-.035em}p{font-size:17px;line-height:1.35;color:#A8A396;max-width:340px;text-wrap:balance;word-break:keep-all}p em{font-style:normal;color:#FF4D2E}</style><div class="t">' + MARK.replaceAll("SIZE", "48") + "<h2>" + NAME + "</h2><p>" + cfg.tile + "</p></div>");
   await tile.screenshot({ path: cfg.tileFile });
+  const marquee = await context.newPage();
+  await marquee.setViewportSize({ width: 1400, height: 560 });
+  await marquee.setContent(page(copy(cfg.popup) + '<div class="shot" style="left:1000px;top:100px"><img src="' + uri(path.join(dirOut, "popup.png")) + '" width="320"></div>', ".stage{width:1400px;height:560px}.copy{left:80px;width:700px}h1{font-size:62px;max-width:700px}p{max-width:650px;font-size:23px}"));
+  await marquee.screenshot({ path: cfg.marqueeFile });
   await browser.close();
 }
 

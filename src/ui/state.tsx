@@ -24,6 +24,15 @@ export function useFilterState() {
 
   useEffect(() => {
     let alive = true;
+    let midnight: number;
+    const refreshCount = () => { void readSkipCount().then((count) => { if (alive) setSkips(count); }); };
+    const armMidnight = () => {
+      const next = new Date();
+      next.setHours(24, 0, 0, 0);
+      midnight = window.setTimeout(() => { refreshCount(); armMidnight(); }, next.getTime() - Date.now() + 10);
+    };
+    armMidnight();
+    document.addEventListener("visibilitychange", refreshCount);
     void chrome.storage.local.get(STORAGE_SETTINGS).then((data) => {
       if (!alive) return;
       latest.current = normalizeSettings(data[STORAGE_SETTINGS]);
@@ -39,7 +48,7 @@ export function useFilterState() {
         latest.current = normalizeSettings(changes[STORAGE_SETTINGS].newValue);
         setSettings(latest.current);
       }
-      if (changes[STORAGE_DAILY]) void readSkipCount().then(setSkips);
+      if (changes[STORAGE_DAILY]) refreshCount();
     };
     chrome.storage.onChanged.addListener(listener);
     void askActive().then((next) => {
@@ -47,6 +56,8 @@ export function useFilterState() {
     });
     return () => {
       alive = false;
+      window.clearTimeout(midnight);
+      document.removeEventListener("visibilitychange", refreshCount);
       chrome.storage.onChanged.removeListener(listener);
     };
   }, []);
@@ -60,8 +71,9 @@ export function useFilterState() {
 
   const allowCurrent = useCallback(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab?.id == null) return;
-    await chrome.tabs.sendMessage(tab.id, { type: "scrollplus:allow" });
+    if (tab?.id == null) throw new Error("No active tab");
+    const response = await chrome.tabs.sendMessage(tab.id, { type: "scrollplus:allow" });
+    if (response?.ok !== true) throw new Error("Creator unavailable");
   }, []);
 
   return { settings, ready, skips, active, update, allowCurrent };
@@ -78,4 +90,3 @@ async function askActive(): Promise<ActiveState | null> {
     return null;
   }
 }
-

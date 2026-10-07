@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: shipped as 0.3.0. Decisions below are locked.
+Status: 0.3.1 release preparation. Signed-in Instagram and TikTok QA remains pending. Decisions below are locked.
 
 ## Product
 
@@ -31,7 +31,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.0
+- Version: 0.3.1
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -105,6 +105,8 @@ On install, write these defaults and apply them immediately. The extension must 
 
 Settings from 0.1.x that hold a sensitivity map to the matching preset. Anything unreadable falls back to the defaults.
 
+Rule and power changes re-evaluate the current video immediately. Undo still keeps its video for the session. A deliberate Continue or Lower action renews the decision window after a long pause; known counts that arrived on time remain usable after writing a comment.
+
 There is a master switch. Default is on. Turning it off pauses every platform without deleting settings.
 
 ## Skip behavior
@@ -120,7 +122,7 @@ This applies to the active vertical player only.
 - If the next control does not exist, stop and leave the current video. Do not loop.
 - The extension's only host-page UI is the chip. No banner, no sidebar, and no restyling of YouTube, TikTok, or Instagram.
 
-When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way. Undo moves back one item and keeps that id for the browser session. Undo does not write the creator allowlist.
+When a skip happens and showSkipChip is on, the chip says why, with the count that missed: "Skipped · 454 likes" / "넘김 · 좋아요 454", plus "Undo" / "되돌리기", for 2.5 seconds. Comments and views read the same way. Undo moves back one item and keeps the skipped id for the browser session, even when the engine already sees the next video. Undo does not write the creator allowlist. Repeated polling never replaces a focused chip button.
 
 A session keep-set is memory only. Do not persist video ids.
 
@@ -165,6 +167,8 @@ Options, top to bottom:
 
 Changes apply immediately. There is no save button. The toolbar icon has no number badge.
 
+Escape cancels a numeric edit. An invalid number is not saved and gets an inline error. At narrow widths, a rule's number field moves below its label and switch. Saved creators already show as kept when the popup reopens.
+
 The GitHub button shows a star icon and the word GitHub, with the tooltip "Star this project on GitHub" / "GitHub에서 별표 남기기". The interface never says "Star us". It opens the public repo in a new tab and appears in the popup and the options page. It is never injected into a host site.
 
 ## Visual system
@@ -199,6 +203,8 @@ Permissions:
 No all-urls permission, and no tabs, cookies, webRequest, history, or identity permission.
 
 Persist only settings and a daily skip count in chrome.storage.local. Reset the count at local midnight. Do not persist watch history or video ids.
+
+The background worker serializes counter writes across tabs. An open options page refreshes its counter at local midnight.
 
 Read metrics the page has already loaded. Do not call private APIs yourself.
 

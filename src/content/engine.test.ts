@@ -193,6 +193,74 @@ describe("engine", () => {
     expect(box.advances).toEqual(["a"]);
   });
 
+  it("undo keeps the skipped id when the page already shows the next video", async () => {
+    const box = harness({}, true, (show) => show(low("next")));
+    box.show(low("skipped"));
+    await box.drain();
+    box.engine.undo();
+    await box.drain();
+    box.show(low("skipped"));
+    await box.drain();
+    expect(box.advances).toEqual(["skipped"]);
+    box.flush(450);
+    box.show(low("next"));
+    await box.drain();
+    expect(box.advances).toEqual(["skipped", "next"]);
+  });
+
+  it("applies changed settings to a video previously kept while paused", async () => {
+    const box = harness({ enabled: false });
+    box.show(low("a"));
+    await box.drain();
+    box.flush(10000);
+    box.settings.enabled = true;
+    box.engine.settingsChanged();
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("keep going works after the six-skip chip has waited for a decision", async () => {
+    const box = harness();
+    for (let index = 1; index <= 6; index += 1) {
+      box.show(low("v" + index));
+      await box.drain();
+      box.flush(450);
+    }
+    box.show(low("v7"));
+    box.flush(10000);
+    box.engine.keepGoing();
+    await box.drain();
+    expect(box.advances).toHaveLength(7);
+  });
+
+  it("lowering the bar works after a long pause", async () => {
+    const box = harness();
+    for (let index = 1; index <= 6; index += 1) {
+      box.show(low("v" + index));
+      await box.drain();
+      box.flush(450);
+    }
+    box.show({ ...low("v7"), metrics: { ...low("v7").metrics!, likes: 3000 } });
+    box.flush(10000);
+    box.engine.lower();
+    await box.drain();
+    expect(box.settings.rule.likes.min).toBe(2000);
+    expect(box.advances).toHaveLength(6);
+    expect(box.chips.at(-1)).toBe("none");
+  });
+
+  it("keeps timely metrics usable while a comment is being written", async () => {
+    const box = harness();
+    box.flush(10000);
+    box.setBlocked(true);
+    box.show(low("a"));
+    box.flush(10000);
+    box.setBlocked(false);
+    box.engine.poke();
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
   it("does not advance while blocked, then skips when free", async () => {
     const box = harness();
     box.setBlocked(true);

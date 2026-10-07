@@ -42,6 +42,7 @@ export function OptionsApp() {
               return (
                 <Row
                   key={metric}
+                  className="condition"
                   icon={METRIC_ICON[metric]}
                   on={condition.on}
                   label={t(metric)}
@@ -101,7 +102,7 @@ export function OptionsApp() {
                 <div className="row" key={entry.platform + entry.id}>
                   <Tile name={SITES[entry.platform].icon} />
                   <span className="row-title">{entry.id}</span>
-                  <button type="button" className="icon-button" aria-label={t("remove")} title={t("remove")} onClick={() => update((current) => ({ ...current, allowlist: current.allowlist.filter((item) => item.platform !== entry.platform || item.id !== entry.id) }))}>
+                  <button type="button" className="icon-button" aria-label={t("remove") + " · " + entry.id} title={t("remove")} onClick={() => update((current) => ({ ...current, allowlist: current.allowlist.filter((item) => item.platform !== entry.platform || item.id !== entry.id) }))}>
                     <Icon name="trash" size={15} />
                   </button>
                 </div>

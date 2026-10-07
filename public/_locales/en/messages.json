@@ -164,6 +164,15 @@
   "starTitle": {
     "message": "Star this project on GitHub"
   },
+  "keepError": {
+    "message": "Couldn't keep this creator. Try again."
+  },
+  "invalidNumber": {
+    "message": "Enter a positive number, e.g. 5k."
+  },
+  "numberLocale": {
+    "message": "en"
+  },
   "appName": {
     "message": "ScrollPlus"
   }

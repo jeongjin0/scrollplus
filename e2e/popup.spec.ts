@@ -1,36 +1,9 @@
-import { chromium, expect, test, type BrowserContext, type Page } from "@playwright/test";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
+import { expect, test } from "@playwright/test";
+import { launch, open, stored } from "./extension";
 
-async function launch() {
-  const extension = path.resolve(".output/chrome-mv3");
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "scrollplus-ext-"));
-  const context = await chromium.launchPersistentContext(dir, {
-    headless: false,
-    args: ["--disable-extensions-except=" + extension, "--load-extension=" + extension],
-  });
-  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker");
-  return { context, id: new URL(worker.url()).host };
-}
-
-async function open(context: BrowserContext, id: string, file: string, scale = 1) {
-  const page = await context.newPage();
-  await page.goto("chrome-extension://" + id + "/" + file);
-  if (file === "popup.html") {
-    const client = await context.newCDPSession(page);
-    await client.send("Emulation.setDeviceMetricsOverride", { width: 320, height: 420, deviceScaleFactor: scale, mobile: false });
-  }
-  await page.waitForSelector(".ready");
-  return page;
-}
-
-async function stored(page: Page) {
-  return page.evaluate(async () => (await chrome.storage.local.get("settings")).settings);
-}
-
-test("popup fits without scrolling at 1x and 2x, even with the optional rows", async () => {
-  const { context, id } = await launch();
+for (const language of ["en", "ko"] as const) {
+test(`popup fits in ${language} at 1x and 2x, even with the optional rows`, async () => {
+  const { context, id } = await launch(language);
   try {
     for (const scale of [1, 2]) {
       const page = await open(context, id, "popup.html", scale);
@@ -42,11 +15,11 @@ test("popup fits without scrolling at 1x and 2x, even with the optional rows", a
         const body = popup.querySelector(".body");
         const extra = document.createElement("button");
         extra.className = "action";
-        extra.textContent = "Keep this creator";
+        extra.textContent = chrome.i18n.getMessage("keepCreator");
         body?.append(extra);
         const note = document.createElement("p");
         note.className = "note";
-        note.textContent = "Instagram is signed out. Nothing is hidden.";
+        note.textContent = chrome.i18n.getMessage("signedOut");
         body?.append(note);
         return {
           plain,
@@ -68,6 +41,7 @@ test("popup fits without scrolling at 1x and 2x, even with the optional rows", a
     await context.close();
   }
 });
+}
 
 test("a fresh install already skips under 5K likes, and the popup changes the rule", async () => {
   const { context, id } = await launch();
@@ -91,6 +65,30 @@ test("a fresh install already skips under 5K likes, and the popup changes the ru
   }
 });
 
+test("Escape cancels a number edit and invalid input leaves the previous value", async () => {
+  const { context, id } = await launch("en");
+  try {
+    const page = await open(context, id, "options.html");
+    const likes = page.getByRole("textbox", { name: "Minimum Likes", exact: true });
+    await likes.click();
+    await likes.fill("1234");
+    await likes.press("Escape");
+    await expect(likes).toHaveValue("5K");
+    expect((await stored(page)).rule.likes.min).toBe(5000);
+    await likes.click();
+    await likes.fill("abc");
+    await likes.press("Enter");
+    await expect(likes).toHaveAttribute("aria-invalid", "true");
+    expect((await stored(page)).rule.likes.min).toBe(5000);
+    await likes.fill("7k");
+    await likes.press("Enter");
+    await expect.poll(async () => (await stored(page)).rule.likes.min).toBe(7000);
+    await expect(likes).not.toHaveAttribute("aria-invalid", "true");
+  } finally {
+    await context.close();
+  }
+});
+
 test("settings accept typed numbers and mark the popup as custom", async () => {
   const { context, id } = await launch();
   try {
@@ -99,7 +97,7 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
     await expect(options.locator("body")).toContainText(/Nothing is collected or sent|수집하거나 전송하지 않습니다/);
     await expect(options.locator("a.star")).toHaveAttribute("href", "https://github.com/jeongjin0/scrollplus");
 
-    const likes = options.getByLabel(/Minimum Likes|좋아요 최소 개수/);
+    const likes = options.getByRole("textbox", { name: /Minimum Likes|좋아요 최소 개수/ });
     await likes.click();
     await likes.fill("2만");
     await likes.press("Enter");

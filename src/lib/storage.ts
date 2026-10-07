@@ -13,14 +13,20 @@ export async function readSkipCount(): Promise<number> {
   const data = await chrome.storage.local.get(STORAGE_DAILY);
   const daily = data[STORAGE_DAILY] as DailySkips | undefined;
   if (!daily || daily.day !== localDay()) return 0;
-  return daily.count;
+  return Number.isSafeInteger(daily.count) && daily.count >= 0 ? daily.count : 0;
 }
 
 export async function incrementSkips(): Promise<void> {
+  await chrome.runtime.sendMessage({ type: "scrollplus:skipped" });
+}
+
+// Only the background worker writes the count, so simultaneous tabs cannot lose an increment.
+export async function recordSkip(): Promise<void> {
   const today = localDay();
   const data = await chrome.storage.local.get(STORAGE_DAILY);
   const daily = data[STORAGE_DAILY] as DailySkips | undefined;
-  const count = daily && daily.day === today ? daily.count + 1 : 1;
+  const previous = daily && daily.day === today && Number.isSafeInteger(daily.count) && daily.count >= 0 ? daily.count : 0;
+  const count = previous + 1;
   await chrome.storage.local.set({ [STORAGE_DAILY]: { day: today, count } satisfies DailySkips });
 }
 

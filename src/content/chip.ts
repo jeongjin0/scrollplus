@@ -48,6 +48,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   let host: HTMLDivElement | null = null;
   let root: HTMLDivElement | null = null;
   let leaveTimer: number | null = null;
+  let previousModel = "null";
 
   function ensure(): void {
     if (host && root) return;
@@ -77,6 +78,10 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
     },
     update(model: ChipModel | null): void {
       if (!document.documentElement) return;
+      const key = JSON.stringify(model);
+      // Repeated feed polling must not replace the focused pause/Undo button.
+      if (key === previousModel) return;
+      previousModel = key;
       ensure();
       if (!root) return;
       clearLeave();

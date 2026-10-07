@@ -2,6 +2,8 @@ export const LADDER = [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20
 
 export function uiLanguage(): string {
   try {
+    const localized = globalThis.chrome?.i18n?.getMessage?.("numberLocale");
+    if (localized === "en" || localized === "ko") return localized;
     const lang = globalThis.chrome?.i18n?.getUILanguage?.();
     if (lang) return lang;
   } catch {
@@ -37,4 +39,3 @@ export function stepValue(value: number, direction: 1 | -1): number {
   }
   return Math.min(value, LADDER[0]);
 }
-

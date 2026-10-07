@@ -22,6 +22,15 @@ describe("extractors", () => {
     expect(items[0]).toMatchObject({ id: "99", creatorId: "creator", metrics: { views: 5000, likes: 100, comments: 2, shares: 1, saves: 3 } });
   });
 
+  it("retains zero views and does not discard an independently known like count", () => {
+    expect(extractYouTube({ videoDetails: { videoId: "zero", viewCount: "0" }, likeCount: 1 })?.metrics).toMatchObject({ views: 0, likes: 1 });
+  });
+
+  it("marks TikTok and Instagram ads so the rule always keeps them", () => {
+    expect(extractTikTok({ item: { id: "ad", isAd: true, stats: { diggCount: 0, playCount: 100 } } })[0]?.kind).toBe("ad");
+    expect(extractInstagram({ media: { code: "ad", is_ad: true, like_count: 0 } })[0]?.kind).toBe("ad");
+  });
+
   it("reads instagram reel counts", () => {
     const items = extractInstagram({
       media: { code: "ABC", like_count: 10, comment_count: 1, play_count: 2500, user: { username: "Creator" } },

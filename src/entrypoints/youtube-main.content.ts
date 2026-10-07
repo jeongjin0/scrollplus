@@ -26,8 +26,9 @@ export default defineContentScript({
       publish(latest);
     });
     window.addEventListener("message", (event) => {
+      if (event.source !== window) return;
       const data = event.data as { source?: string; type?: string; key?: string } | null;
-      if (!data || data.source !== "scrollplus" || data.type !== "advance") return;
+      if (!data || data.source !== "scrollplus" || data.type !== "advance" || (data.key !== "ArrowUp" && data.key !== "ArrowDown")) return;
       const selector = data.key === "ArrowUp" ? "#navigation-button-up button" : "#navigation-button-down button";
       const button = document.querySelector(selector);
       if (button instanceof HTMLElement) button.click();
