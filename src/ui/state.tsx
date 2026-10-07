@@ -54,6 +54,11 @@ export function useCopy() {
     sampleFloor: message("sampleFloor", korean ? "최소 조회" : "Minimum plays"),
     cutoff: message("cutoff", korean ? "기본 기준 %" : "Balanced bar %"),
     conditions: message("conditions", korean ? "조건" : "Conditions"),
+    perThousand: (count: number) => message("perThousand", korean ? "1,000번에 약 " + count + "개" : "about " + count + " per 1,000", String(count)),
+    approxLead: message("approxLead", korean ? "좋아요로 치면, 재생 1,000번당" : "In likes, per 1,000 plays"),
+    approx: (youtube: number, tiktok: number, instagram: number) => korean
+      ? "유튜브 " + youtube + "개 · 틱톡 " + tiktok + "개 · 릴스 " + instagram + "개 아래"
+      : "YouTube " + youtube + " · TikTok " + tiktok + " · Reels " + instagram + " under",
     reactions: message("reactions", korean ? "반응" : "Reactions"),
     reactionNote: message("reactionNote", korean ? "고른 반응만 점수에 넣습니다. 페이지에 없는 수는 0으로 보지 않습니다." : "Only selected reactions count. A missing count is not treated as zero."),
     presetNote: message("presetNote", korean ? "느슨은 기본의 절반, 엄격은 두 배입니다. 아래 숫자는 기본 기준입니다." : "Lenient is half of Balanced. Strict is double. The numbers below are the Balanced bar."),

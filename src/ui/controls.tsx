@@ -1,7 +1,10 @@
 import type { Platform, Sensitivity, Signal, Signals } from "../lib/score";
+import { Icon, type IconName } from "./icons";
 
 const SENSITIVITIES: Sensitivity[] = ["lenient", "balanced", "strict"];
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
+const PLATFORM_ICON: Record<Platform, IconName> = { youtube: "youtube", tiktok: "tiktok", instagram: "reels" };
+const SIGNAL_ICON: Record<Signal, IconName> = { likes: "heart", comments: "comment", shares: "share", saves: "save" };
 export const SIGNALS: Array<{ id: Signal; weight: number }> = [
   { id: "likes", weight: 1 },
   { id: "comments", weight: 3 },
@@ -33,12 +36,23 @@ export function SensitivityControl(props: { value: Sensitivity; labels: Record<S
   );
 }
 
-export function SiteChips(props: { enabled: Record<Platform, boolean>; labels: Record<Platform, string>; onToggle: (platform: Platform) => void }) {
+export function Knob(props: { on: boolean }) {
+  return <span className={props.on ? "knob on" : "knob"} aria-hidden="true" />;
+}
+
+export function SiteRows(props: { enabled: Record<Platform, boolean>; labels: Record<Platform, string>; detail: Record<Platform, string>; onToggle: (platform: Platform) => void }) {
   return (
     <div className="sites" role="group">
       {PLATFORMS.map((platform) => (
-        <button key={platform} type="button" className={props.enabled[platform] ? "site on" : "site"} aria-pressed={props.enabled[platform]} onClick={() => props.onToggle(platform)}>
-          {props.labels[platform]}
+        <button key={platform} type="button" className={props.enabled[platform] ? "row-switch on" : "row-switch"} role="switch" aria-checked={props.enabled[platform]} onClick={() => props.onToggle(platform)}>
+          <span className="id">
+            <Icon name={PLATFORM_ICON[platform]} />
+            <span>
+              <strong>{props.labels[platform]}</strong>
+              <small>{props.detail[platform]}</small>
+            </span>
+          </span>
+          <Knob on={props.enabled[platform]} />
         </button>
       ))}
     </div>
@@ -50,6 +64,7 @@ export function SignalChips(props: { signals: Signals; labels: Record<Signal, st
     <div className="signals" role="group">
       {SIGNALS.map((signal) => (
         <button key={signal.id} type="button" className={props.signals[signal.id] ? "signal on" : "signal"} aria-pressed={props.signals[signal.id]} onClick={() => props.onToggle(signal.id)}>
+          <Icon name={SIGNAL_ICON[signal.id]} />
           {props.labels[signal.id]}
           <span>×{signal.weight}</span>
         </button>

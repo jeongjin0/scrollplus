@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS, DEFAULT_SIGNALS, cutoffFor, effectiveLimit, type Platform } from "../lib/score";
-import { Master, Mark, SensitivityControl, SignalChips } from "./controls";
+import { Knob, Mark, Master, SensitivityControl, SignalChips } from "./controls";
+import { Icon } from "./icons";
 import { formatPercent, useKeptState } from "./state";
 
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
@@ -29,15 +30,17 @@ export function OptionsApp() {
           {PLATFORMS.map((platform) => {
             const cutoff = cutoffFor(settings, platform);
             const custom = settings.advanced?.[platform] != null;
+            const likes = Math.max(1, Math.round(effectiveLimit(settings, platform) * 1000));
             return (
               <article className={settings.platforms[platform] ? "panel" : "panel off"} key={platform}>
                 <div className="row">
-                  <h3>{copy.platform[platform]}</h3>
-                  <button type="button" className={settings.platforms[platform] ? "mini on" : "mini"} aria-pressed={settings.platforms[platform]} onClick={() => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}>
-                    {settings.platforms[platform] ? copy.on : copy.off}
+                  <h3 className="id"><Icon name={platform === "instagram" ? "reels" : platform} />{copy.platform[platform]}</h3>
+                  <button type="button" className="switch" role="switch" aria-checked={settings.platforms[platform]} aria-label={copy.platform[platform]} onClick={() => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}>
+                    <Knob on={settings.platforms[platform]} />
                   </button>
                 </div>
                 <p className="rule">{copy.liveRule(formatCount(cutoff.sampleFloor), formatPercent(effectiveLimit(settings, platform)))}</p>
+                <p className="note">{copy.perThousand(likes)}</p>
                 <div className="fields">
                   <label>
                     {copy.sampleFloor}
@@ -63,8 +66,8 @@ export function OptionsApp() {
           />
         </section>
         <div className="choices">
-          <button type="button" className={settings.filterGrids ? "signal on" : "signal"} aria-pressed={settings.filterGrids} onClick={() => void patch({ filterGrids: !settings.filterGrids })}>{copy.filterGrids}</button>
-          <button type="button" className={settings.showSkipChip ? "signal on" : "signal"} aria-pressed={settings.showSkipChip} onClick={() => void patch({ showSkipChip: !settings.showSkipChip })}>{copy.showChip}</button>
+          <button type="button" className={settings.filterGrids ? "signal on" : "signal"} aria-pressed={settings.filterGrids} onClick={() => void patch({ filterGrids: !settings.filterGrids })}><Icon name="grid" />{copy.filterGrids}</button>
+          <button type="button" className={settings.showSkipChip ? "signal on" : "signal"} aria-pressed={settings.showSkipChip} onClick={() => void patch({ showSkipChip: !settings.showSkipChip })}><Icon name="chip" />{copy.showChip}</button>
         </div>
         {active?.creatorId ? <button className="text-button" onClick={() => void allowCurrent()}>{copy.keepCreator}</button> : null}
         {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{copy.signedOut}</p> : null}
@@ -79,7 +82,7 @@ export function OptionsApp() {
         </section>
         <button className="text-button" onClick={() => void patch({ ...DEFAULT_SETTINGS, signals: { ...DEFAULT_SIGNALS }, platforms: { ...DEFAULT_SETTINGS.platforms } })}>{copy.reset}</button>
         <p className="privacy">{copy.privacy}</p>
-        <a className="star" href={copy.repo} target="_blank" rel="noreferrer">{copy.star}</a>
+        <a className="star icon-link" href={copy.repo} target="_blank" rel="noreferrer"><Icon name="star" />{copy.star}</a>
       </div>
     </main>
   );

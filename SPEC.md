@@ -139,8 +139,8 @@ Popup contains only:
 - Wordmark: Kept
 - Master status, acting as the on/off switch
 - Segmented control: Lenient, Balanced, Strict. Korean: 느슨, 기본, 엄격
-- One row of three site chips: YouTube, TikTok, Reels. Changes apply immediately. No save button.
-- One line showing the live bar for each site that is on.
+- Three site rows, each with an original icon, the live approximate bar, and a switch. Changes apply immediately. No save button.
+- Directly under the preset control, one approximate line in likes per 1,000 plays for the selected preset.
 - A conditions link that opens the options page.
 - Today's skip count, for example "18 skipped today" / "오늘 18개 넘김"
 - "Keep this creator" when a supported video is active
