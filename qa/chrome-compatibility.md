@@ -23,6 +23,22 @@ The test launcher now selects an extension worker and polls for its storage API 
 
 An isolated, intentionally failed extension-page check verified that manually launched contexts retain frame snapshots and the actual error in a valid trace ZIP. This checks diagnostics, not product behavior. The current-browser release-ZIP control passed all 23 cases with the updated launcher and tracing enabled.
 
+### Traced cold-start timeout
+
+The [0.3.5 QA documentation main run](https://github.com/jeongjin0/scrollplus/actions/runs/37683435521/job/113005049134) passed 22 cases and timed out in the YouTube adapter case. Its retained trace shows persistent-browser launch taking 19,852ms of the 30-second test budget. Initial keeping, message rejection, creator lookup, default skip/reason/count, Undo and reload assertions passed. The timeout occurred during the 2.2-second new-tab retention observation. The cause of the slow launch, and the earlier untraced timeout, remain unestablished.
+
+Adapter cases now launch their isolated extension browser in a fixture with its own 30-second setup budget. Their functional test budget remains 30 seconds, with every assertion and retention observation unchanged. Startup can still fail within its own bound; no retry or optional test is added. Fixture cleanup closes the test-owned context. [Playwright documents separate fixture timeout budgets](https://playwright.dev/docs/test-fixtures#fixture-timeout).
+
+A controlled local probe inserted the same 20-second executable startup delay into a fresh current-browser launch with the immutable 0.3.5 extension. The original case timed out at 30 seconds; the fixture version completed every original action and assertion without retries. This verifies setup-budget isolation, not the cause of Chrome 120's slow launch.
+
+### Reset and transient Undo observation
+
+The first local full-suite run after the fixture change passed 22 cases and timed out waiting for Undo after Reset on the TikTok video route. The trace and frames show the 10-like reason/Undo chip after the actual reset click; it faded out before the test continued from the settings-page action. The chip's normal hold is 2.5 seconds. The reset action's traced API returned about 3.1 seconds after its browser click completed, so the following Undo lookup began after the affordance had expired. The underlying cause of that delay is unestablished.
+
+The reset action and its resulting skip/count/Undo checks now run together: the test still observes the second video and count 2 before clicking actual Undo, then verifies the first video was restored. Every assertion and retention observation stays in force. No product timer or retry changes, and the failed run/trace are retained as local evidence under `qa/tmp/startup-budget-035/`.
+
+A controlled current-browser probe added the same 3.5-second delay after the reset click to both flows. Sequential observation timed out waiting for the expired Undo; concurrent observation passed every original check without retries. The product timer and browser clock were unchanged.
+
 ### CI setup deadlines
 
 An observed [hosted branch job](https://github.com/jeongjin0/scrollplus/actions/runs/37665127912/job/112942286446) remained in system dependency installation for over 90 minutes before any browser tests ran. Its completed counterpart installed those dependencies in 100 seconds; the current-browser install, including its download, took about eight minutes. These observations do not establish the cause of the delayed job.

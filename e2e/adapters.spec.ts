@@ -1,5 +1,17 @@
-import { expect, test } from "@playwright/test";
+import { expect, test as base } from "@playwright/test";
 import { launch, open, stored } from "./extension";
+
+// Browser startup has a bounded fixture budget; adapter assertions keep the 30s test budget.
+const test = base.extend<{ extension: Awaited<ReturnType<typeof launch>> }>({
+  extension: [async ({}, use) => {
+    const extension = await launch();
+    try {
+      await use(extension);
+    } finally {
+      await extension.context.close();
+    }
+  }, { timeout: 30000 }],
+});
 
 // Routed pages exercise the shipped MAIN/isolated scripts and their bridge together.
 // They do not establish compatibility with a site's current signed-in DOM.
@@ -51,80 +63,81 @@ function fixture(platform: typeof platforms[number]) {
 }
 
 for (const platform of platforms) {
-  test(`${platform.name} ${new URL(platform.url).pathname}: built scripts apply settings, skip, undo, and keep a creator`, async () => {
-    const { context, worker, id } = await launch();
-    try {
-      await worker.evaluate(async () => {
-        const data = await chrome.storage.local.get("settings");
-        await chrome.storage.local.set({ settings: { ...data.settings, enabled: false } });
-      });
-      await context.route(`https://www.${platform.name === "youtube" ? "youtube.com" : platform.name === "tiktok" ? "tiktok.com" : "instagram.com"}/**`, async (route) => {
-        if (platform.name === "tiktok" && new URL(route.request().url()).pathname === "/api/item_list") {
-          await route.fulfill({ contentType: "application/json", body: JSON.stringify({ items: platform.ids.map((id, index) => ({ id, author: { uniqueId: platform.creator }, stats: { diggCount: index ? 8000 : 10, playCount: 100000, commentCount: 100 } })) }) });
-          return;
-        }
-        await route.fulfill({ contentType: "text/html", body: fixture(platform) });
-      });
-      const app = await open(context, id, "options.html");
-      const page = await context.newPage();
-      const errors: string[] = [];
-      page.on("pageerror", (error) => errors.push(error.message));
-      await page.goto(platform.url);
-      await page.waitForTimeout(2200);
-      expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      await page.evaluate(() => {
-        const frame = document.createElement("iframe");
-        document.body.append(frame);
-        window.dispatchEvent(new MessageEvent("message", { source: frame.contentWindow, data: { source: "scrollplus", type: "advance", key: "ArrowDown" } }));
-        window.postMessage({ source: "scrollplus", type: "advance", key: "Enter" }, "*");
-      });
-      await page.waitForTimeout(150);
-      expect(await page.evaluate(() => (window as any).fixtureMoves)).toBe(0);
-      const send = (type: string) => app.evaluate(async ({ url, type }) => {
-        const [tab] = await chrome.tabs.query({ url });
-        return chrome.tabs.sendMessage(tab.id!, { type });
-      }, { url: platform.url.split("/", 3).join("/") + "/*", type });
-      await expect.poll(async () => (await send("scrollplus:context")).creatorId).toBe(platform.creator);
-      await worker.evaluate(async () => {
-        const data = await chrome.storage.local.get("settings");
-        await chrome.storage.local.set({ settings: { ...data.settings, enabled: true } });
-      });
-      await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
-      await expect(page.locator("#scrollplus-chip-host")).toContainText(/10/);
-      await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(1);
-      await page.getByRole("button", { name: /Undo|되돌리기/ }).click();
-      await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      await page.waitForTimeout(2200);
-      expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      expect((await stored(app)).allowlist).toEqual([]);
-      await page.reload();
-      await page.waitForTimeout(2200);
-      expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      expect(await app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(1);
-      const revisit = await context.newPage();
-      await revisit.goto(platform.url);
-      await revisit.waitForTimeout(2200);
-      expect(await revisit.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      await revisit.close();
-      await app.getByRole("radio", { name: /Strict|엄격/ }).click();
-      await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(20000);
-      await page.waitForTimeout(600);
-      expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      await app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click();
-      await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
-      await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(2);
-      await page.getByRole("button", { name: /Undo|되돌리기/ }).click();
-      await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      expect(await send("scrollplus:allow")).toEqual({ ok: true });
-      await expect.poll(async () => (await stored(app)).allowlist).toEqual([{ platform: platform.name, id: platform.creator }]);
-      await app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click();
-      await expect.poll(async () => (await stored(app)).allowlist).toEqual([{ platform: platform.name, id: platform.creator }]);
-      await page.reload();
-      await page.waitForTimeout(2500);
-      expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-      expect(errors).toEqual([]);
-    } finally {
-      await context.close();
-    }
+  test(`${platform.name} ${new URL(platform.url).pathname}: built scripts apply settings, skip, undo, and keep a creator`, async ({ extension }) => {
+    const { context, worker, id } = extension;
+    await worker.evaluate(async () => {
+      const data = await chrome.storage.local.get("settings");
+      await chrome.storage.local.set({ settings: { ...data.settings, enabled: false } });
+    });
+    await context.route(`https://www.${platform.name === "youtube" ? "youtube.com" : platform.name === "tiktok" ? "tiktok.com" : "instagram.com"}/**`, async (route) => {
+      if (platform.name === "tiktok" && new URL(route.request().url()).pathname === "/api/item_list") {
+        await route.fulfill({ contentType: "application/json", body: JSON.stringify({ items: platform.ids.map((id, index) => ({ id, author: { uniqueId: platform.creator }, stats: { diggCount: index ? 8000 : 10, playCount: 100000, commentCount: 100 } })) }) });
+        return;
+      }
+      await route.fulfill({ contentType: "text/html", body: fixture(platform) });
+    });
+    const app = await open(context, id, "options.html");
+    const page = await context.newPage();
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(platform.url);
+    await page.waitForTimeout(2200);
+    expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    await page.evaluate(() => {
+      const frame = document.createElement("iframe");
+      document.body.append(frame);
+      window.dispatchEvent(new MessageEvent("message", { source: frame.contentWindow, data: { source: "scrollplus", type: "advance", key: "ArrowDown" } }));
+      window.postMessage({ source: "scrollplus", type: "advance", key: "Enter" }, "*");
+    });
+    await page.waitForTimeout(150);
+    expect(await page.evaluate(() => (window as any).fixtureMoves)).toBe(0);
+    const send = (type: string) => app.evaluate(async ({ url, type }) => {
+      const [tab] = await chrome.tabs.query({ url });
+      return chrome.tabs.sendMessage(tab.id!, { type });
+    }, { url: platform.url.split("/", 3).join("/") + "/*", type });
+    await expect.poll(async () => (await send("scrollplus:context")).creatorId).toBe(platform.creator);
+    await worker.evaluate(async () => {
+      const data = await chrome.storage.local.get("settings");
+      await chrome.storage.local.set({ settings: { ...data.settings, enabled: true } });
+    });
+    await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
+    await expect(page.locator("#scrollplus-chip-host")).toContainText(/10/);
+    await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(1);
+    await page.getByRole("button", { name: /Undo|되돌리기/ }).click();
+    await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    await page.waitForTimeout(2200);
+    expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    expect((await stored(app)).allowlist).toEqual([]);
+    await page.reload();
+    await page.waitForTimeout(2200);
+    expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    expect(await app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(1);
+    const revisit = await context.newPage();
+    await revisit.goto(platform.url);
+    await revisit.waitForTimeout(2200);
+    expect(await revisit.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    await revisit.close();
+    await app.getByRole("radio", { name: /Strict|엄격/ }).click();
+    await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(20000);
+    await page.waitForTimeout(600);
+    expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    // Observe the short-lived Undo while Reset is in flight, before action tracing returns.
+    await Promise.all([
+      app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click(),
+      (async () => {
+        await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
+        await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(2);
+        await page.getByRole("button", { name: /Undo|되돌리기/ }).click();
+      })(),
+    ]);
+    await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    expect(await send("scrollplus:allow")).toEqual({ ok: true });
+    await expect.poll(async () => (await stored(app)).allowlist).toEqual([{ platform: platform.name, id: platform.creator }]);
+    await app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click();
+    await expect.poll(async () => (await stored(app)).allowlist).toEqual([{ platform: platform.name, id: platform.creator }]);
+    await page.reload();
+    await page.waitForTimeout(2500);
+    expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
+    expect(errors).toEqual([]);
   });
 }
