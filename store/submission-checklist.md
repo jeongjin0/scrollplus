@@ -31,7 +31,7 @@ Nothing here has been submitted. This is what to have ready when the owner decid
 ## Privacy practices tab
 
 - Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels that have too few likes, using counts already on the page.
-- `storage` justification: keeps the user's settings (rule, site switches, creators to keep) and today's skip count on their device.
+- `storage` justification: saves the user's settings (rule, site switches, creators to keep) and today's skip count on their device. It also keeps the video IDs the user chooses to Undo only in memory for the current browser session, so those choices survive reloads and new tabs. Temporary Undo choices clear on browser restart, extension reload/update/disable, or Reset to defaults; they are not written to disk.
 - Host permission justification: on these three sites only, the extension reads the like, comment, and view counts the page has already loaded, and presses the page's own next-video control to skip a video. It does not call any site API of its own.
 - Remote code: none. All code ships in the package.
 - Data collected: none. The extension does not collect, transmit, or sell user data, so leave every data-collection box unchecked.
