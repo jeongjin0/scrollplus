@@ -1,7 +1,7 @@
-import { DEFAULT_SETTINGS, DEFAULT_SIGNALS, cutoffFor, effectiveLimit, type Platform } from "../lib/score";
-import { Knob, Mark, Master, SensitivityControl, SignalChips } from "./controls";
+import { DEFAULT_SETTINGS, ruleFor, type Platform } from "../lib/score";
+import { Knob, Mark, Master, SensitivityControl } from "./controls";
 import { Icon } from "./icons";
-import { formatPercent, useKeptState } from "./state";
+import { useKeptState } from "./state";
 
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
 
@@ -28,9 +28,8 @@ export function OptionsApp() {
         <section className="stack">
           <h2>{copy.conditions}</h2>
           {PLATFORMS.map((platform) => {
-            const cutoff = cutoffFor(settings, platform);
+            const rule = ruleFor(settings, platform);
             const custom = settings.advanced?.[platform] != null;
-            const likes = Math.max(1, Math.round(effectiveLimit(settings, platform) * 1000));
             return (
               <article className={settings.platforms[platform] ? "panel" : "panel off"} key={platform}>
                 <div className="row">
@@ -39,31 +38,21 @@ export function OptionsApp() {
                     <Knob on={settings.platforms[platform]} />
                   </button>
                 </div>
-                <p className="rule">{copy.liveRule(formatCount(cutoff.sampleFloor), formatPercent(effectiveLimit(settings, platform)))}</p>
-                <p className="note">{copy.perThousand(likes)}</p>
+                <p className="rule">{copy.liveRule(formatCount(rule.sampleFloor), formatCount(rule.minLikes))}</p>
                 <div className="fields">
                   <label>
                     {copy.sampleFloor}
-                    <input type="number" min={0} value={cutoff.sampleFloor} onChange={(event) => updateCutoff(platform, event.target.value, cutoff.balancedCutoff, "floor")} />
+                    <input type="number" min={0} step={1} value={rule.sampleFloor} onChange={(event) => updateRule(platform, event.target.value, "floor")} />
                   </label>
                   <label>
                     {copy.cutoff}
-                    <input type="number" min={0} step={0.1} value={Number((cutoff.balancedCutoff * 100).toFixed(2))} onChange={(event) => updateCutoff(platform, event.target.value, cutoff.sampleFloor, "bar")} />
+                    <input type="number" min={0} step={1} value={rule.minLikes} onChange={(event) => updateRule(platform, event.target.value, "likes")} />
                   </label>
                 </div>
                 {custom ? <button type="button" className="text-button" onClick={() => clearPlatform(platform)}>{copy.useDefault}</button> : null}
               </article>
             );
           })}
-        </section>
-        <section className="panel">
-          <h2>{copy.reactions}</h2>
-          <p className="note">{copy.reactionNote}</p>
-          <SignalChips
-            signals={settings.signals}
-            labels={copy.signal}
-            onToggle={(signal) => void patch({ signals: { ...settings.signals, [signal]: !settings.signals[signal] } })}
-          />
         </section>
         <div className="choices">
           <button type="button" className={settings.filterGrids ? "signal on" : "signal"} aria-pressed={settings.filterGrids} onClick={() => void patch({ filterGrids: !settings.filterGrids })}><Icon name="grid" />{copy.filterGrids}</button>
@@ -80,24 +69,23 @@ export function OptionsApp() {
             </div>
           ))}
         </section>
-        <button className="text-button" onClick={() => void patch({ ...DEFAULT_SETTINGS, signals: { ...DEFAULT_SIGNALS }, platforms: { ...DEFAULT_SETTINGS.platforms } })}>{copy.reset}</button>
+        <button className="text-button" onClick={() => void patch({ ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms } })}>{copy.reset}</button>
         <p className="privacy">{copy.privacy}</p>
         <a className="star icon-link" href={copy.repo} target="_blank" rel="noreferrer"><Icon name="star" />{copy.star}</a>
       </div>
     </main>
   );
 
-  function updateCutoff(platform: Platform, raw: string, other: number, field: "floor" | "bar") {
+  function updateRule(platform: Platform, raw: string, field: "floor" | "likes") {
     if (raw.trim() === "") return;
     const value = Number(raw);
     if (!Number.isFinite(value) || value < 0) return;
-    const current = cutoffFor(settings, platform);
-    const sampleFloor = field === "floor" ? value : current.sampleFloor;
-    const balancedCutoff = field === "bar" ? value / 100 : other;
+    const current = settings.advanced?.[platform] ?? {};
+    const next = field === "floor" ? { ...current, sampleFloor: value } : { ...current, minLikes: value };
     void patch({
       advanced: {
         ...(settings.advanced ?? {}),
-        [platform]: { sampleFloor, balancedCutoff },
+        [platform]: next,
       },
     });
   }

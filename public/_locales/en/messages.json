@@ -48,7 +48,7 @@
     "message": "Minimum plays"
   },
   "cutoff": {
-    "message": "Balanced bar %"
+    "message": "Like count"
   },
   "conditions": {
     "message": "Conditions"
@@ -60,10 +60,10 @@
     "message": "Only selected reactions count. A missing count is not treated as zero."
   },
   "presetNote": {
-    "message": "Lenient is half of Balanced. Strict is double. The numbers below are the Balanced bar."
+    "message": "Fewer plays than the minimum are left alone. If the like count is missing, the video stays."
   },
   "lead": {
-    "message": "It is already on. Change the conditions here."
+    "message": "It is already on. Set the like count here."
   },
   "useDefault": {
     "message": "Use the preset for this site"
@@ -76,10 +76,10 @@
   "signalShares": { "message": "Shares" },
   "signalSaves": { "message": "Saves" },
   "liveRule": {
-    "message": "Past $FLOOR$ plays, skip anything under $PERCENT$.",
+    "message": "Past $FLOOR$ plays, skip under $LIKES$ likes.",
     "placeholders": {
       "floor": { "content": "$1", "example": "2,000" },
-      "percent": { "content": "$2", "example": "0.8%" }
+      "likes": { "content": "$2", "example": "1,000" }
     }
   },
   "remove": {

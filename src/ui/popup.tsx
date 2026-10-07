@@ -1,17 +1,19 @@
 import type { Platform } from "../lib/score";
-import { effectiveLimit } from "../lib/score";
+import { ruleFor } from "../lib/score";
 import { Master, Mark, SensitivityControl, SiteRows } from "./controls";
 import { Icon } from "./icons";
-import { formatPercent, useKeptState } from "./state";
+import { useKeptState } from "./state";
 
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
 
 export function PopupApp() {
   const { settings, skips, active, copy, patch, allowCurrent } = useKeptState();
-  const perThousand = (platform: Platform) => Math.max(1, Math.round(effectiveLimit(settings, platform) * 1000));
+  const likesFor = (platform: Platform) => ruleFor(settings, platform).minLikes;
+  const counts = PLATFORMS.map(likesFor);
+  const same = new Set(counts).size === 1;
   const detail = Object.fromEntries(PLATFORMS.map((platform) => [
     platform,
-    settings.platforms[platform] ? copy.perThousand(perThousand(platform)) : copy.off,
+    settings.platforms[platform] ? copy.under(likesFor(platform)) : copy.off,
   ])) as Record<Platform, string>;
   return (
     <div className="popup">
@@ -27,7 +29,7 @@ export function PopupApp() {
       />
       <p className="hint">
         <span>{copy.approxLead}</span>
-        <b>{copy.approx(perThousand("youtube"), perThousand("tiktok"), perThousand("instagram"))}</b>
+        <b>{same ? copy.under(counts[0]) : copy.approx(counts[0], counts[1], counts[2])}</b>
       </p>
       <SiteRows
         enabled={settings.platforms}

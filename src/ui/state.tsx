@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { REPO_URL, STORAGE_DAILY, STORAGE_SETTINGS, cutoffFor, normalizeSettings, type Platform, type Settings, type Signal } from "../lib/score";
+import { REPO_URL, STORAGE_DAILY, STORAGE_SETTINGS, normalizeSettings, type Platform, type Settings } from "../lib/score";
 import { DEFAULT_SETTINGS } from "../lib/score";
 import { readSkipCount, saveSettings } from "../lib/storage";
 
@@ -16,6 +16,10 @@ function message(key: string, fallback: string, substitution?: string | string[]
   } catch {
     return fallback;
   }
+}
+
+function formatCount(value: number): string {
+  return Math.round(value).toLocaleString("en-US");
 }
 
 export function useCopy() {
@@ -36,12 +40,6 @@ export function useCopy() {
       tiktok: "TikTok",
       instagram: korean ? "인스타그램 릴스" : "Instagram Reels",
     } as Record<Platform, string>,
-    signal: {
-      likes: message("signalLikes", korean ? "좋아요" : "Likes"),
-      comments: message("signalComments", korean ? "댓글" : "Comments"),
-      shares: message("signalShares", korean ? "공유" : "Shares"),
-      saves: message("signalSaves", korean ? "저장" : "Saves"),
-    } as Record<Signal, string>,
     keepCreator: message("keepCreator", korean ? "이 제작자는 유지" : "Keep this creator"),
     star: message("star", korean ? "GitHub에 Star" : "Star on GitHub"),
     signedOut: message("signedOut", korean ? "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다." : "Instagram is signed out. Nothing is hidden."),
@@ -52,28 +50,21 @@ export function useCopy() {
     allowlist: message("allowlist", korean ? "유지할 제작자" : "Creators to keep"),
     allowEmpty: message("allowEmpty", korean ? "아직 없습니다." : "None yet."),
     sampleFloor: message("sampleFloor", korean ? "최소 조회" : "Minimum plays"),
-    cutoff: message("cutoff", korean ? "기본 기준 %" : "Balanced bar %"),
+    cutoff: message("cutoff", korean ? "좋아요 개수" : "Like count"),
     conditions: message("conditions", korean ? "조건" : "Conditions"),
-    perThousand: (count: number) => message("perThousand", korean ? "1,000번에 약 " + count + "개" : "about " + count + " per 1,000", String(count)),
-    approxLead: message("approxLead", korean ? "좋아요로 치면, 재생 1,000번당" : "In likes, per 1,000 plays"),
+    approxLead: message("approxLead", korean ? "좋아요가 이보다 적으면 넘깁니다" : "Skip when likes are under this"),
+    under: (count: number) => message("underCount", korean ? formatCount(count) + "개 미만" : "under " + formatCount(count), String(count)),
     approx: (youtube: number, tiktok: number, instagram: number) => korean
-      ? "유튜브 " + youtube + "개 · 틱톡 " + tiktok + "개 · 릴스 " + instagram + "개 아래"
-      : "YouTube " + youtube + " · TikTok " + tiktok + " · Reels " + instagram + " under",
-    reactions: message("reactions", korean ? "반응" : "Reactions"),
-    reactionNote: message("reactionNote", korean ? "고른 반응만 점수에 넣습니다. 페이지에 없는 수는 0으로 보지 않습니다." : "Only selected reactions count. A missing count is not treated as zero."),
-    presetNote: message("presetNote", korean ? "느슨은 기본의 절반, 엄격은 두 배입니다. 아래 숫자는 기본 기준입니다." : "Lenient is half of Balanced. Strict is double. The numbers below are the Balanced bar."),
-    lead: message("lead", korean ? "설치하면 기본으로 켜집니다. 조건은 여기서만 바꿉니다." : "It is already on. Change the conditions here."),
+      ? "유튜브 " + formatCount(youtube) + " · 틱톡 " + formatCount(tiktok) + " · 릴스 " + formatCount(instagram)
+      : "YouTube " + formatCount(youtube) + " · TikTok " + formatCount(tiktok) + " · Reels " + formatCount(instagram),
+    presetNote: message("presetNote", korean ? "조회가 최소보다 적으면 아직 넘기지 않습니다. 좋아요 수를 모르면 그대로 둡니다." : "Fewer plays than the minimum are left alone. If the like count is missing, the video stays."),
+    lead: message("lead", korean ? "설치하면 기본으로 켜집니다. 좋아요 개수는 여기서 바꿉니다." : "It is already on. Set the like count here."),
     useDefault: message("useDefault", korean ? "이 사이트는 기본값" : "Use the preset for this site"),
-    liveRule: (floor: string, percent: string) => message("liveRule", korean ? floor + "회가 넘고 " + percent + "보다 약하면 넘깁니다." : "Past " + floor + " plays, skip anything under " + percent + ".", [floor, percent]),
+    liveRule: (floor: string, likes: string) => message("liveRule", korean ? "조회 " + floor + "이 넘었는데 좋아요가 " + likes + "개 미만이면 넘깁니다." : "Past " + floor + " plays, skip under " + likes + " likes.", [floor, likes]),
     remove: message("remove", korean ? "제거" : "Remove"),
     skippedToday: (count: number) => message("skippedToday", korean ? "오늘 " + count + "개 넘김" : count + " skipped today", String(count)),
     repo: REPO_URL,
   };
-}
-
-export function formatPercent(value: number): string {
-  const percent = Math.round(value * 1000) / 10;
-  return (Number.isInteger(percent) ? percent.toFixed(0) : percent.toFixed(1)) + "%";
 }
 
 export function useKeptState() {
@@ -120,7 +111,7 @@ export function useKeptState() {
     await chrome.tabs.sendMessage(tab.id, { type: "kept:allow" });
   }
 
-  return { settings, skips, active, copy, patch, allowCurrent, cutoffFor };
+  return { settings, skips, active, copy, patch, allowCurrent };
 }
 
 async function askActive(): Promise<ActiveState | null> {

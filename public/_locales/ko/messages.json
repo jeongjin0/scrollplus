@@ -48,7 +48,7 @@
     "message": "최소 조회"
   },
   "cutoff": {
-    "message": "기본 기준 %"
+    "message": "좋아요 개수"
   },
   "conditions": {
     "message": "조건"
@@ -60,10 +60,10 @@
     "message": "고른 반응만 점수에 넣습니다. 페이지에 없는 수는 0으로 보지 않습니다."
   },
   "presetNote": {
-    "message": "느슨은 기본의 절반, 엄격은 두 배입니다. 아래 숫자는 기본 기준입니다."
+    "message": "조회가 최소보다 적으면 아직 넘기지 않습니다. 좋아요 수를 모르면 그대로 둡니다."
   },
   "lead": {
-    "message": "설치하면 기본으로 켜집니다. 조건은 여기서만 바꿉니다."
+    "message": "설치하면 기본으로 켜집니다. 좋아요 개수는 여기서 바꿉니다."
   },
   "useDefault": {
     "message": "이 사이트는 기본값"
@@ -76,10 +76,10 @@
   "signalShares": { "message": "공유" },
   "signalSaves": { "message": "저장" },
   "liveRule": {
-    "message": "$FLOOR$회가 넘고 $PERCENT$보다 약하면 넘깁니다.",
+    "message": "조회 $FLOOR$이 넘었는데 좋아요가 $LIKES$개 미만이면 넘깁니다.",
     "placeholders": {
       "floor": { "content": "$1", "example": "2,000" },
-      "percent": { "content": "$2", "example": "0.8%" }
+      "likes": { "content": "$2", "example": "1,000" }
     }
   },
   "remove": {

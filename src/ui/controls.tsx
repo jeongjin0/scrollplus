@@ -1,17 +1,9 @@
-import type { Platform, Sensitivity, Signal, Signals } from "../lib/score";
+import type { Platform, Sensitivity } from "../lib/score";
 import { Icon, type IconName } from "./icons";
 
 const SENSITIVITIES: Sensitivity[] = ["lenient", "balanced", "strict"];
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
 const PLATFORM_ICON: Record<Platform, IconName> = { youtube: "youtube", tiktok: "tiktok", instagram: "reels" };
-const SIGNAL_ICON: Record<Signal, IconName> = { likes: "heart", comments: "comment", shares: "share", saves: "save" };
-export const SIGNALS: Array<{ id: Signal; weight: number }> = [
-  { id: "likes", weight: 1 },
-  { id: "comments", weight: 3 },
-  { id: "shares", weight: 4 },
-  { id: "saves", weight: 4 },
-];
-
 export function Mark() {
   return <span className="mark" aria-hidden="true" />;
 }
@@ -53,20 +45,6 @@ export function SiteRows(props: { enabled: Record<Platform, boolean>; labels: Re
             </span>
           </span>
           <Knob on={props.enabled[platform]} />
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function SignalChips(props: { signals: Signals; labels: Record<Signal, string>; onToggle: (signal: Signal) => void }) {
-  return (
-    <div className="signals" role="group">
-      {SIGNALS.map((signal) => (
-        <button key={signal.id} type="button" className={props.signals[signal.id] ? "signal on" : "signal"} aria-pressed={props.signals[signal.id]} onClick={() => props.onToggle(signal.id)}>
-          <Icon name={SIGNAL_ICON[signal.id]} />
-          {props.labels[signal.id]}
-          <span>×{signal.weight}</span>
         </button>
       ))}
     </div>

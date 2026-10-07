@@ -54,46 +54,37 @@ On install, write these defaults and apply them immediately. The extension must 
       "filterGrids": false,
       "showSkipChip": true,
       "allowlist": [],
-      "advanced": null,
-      "signals": { "likes": true, "comments": true, "shares": true, "saves": true }
+      "advanced": null
     }
 
-advanced null means the calibrated preset cutoffs are used. A saved advanced object replaces the cutoff and sample floor for that platform only.
+advanced null means the preset like counts are used. A saved advanced object can replace the minimum plays, the like count, or both, for that platform only.
 
 There is a master switch. Default is on. Turning it off pauses every platform without deleting settings.
 
 ## Scoring
 
-Use this score when views is a number greater than zero:
+The rule is a like count, not a rate. Presets:
 
-    (likes + comments * 3 + shares * 4 + saves * 4) / views
+| Preset | Skip when likes are under |
+| --- | --- |
+| Lenient | 100 |
+| Balanced | 1,000 |
+| Strict | 5,000 |
 
-Omit a numerator field when it is null or when that reaction is turned off in settings. Do not treat null as zero. Views of zero or null cannot produce a score. All four reactions start on.
+Do not judge until plays reach the platform floor. Floors do not change with the preset.
 
-Provisional Balanced cutoffs are a starting point, not a researched constant. Public engagement averages disagree, and YouTube has counted a Shorts view at play start since 2025-03-31, so a raw view floor is the wrong default.
+| Platform | Minimum plays |
+| --- | --- |
+| YouTube | 2,000 |
+| TikTok | 3,000 |
+| Instagram | 2,000 |
 
-| Platform | Sample floor | Weighted score cutoff |
-| --- | --- | --- |
-| YouTube | 2,000 views | 0.8% |
-| TikTok | 3,000 plays | 3.0% |
-| Instagram | 2,000 plays | 1.0% |
-
-- Lenient uses half the cutoff. Strict uses double the cutoff. The sample floor does not change with sensitivity.
-- Skip when a score exists, views are at or above the sample floor, and the score is below the cutoff.
-- Also skip when views are at least 800 and every enabled reaction among likes, comments, and shares is present and zero. Saves may be null. A turned-off reaction is not required.
-- If views are null, keep the video.
-- If the score cannot be computed, keep the video.
+- Skip when views are at or above the floor, likes are a number, and likes are under the chosen count.
+- If views or likes are missing, keep the video.
+- A custom like count or floor for one platform replaces only that field. The preset still supplies the other.
 - If the creator is allowlisted, keep the video.
 - If the platform is off or the master switch is off, keep the video.
 - Ads, photo carousels, and items with no metrics are kept.
-
-### Calibration
-
-During live QA, save public item ids and counts only, under qa/samples/. No cookies, titles, captions, or account data.
-
-Adjust the Balanced cutoff so that, among items at or above the sample floor, 20-30% are skipped. Do this per platform. If a platform has fewer than 40 such items, keep the provisional cutoff and write that in qa/calibration.md.
-
-Lenient and Strict stay at 0.5x and 2x the calibrated Balanced cutoff.
 
 ### Grids and shelves
 
@@ -140,7 +131,7 @@ Popup contains only:
 - Master status, acting as the on/off switch
 - Segmented control: Lenient, Balanced, Strict. Korean: 느슨, 기본, 엄격
 - Three site rows, each with an original icon, the live approximate bar, and a switch. Changes apply immediately. No save button.
-- Directly under the preset control, one approximate line in likes per 1,000 plays for the selected preset.
+- Directly under the preset control, the like count that preset uses. Example: "under 1,000".
 - A conditions link that opens the options page.
 - Today's skip count, for example "18 skipped today" / "오늘 18개 넘김"
 - "Keep this creator" when a supported video is active
@@ -148,9 +139,9 @@ Popup contains only:
 
 If Instagram metrics are unavailable because the user is signed out, the popup says "Instagram is signed out. Nothing is hidden." Korean: "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다." Do not show this as a modal on instagram.com.
 
-Options contains the master switch, the three presets, and the conditions. Each site has its own on/off control, minimum plays, and Balanced bar. Lenient stays half of that bar and Strict stays double. The reaction chips choose which of likes, comments, shares, and saves enter the score. Options also has allowlist management, the grid filter, the chip toggle, reset to defaults, a one-line privacy statement, and the same Star link.
+Options contains the master switch, the three presets, and the conditions. Each site has its own on/off control, minimum plays, and like count. Options also has allowlist management, the grid filter, the chip toggle, reset to defaults, a one-line privacy statement, and the same Star link.
 
-Reset restores the defaults in this spec, including all four reactions and the calibrated cutoffs.
+Reset restores the defaults in this spec, including the preset like counts and the platform floors.
 
 The toolbar icon has no number badge.
 

@@ -12,8 +12,8 @@ export interface Metrics {
 }
 
 export interface PlatformCutoff {
-  sampleFloor: number;
-  balancedCutoff: number;
+  sampleFloor?: number;
+  minLikes?: number;
 }
 
 export interface AllowEntry {
@@ -27,22 +27,6 @@ export interface AdvancedSettings {
   instagram?: PlatformCutoff;
 }
 
-export type Signal = "likes" | "comments" | "shares" | "saves";
-
-export interface Signals {
-  likes: boolean;
-  comments: boolean;
-  shares: boolean;
-  saves: boolean;
-}
-
-export const DEFAULT_SIGNALS: Signals = {
-  likes: true,
-  comments: true,
-  shares: true,
-  saves: true,
-};
-
 export interface Settings {
   enabled: boolean;
   sensitivity: Sensitivity;
@@ -51,7 +35,6 @@ export interface Settings {
   showSkipChip: boolean;
   allowlist: AllowEntry[];
   advanced: AdvancedSettings | null;
-  signals: Signals;
 }
 
 export const REPO_URL = "https://github.com/jeongjin0/kept";
@@ -59,10 +42,16 @@ export const STORAGE_SETTINGS = "settings";
 export const STORAGE_DAILY = "dailySkips";
 export const STORAGE_ACTIVE = "keptActive";
 
-export const PROVISIONAL_CUTOFFS: Record<Platform, PlatformCutoff> = {
-  youtube: { sampleFloor: 2000, balancedCutoff: 0.008 },
-  tiktok: { sampleFloor: 3000, balancedCutoff: 0.03 },
-  instagram: { sampleFloor: 2000, balancedCutoff: 0.01 },
+export const PLATFORM_FLOORS: Record<Platform, number> = {
+  youtube: 2000,
+  tiktok: 3000,
+  instagram: 2000,
+};
+
+export const PRESET_MIN_LIKES: Record<Sensitivity, number> = {
+  lenient: 100,
+  balanced: 1000,
+  strict: 5000,
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -73,7 +62,6 @@ export const DEFAULT_SETTINGS: Settings = {
   showSkipChip: true,
   allowlist: [],
   advanced: null,
-  signals: DEFAULT_SIGNALS,
 };
 
 export interface DailySkips {
@@ -95,48 +83,22 @@ export function localDay(date = new Date()): string {
   return year + "-" + month + "-" + day;
 }
 
-export function sensitivityMultiplier(sensitivity: Sensitivity): number {
-  if (sensitivity === "lenient") return 0.5;
-  if (sensitivity === "strict") return 2;
-  return 1;
-}
-
 export function lowerSensitivity(sensitivity: Sensitivity): Sensitivity | null {
   if (sensitivity === "strict") return "balanced";
   if (sensitivity === "balanced") return "lenient";
   return null;
 }
 
-export function cutoffFor(settings: Settings, platform: Platform): PlatformCutoff {
-  return settings.advanced?.[platform] ?? PROVISIONAL_CUTOFFS[platform];
-}
-
-export function effectiveLimit(settings: Settings, platform: Platform): number {
-  return cutoffFor(settings, platform).balancedCutoff * sensitivityMultiplier(settings.sensitivity);
+export function ruleFor(settings: Settings, platform: Platform): { sampleFloor: number; minLikes: number } {
+  const custom = settings.advanced?.[platform];
+  return {
+    sampleFloor: custom?.sampleFloor ?? PLATFORM_FLOORS[platform],
+    minLikes: custom?.minLikes ?? PRESET_MIN_LIKES[settings.sensitivity],
+  };
 }
 
 function finite(value: number | null | undefined): value is number {
   return typeof value === "number" && Number.isFinite(value);
-}
-
-export function engagementScore(metrics: Metrics, signals: Signals = DEFAULT_SIGNALS): number | null {
-  if (!finite(metrics.views) || metrics.views <= 0) return null;
-  const parts: Array<[Signal, number | null, number]> = [
-    ["likes", metrics.likes, 1],
-    ["comments", metrics.comments, 3],
-    ["shares", metrics.shares, 4],
-    ["saves", metrics.saves, 4],
-  ];
-  let numerator = 0;
-  let any = false;
-  for (const [signal, value, weight] of parts) {
-    if (!signals[signal]) continue;
-    if (!finite(value)) continue;
-    numerator += value * weight;
-    any = true;
-  }
-  if (!any) return null;
-  return numerator / metrics.views;
 }
 
 function normalizeId(platform: Platform, id: string): string {
@@ -186,20 +148,11 @@ export function decide(input: DecideInput): Decision {
   if (surface === "grid" && !settings.filterGrids) return { action: "keep", reason: "grid-off" };
   if (!finite(metrics.views)) return { action: "keep", reason: "no-views" };
   if (metrics.views <= 0) return { action: "keep", reason: "unscored" };
-  if (isZeroEngagement(metrics, settings.signals)) return { action: "skip", reason: "zero-engagement" };
-  const cutoff = cutoffFor(settings, platform);
-  if (metrics.views < cutoff.sampleFloor) return { action: "keep", reason: "sample-floor" };
-  const score = engagementScore(metrics, settings.signals);
-  if (score == null) return { action: "keep", reason: "unscored" };
-  const limit = cutoff.balancedCutoff * sensitivityMultiplier(settings.sensitivity);
-  if (score < limit) return { action: "skip", reason: "below-cutoff" };
+  const rule = ruleFor(settings, platform);
+  if (metrics.views < rule.sampleFloor) return { action: "keep", reason: "sample-floor" };
+  if (!finite(metrics.likes)) return { action: "keep", reason: "unscored" };
+  if (metrics.likes < rule.minLikes) return { action: "skip", reason: "below-cutoff" };
   return { action: "keep", reason: "above-cutoff" };
-}
-
-function isZeroEngagement(metrics: Metrics, signals: Signals): boolean {
-  if (!finite(metrics.views) || metrics.views < 800) return false;
-  const required = (["likes", "comments", "shares"] as const).filter((signal) => signals[signal]);
-  return required.length > 0 && required.every((signal) => metrics[signal] === 0);
 }
 
 function isPlatform(value: unknown): value is Platform {
@@ -209,7 +162,9 @@ function isPlatform(value: unknown): value is Platform {
 function isCutoff(value: unknown): value is PlatformCutoff {
   if (!value || typeof value !== "object") return false;
   const cutoff = value as PlatformCutoff;
-  return finite(cutoff.sampleFloor) && cutoff.sampleFloor >= 0 && finite(cutoff.balancedCutoff) && cutoff.balancedCutoff >= 0;
+  const floorOk = cutoff.sampleFloor == null || (finite(cutoff.sampleFloor) && cutoff.sampleFloor >= 0);
+  const likesOk = cutoff.minLikes == null || (finite(cutoff.minLikes) && cutoff.minLikes >= 0);
+  return floorOk && likesOk && (cutoff.sampleFloor != null || cutoff.minLikes != null);
 }
 
 export function normalizeSettings(value: unknown): Settings {
@@ -230,11 +185,14 @@ export function normalizeSettings(value: unknown): Settings {
     const next: AdvancedSettings = {};
     for (const platform of ["youtube", "tiktok", "instagram"] as const) {
       const cutoff = raw.advanced[platform];
-      if (isCutoff(cutoff)) next[platform] = { sampleFloor: cutoff.sampleFloor, balancedCutoff: cutoff.balancedCutoff };
+      if (isCutoff(cutoff)) {
+        next[platform] = {};
+        if (finite(cutoff.sampleFloor)) next[platform].sampleFloor = cutoff.sampleFloor;
+        if (finite(cutoff.minLikes)) next[platform].minLikes = cutoff.minLikes;
+      }
     }
     advanced = Object.keys(next).length ? next : null;
   }
-  const signals = normalizeSignals(raw.signals);
   return {
     enabled: raw.enabled !== false,
     sensitivity,
@@ -247,17 +205,6 @@ export function normalizeSettings(value: unknown): Settings {
     showSkipChip: raw.showSkipChip !== false,
     allowlist,
     advanced,
-    signals,
-  };
-}
-
-function normalizeSignals(value: unknown): Signals {
-  const raw = value && typeof value === "object" ? (value as Partial<Signals>) : {};
-  return {
-    likes: raw.likes !== false,
-    comments: raw.comments !== false,
-    shares: raw.shares !== false,
-    saves: raw.saves !== false,
   };
 }
 
