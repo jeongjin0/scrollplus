@@ -17,3 +17,20 @@ jobs:
       - run: npm run compile
       - run: npm test
       - run: npm run zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: .output/*.zip
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: xvfb-run -a npm run test:e2e

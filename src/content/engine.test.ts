@@ -124,11 +124,21 @@ describe("engine", () => {
     expect(box.advances).toEqual(["a"]);
   });
 
-  it("does not skip when metrics arrive after the grace period", async () => {
+  it("still judges late counts on a freshly loaded page", async () => {
     const box = harness();
     box.show({ ...low("a"), metrics: null });
-    box.flush(2000);
+    box.flush(3300);
     box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("does not skip when counts arrive long after the video opened", async () => {
+    const box = harness();
+    box.flush(10000);
+    box.show({ ...low("b"), metrics: null });
+    box.flush(2100);
+    box.show(low("b"));
     await box.drain();
     expect(box.advances).toEqual([]);
   });

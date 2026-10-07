@@ -8,6 +8,8 @@ Installed means on. No account, no setup.</p>
 
 <p align="center"><img src="store/screenshots/popup.png" alt="The popup" width="720"></p>
 
+<p align="center"><img src="store/screenshots/options.png" alt="The settings page" width="356"> <img src="store/screenshots/chip.png" alt="The skip chip with Undo" width="356"></p>
+
 ## What it does
 
 Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why, with an Undo that lasts a few seconds.

@@ -43,9 +43,34 @@ export default defineContentScript({
       }
     };
     document.addEventListener("DOMContentLoaded", readEmbedded);
+    window.addEventListener("message", (event) => {
+      const data = event.data as { source?: string; type?: string; key?: string } | null;
+      if (!data || data.source !== "scrollplus" || data.type !== "advance") return;
+      try {
+        moveReel(data.key === "ArrowUp" ? "prev" : "next");
+      } catch {
+        /* leave the page alone */
+      }
+    });
     window.setInterval(() => {
       readEmbedded();
       publish();
     }, 800);
   },
 });
+
+const NEXT = { label: /next|다음/i, key: "ArrowDown", code: 40 };
+const PREV = { label: /previous|prev|이전/i, key: "ArrowUp", code: 38 };
+
+// Click the reel navigation control from the page script, because a click sent from the
+// extension's isolated world is ignored on the other two sites. Press the key only as a last resort.
+function moveReel(direction: "next" | "prev"): void {
+  const target = direction === "next" ? NEXT : PREV;
+  for (const node of document.querySelectorAll("button, [role='button']")) {
+    if (target.label.test(node.getAttribute("aria-label") || "") && node instanceof HTMLElement) {
+      node.click();
+      return;
+    }
+  }
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: target.key, code: target.key, keyCode: target.code, which: target.code, bubbles: true, cancelable: true }));
+}

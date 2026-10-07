@@ -39,3 +39,15 @@ TikTok found a real bug. With the first 0.2.0 build Kept judged TikTok videos co
 Fix: the click now comes from the page script, it looks for the button labelled Next video and the feed navigation button, the For You video id and creator are read from the player wrapper and author link, and the move is detected by the feed item on screen, since the next player is empty while it loads.
 
 After the fix, with the minimum raised to 50,000 to force skips: on Explore, Kept skipped videos with 33K, 24K, and 7.4K likes with the reason chip each time, then stopped after six in a row as designed. On For You it skipped a 37K-like video with "넘김 · 좋아요 3.7만". The default 5,000 bar was not re-run on TikTok after the fix, and the logged-in For You feed was not tried. Instagram remains unverified.
+
+## 2026-10-07, version 0.3.0 (ScrollPlus)
+
+All runs on a fresh logged-out Chrome profile with the built extension. Where a run needed skips to happen quickly, the likes minimum was raised to 50,000 through storage; the default rule was not used for these four checks.
+
+- Undo on YouTube Shorts: after a skip, the chip's Undo button went back to the skipped Short and it stayed for 4.5 seconds without being skipped again. Pass.
+- Keep this creator on YouTube Shorts: the page answered with the channel id, the keep message saved it to the allowlist, and a fresh load of the same Short stayed put for 6.5 seconds even though it was under the minimum. Removing the creator again made a fresh load skip it. Pass.
+- Late counts: the removal check first failed, because on a freshly loaded page the counts arrive about 3 seconds after the script starts, past the 2-second window, so the first video was kept. The first video now gets until 6 seconds after load. The check passes after the change.
+- Instagram signed out: /reels/ redirected to the login page, no chip appeared, the extension reported "signed out", and the page had no script errors. Signed in is still untested, and the next-reel button is unverified.
+- Cost: over 20 seconds on a Short that stays on screen, the extension added about 1.4 ms of CPU per second (script time 2.6 to 4.0 ms, total task time 8.1 to 9.5 ms, two runs each). On the YouTube home page it added about 0.3 ms per second (one run each). Both are tiny next to the page itself.
+
+One run each, one machine, one network. These show the paths work, not how often they fail.

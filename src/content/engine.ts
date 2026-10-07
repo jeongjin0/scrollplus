@@ -28,6 +28,7 @@ export interface EngineDeps {
 
 const METRIC_WAIT_MS = 700;
 const METRIC_GRACE_MS = 2000;
+const STARTUP_GRACE_MS = 6000;
 const ADVANCE_GAP_MS = 450;
 const CHIP_HOLD_MS = 2500;
 const SKIP_CAP = 6;
@@ -35,6 +36,7 @@ const RETRY_GAP_MS = 400;
 const RETRY_FOR_MS = 5000;
 
 export function createEngine(deps: EngineDeps) {
+  const bornAt = deps.now();
   let current: EngineItem | null = null;
   let waitTimer: number | null = null;
   let chipTimer: number | null = null;
@@ -57,6 +59,11 @@ export function createEngine(deps: EngineDeps) {
       metrics: item.metrics,
       kind: item.kind,
     });
+  }
+
+  // Counts may arrive late on a freshly loaded page, so the first video gets a longer window.
+  function graceEnd(): number {
+    return Math.max(seenAt + METRIC_GRACE_MS, bornAt + STARTUP_GRACE_MS);
   }
 
   function clearWait() {
@@ -139,14 +146,14 @@ export function createEngine(deps: EngineDeps) {
     const decision = judge(item);
     if (decision.action === "keep") {
       const waiting = decision.reason === "no-metrics" || decision.reason === "unscored";
-      if (waiting && deps.now() - seenAt < METRIC_GRACE_MS) return;
+      if (waiting && deps.now() < graceEnd()) return;
       finished.add(item.id);
       consecutive = 0;
       paused = false;
       if (chipTimer == null) deps.render(null);
       return;
     }
-    if (deps.now() - seenAt >= METRIC_GRACE_MS) {
+    if (deps.now() >= graceEnd()) {
       finished.add(item.id);
       return;
     }
