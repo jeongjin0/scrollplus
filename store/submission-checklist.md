@@ -6,7 +6,7 @@ Nothing here has been submitted. This is what to have ready when the owner decid
 
 - A Chrome Web Store developer account (one-time registration fee).
 - The public store search for [ScrollPlus](https://chromewebstore.google.com/search/scrollplus) showed no results on 2026-10-07. Recheck before submission; this is not a trademark clearance.
-- Finish the signed-in Instagram and TikTok checks in [release-readiness.md](../qa/release-readiness.md).
+- Review the scoped [signed-in Instagram and TikTok results](../qa/signed-in-smoke.md) and finish the remaining gates in [release-readiness.md](../qa/release-readiness.md).
 - Install the zip on a clean Chrome profile and use it for a day on your own feed.
 
 ## Package

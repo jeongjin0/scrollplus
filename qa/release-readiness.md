@@ -1,6 +1,6 @@
 # Release readiness · 0.3.3
 
-Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. This is a GitHub beta candidate. Chrome Web Store submission is still pending; signed-in Instagram support is not release-verified.
+Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. The 0.3.3 GitHub beta is published. Core signed-in paths were verified in Aside Chromium 153; broader compatibility and ordinary day-use remain open. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
@@ -18,8 +18,8 @@ Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. This is a GitHub
 | TikTok custom comments/views, Undo and kept creator | Pass for recorded 0.3.2 signed-out paths | [Live boundary checks](live-smoke.md); 686 comments and 3.6M views, equal minimum stays, below minimum skips, Undo restores, kept creator survives fresh page. Active-player code unchanged in 0.3.3 |
 | TikTok runtime error | Reproduced without extension | `a.init is not a function` at the same TikTok login-bundle location in a fresh 90-second no-extension control. It does not require the extension to occur; the site overlay still limits signed-out QA |
 | Instagram signed out | Pass for fail-open | Reels redirected to login; no filtering was claimed |
-| Instagram signed in | Pending | No signed-in session available in the checked browsers. Synthetic adapter tests do not verify the site's current signed-in DOM |
-| TikTok signed-in For You | Pending | No signed-in session available in the checked browsers |
+| Instagram signed in | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): default, counts/navigation, Undo, persisted creator, Reset, away/back and missing views; actual Aside Chromium 153 |
+| TikTok signed-in For You | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): 2,639-like default skip, Undo, creator, identified Strict skip and low-like ads kept; actual Aside Chromium 153 |
 | 24-hour YouTube default-rule QA | Running, not passed | [Long feed QA](soak.md); immutable 0.3.3 ZIP, fresh profile, initial actual samples and skip recorded. Does not replace ordinary human day-use |
 | Chrome Web Store | Not submitted | [Listing and submission checklist](../store/submission-checklist.md) prepared |
 
@@ -33,9 +33,8 @@ This identifies the local tested package. A separately built CI artifact can dif
 
 ## Remaining release gates
 
-1. In an existing owner-authorized signed-in Instagram browser, verify actual Reels count extraction, automatic advance, Undo, missing counts, a kept creator, and navigating away/back. Record the current markup and fix the adapter if necessary.
-2. Repeat the default rule on signed-in TikTok For You. The signed-out login-bundle error was reproduced without the extension, but that does not verify signed-in playback or filtering.
-3. Install this ZIP in a clean Chrome profile and use it on an ordinary feed for a day. The short live runs establish working paths, not long-term reliability or compatibility with every experiment the sites run.
-4. After these checks, update this report and the listing's experimental-support wording. Store submission remains an owner decision.
+1. Review the final result of the running [24-hour YouTube check](soak.md), including errors, counters and continued movement. Duration alone is not a pass.
+2. Install this ZIP in a clean Chrome profile and use it on an ordinary feed for a day. Short signed-in runs in Aside establish working paths, not long-term reliability or signed-in Google Chrome compatibility with every experiment the sites run.
+3. After these checks, update this report and the listing's experimental-support wording. Store submission remains an owner decision.
 
 Detailed live observations and local recording locations are in [live-smoke.md](live-smoke.md). Fresh profiles and recordings under `qa/tmp/` are local QA evidence and are not committed or served wholesale.
