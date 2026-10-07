@@ -57,9 +57,9 @@ export function extractYouTube(player: unknown): ExtractedItem | null {
     if (key === "likeCount") likes.push(count);
     if (key === "commentCount" || key === "commentsCount") comments.push(count);
   });
-  metrics.views = views.find((count) => count > 0) ?? null;
-  metrics.likes = likes.find((count) => metrics.views == null || count <= metrics.views) ?? null;
-  metrics.comments = comments.find((count) => metrics.views == null || count <= metrics.views) ?? null;
+  metrics.views = views[0] ?? null;
+  metrics.likes = likes[0] ?? null;
+  metrics.comments = comments[0] ?? null;
   const creatorId = typeof details?.channelId === "string" ? details.channelId : null;
   return { id, creatorId, metrics, kind: "video" };
 }
@@ -80,7 +80,7 @@ export function extractTikTok(root: unknown): ExtractedItem[] {
     items.push({
       id,
       creatorId: unique,
-      kind: parent.imagePost != null ? "carousel" : "video",
+      kind: parent.isAd === true || parent.is_ad === true ? "ad" : parent.imagePost != null ? "carousel" : "video",
       metrics: {
         views: parseCount(stats.playCount),
         likes: parseCount(stats.diggCount),
@@ -111,7 +111,7 @@ export function extractInstagram(root: unknown): ExtractedItem[] {
     items.push({
       id,
       creatorId: username,
-      kind: carousel ? "carousel" : "video",
+      kind: parent.is_ad === true || parent.isAd === true ? "ad" : carousel ? "carousel" : "video",
       metrics: { views, likes, comments, shares: null, saves: null },
     });
   });

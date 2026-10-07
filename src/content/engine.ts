@@ -44,6 +44,8 @@ export function createEngine(deps: EngineDeps) {
   let consecutive = 0;
   let paused = false;
   let advancing = false;
+  let lastSkippedId: string | null = null;
+  let metricsReady = false;
   let skipQueuedFor: string | null = null;
   const sessionKeep = new Set<string>();
   const finished = new Set<string>();
@@ -71,6 +73,25 @@ export function createEngine(deps: EngineDeps) {
     waitTimer = null;
   }
 
+  function clearGap() {
+    if (gapTimer != null) deps.cancel(gapTimer);
+    gapTimer = null;
+    skipQueuedFor = null;
+  }
+
+  function resumeCurrent() {
+    clearWait();
+    clearGap();
+    paused = false;
+    consecutive = 0;
+    deps.render(null);
+    if (!current) return;
+    finished.delete(current.id);
+    seenAt = deps.now();
+    metricsReady = false;
+    evaluate(current);
+  }
+
   function showSkipped(decision: Decision) {
     if (chipTimer != null) deps.cancel(chipTimer);
     if (!deps.getSettings().showSkipChip || decision.action !== "skip") {
@@ -90,9 +111,9 @@ export function createEngine(deps: EngineDeps) {
 
   async function performSkip(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
-    if (advancing) return;
+    if (advancing || paused) return;
     if (deps.isBlocked()) return;
-    const decision = judge(item);
+    const decision = judge(current);
     if (decision.action !== "skip") return;
     const gap = ADVANCE_GAP_MS - (deps.now() - lastAdvanceAt);
     if (gap > 0) {
@@ -130,6 +151,7 @@ export function createEngine(deps: EngineDeps) {
       return;
     }
     finished.add(item.id);
+    lastSkippedId = item.id;
     lastAdvanceAt = deps.now();
     consecutive += 1;
     deps.onSkipped();
@@ -143,6 +165,7 @@ export function createEngine(deps: EngineDeps) {
 
   function evaluate(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
+    if (advancing) return;
     const decision = judge(item);
     if (decision.action === "keep") {
       const waiting = decision.reason === "no-metrics" || decision.reason === "unscored";
@@ -153,10 +176,11 @@ export function createEngine(deps: EngineDeps) {
       if (chipTimer == null) deps.render(null);
       return;
     }
-    if (deps.now() >= graceEnd()) {
+    if (!metricsReady && deps.now() >= graceEnd()) {
       finished.add(item.id);
       return;
     }
+    metricsReady = true;
     if (paused) {
       showPaused();
       return;
@@ -176,7 +200,11 @@ export function createEngine(deps: EngineDeps) {
     onItem(item: EngineItem) {
       const changed = current?.id !== item.id;
       current = item;
-      if (changed) seenAt = deps.now();
+      if (changed) {
+        seenAt = deps.now();
+        metricsReady = false;
+        clearGap();
+      }
       if (sessionKeep.has(item.id)) {
         clearWait();
         deps.render(null);
@@ -197,49 +225,49 @@ export function createEngine(deps: EngineDeps) {
       evaluate(current);
     },
     undo() {
-      if (!current) return;
-      sessionKeep.add(current.id);
-      finished.delete(current.id);
+      if (!lastSkippedId || advancing) return;
+      sessionKeep.add(lastSkippedId);
+      finished.delete(lastSkippedId);
+      lastSkippedId = null;
       clearWait();
-      if (gapTimer != null) deps.cancel(gapTimer);
-      gapTimer = null;
-      skipQueuedFor = null;
+      clearGap();
       if (chipTimer != null) deps.cancel(chipTimer);
       chipTimer = null;
       consecutive = Math.max(0, consecutive - 1);
       paused = false;
       deps.render(null);
-      void deps.retreat();
+      advancing = true;
+      void deps.retreat().catch(() => false).finally(() => { advancing = false; });
     },
     keepGoing() {
-      paused = false;
-      consecutive = 0;
-      deps.render(null);
-      if (!current) return;
-      finished.delete(current.id);
-      evaluate(current);
+      resumeCurrent();
     },
     lower() {
       const next = lowerRule(deps.getSettings().rule);
       if (!next) return;
       deps.setRule(next);
+      resumeCurrent();
+    },
+    settingsChanged() {
+      finished.clear();
+      resumeCurrent();
+    },
+    onInactive() {
+      current = null;
+      clearWait();
+      clearGap();
       paused = false;
       consecutive = 0;
-      if (!current) return;
-      finished.delete(current.id);
-      evaluate(current);
+      deps.render(null);
     },
     keepCurrent() {
       if (!current) return;
       sessionKeep.add(current.id);
       finished.add(current.id);
       clearWait();
-      if (gapTimer != null) deps.cancel(gapTimer);
-      gapTimer = null;
-      skipQueuedFor = null;
+      clearGap();
       paused = false;
       deps.render(null);
     },
   };
 }
-

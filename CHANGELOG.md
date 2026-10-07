@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.1 – 2026-10-07
+
+- Undo remembers the skipped video after the next item becomes active. Settings changes apply to the current video, and Continue/Lower still work after a long pause.
+- Timely counts remain usable after writing a comment. Polling preserves focus on skip-chip buttons.
+- Escape cancels number edits; invalid numbers get an inline error. Switches have larger click targets, rule rows reflow in narrow settings windows, and controls have distinct accessible names.
+- Compact numbers follow the actual localized labels, even when Chrome's reported UI language differs from the locale used for messages.
+- Creator keep confirmations wait for storage, and an already-kept creator is shown correctly when reopening the popup.
+- Ads flagged by TikTok or Instagram are kept; zero views are retained as a known count. Cross-frame and malformed advance messages are ignored.
+- The background serializes daily counter updates across tabs; an open settings page refreshes at midnight. The manifest enforces Chrome 120+.
+- Built-adapter regression coverage, package and asset checks, reproducible bilingual UI captures, refreshed listing copy, and English/Korean marquee images.
+- Signed-in Instagram and TikTok still require live QA. Store submission remains pending.
+
 ## 0.3.0 – 2026-10-07
 
 - Renamed to ScrollPlus.

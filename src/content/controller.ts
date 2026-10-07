@@ -22,6 +22,7 @@ interface ItemMessage {
 
 export function startFilter(adapter: Adapter): void {
   let settings: Settings = DEFAULT_SETTINGS;
+  let ready = false;
   const cache = new Map<string, ExtractedItem>();
   let pointerDown = false;
   const chip = mountChip({
@@ -58,8 +59,12 @@ export function startFilter(adapter: Adapter): void {
   }
 
   function showActive(): void {
+    if (!ready) return;
     const active = adapter.readActive();
-    if (!active) return;
+    if (!active) {
+      engine.onInactive();
+      return;
+    }
     const cached = cache.get(active.id);
     const item: EngineItem = {
       id: active.id,
@@ -145,17 +150,18 @@ export function startFilter(adapter: Adapter): void {
     }
     if (message?.type === "scrollplus:allow") {
       const creatorId = context().creatorId;
-      if (creatorId) {
+      if (!creatorId) { sendResponse({ ok: false }); return false; }
+      void (async () => {
         const id = adapter.platform === "instagram" ? creatorId.toLowerCase() : creatorId.replace(/^@/, "");
         const exists = settings.allowlist.some((entry) => entry.platform === adapter.platform && entry.id.toLowerCase() === id.toLowerCase());
         if (!exists) {
           settings = { ...settings, allowlist: [...settings.allowlist, { platform: adapter.platform, id }] };
-          void saveSettings(settings);
+          await saveSettings(settings);
         }
         engine.keepCurrent();
-      }
-      sendResponse({ ok: true });
-      return false;
+        sendResponse({ ok: true });
+      })().catch(() => sendResponse({ ok: false }));
+      return true;
     }
     return false;
   });
@@ -163,11 +169,13 @@ export function startFilter(adapter: Adapter): void {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local" || !changes[STORAGE_SETTINGS]) return;
     settings = normalizeSettings(changes[STORAGE_SETTINGS].newValue);
+    engine.settingsChanged();
     scanGrids();
   });
 
   void loadSettings().then((next) => {
     settings = next;
+    ready = true;
     showActive();
     scanGrids();
   });

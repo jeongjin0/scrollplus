@@ -28,9 +28,11 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
+YouTube Shorts and logged-out TikTok have been checked on real feeds with the default rule. Instagram's signed-in Reels adapter is experimental and still needs a live signed-in check. See [release readiness](qa/release-readiness.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope and limits.
+
 ## Install
 
-It is not on the Chrome Web Store yet. The quickest way to try it is the zip on the [latest release](https://github.com/jeongjin0/scrollplus/releases/latest): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.1 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.1): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
 To build it yourself:
 
@@ -47,10 +49,13 @@ Open `chrome://extensions`, turn on Developer mode, choose Load unpacked, and se
 
 ```bash
 npm test           # rule and number tests
-npm run test:e2e   # skip engine on a fixture page, popup and options in a real extension
+npm run build
+npx playwright install chromium
+npm run test:e2e   # engine, built adapters, popup, settings, and storage
 npm run compile    # type check
 npm run dev        # live reload
 npm run assets     # re-render the store images
+node scripts/capture-ui.mjs  # capture English and Korean UI
 ```
 
 The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).

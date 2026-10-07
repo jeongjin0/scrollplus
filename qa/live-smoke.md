@@ -51,3 +51,18 @@ All runs on a fresh logged-out Chrome profile with the built extension. Where a 
 - Cost: over 20 seconds on a Short that stays on screen, the extension added about 1.4 ms of CPU per second (script time 2.6 to 4.0 ms, total task time 8.1 to 9.5 ms, two runs each). On the YouTube home page it added about 0.3 ms per second (one run each). Both are tiny next to the page itself.
 
 One run each, one machine, one network. These show the paths work, not how often they fail.
+
+## 2026-10-07, version 0.3.1
+
+Fresh isolated Chrome profiles, shipped defaults: on, all three sites enabled, likes minimum 5,000, comments/views disabled. Unlike the forced-skip 0.3.0 checks, these runs did not raise the minimum.
+
+- YouTube Shorts, 90 seconds: 15 distinct active videos with known likes. Two were below the minimum (859 and 523); both advanced automatically and both reason chips were captured. The other 13 stayed until the test scrolled. No page errors.
+- TikTok For You, signed out, 90 seconds: six active sampled items, all with known likes. One had 3,681 likes; it advanced automatically with the reason chip. A login overlay limited the rest of the run. One error, `a.init is not a function`, had a stack in TikTok's login CDN bundle and no extension frames. A 36-second no-extension run did not reproduce it, but a fresh 90-second control with 13 manual advances reproduced the same error at the same bundle location. The error can occur without ScrollPlus; the limited run still does not establish a clean full-feed or signed-in pass.
+- Instagram Reels, signed out: redirected to `/accounts/login/`; no signed-in behavior was verified. The existing checked native Chrome profiles were also signed out.
+- YouTube Undo, a separate run: the 523-like Short advanced, clicking the real chip's Undo returned to that Short, and it stayed for four seconds. Stored daily count was 1 and the settings were still the shipped defaults. No page errors.
+
+Local evidence: `qa/tmp/release-031-defaults/report.json` with raw videos and chip frames, `qa/tmp/final-live-undo/report.json` with the Undo recording, `qa/tmp/tiktok-without-extension/report.json` for the short control, and `qa/tmp/tiktok-control-90s/report.json` plus its video for the reproduced error without the extension. These are retained locally and ignored by Git. Review clips are trimmed/transcoded copies; original recordings are preserved.
+
+The final package also passes 42 unit tests and 10 browser tests. Built YouTube, TikTok and Instagram scripts are exercised on controlled DOM fixtures, including setting changes, cross-frame/malformed message rejection, skip count, Undo and saved creators. Those fixtures establish our script behavior; they do not establish current signed-in Instagram compatibility. The last changes after the live default run are the message guards and compact-number locale fix, both covered by regressions; the guards were present in the real Undo run.
+
+See [release-readiness.md](release-readiness.md) for the exact artifact and remaining signed-in release gates, and [ui-audit.md](ui-audit.md) for the screenshot review.

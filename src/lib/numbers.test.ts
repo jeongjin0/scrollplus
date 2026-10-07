@@ -1,7 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { formatCount, parseCount, stepValue } from "./numbers";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { formatCount, parseCount, stepValue, uiLanguage } from "./numbers";
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("numbers", () => {
+  it("keeps counts in the same language as the localized labels", () => {
+    vi.stubGlobal("chrome", { i18n: { getUILanguage: () => "en-US", getMessage: (key: string) => key === "numberLocale" ? "ko" : "" } });
+    expect(uiLanguage()).toBe("ko");
+    expect(formatCount(5000)).toBe("5천");
+  });
   it("shortens counts for the interface language", () => {
     expect(formatCount(5000, "en")).toBe("5K");
     expect(formatCount(1500, "en")).toBe("1.5K");
@@ -25,4 +32,3 @@ describe("numbers", () => {
     expect(stepValue(5, -1)).toBe(5);
   });
 });
-

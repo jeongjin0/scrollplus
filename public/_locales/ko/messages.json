@@ -164,6 +164,15 @@
   "starTitle": {
     "message": "GitHub에서 별표 남기기"
   },
+  "keepError": {
+    "message": "제작자를 저장하지 못했어요. 다시 시도하세요."
+  },
+  "invalidNumber": {
+    "message": "0보다 큰 숫자를 입력하세요. 예: 5천."
+  },
+  "numberLocale": {
+    "message": "ko"
+  },
   "appName": {
     "message": "ScrollPlus"
   }

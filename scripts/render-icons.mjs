@@ -16,7 +16,8 @@ const browser = await chromium.launch();
 try {
   for (const size of [16, 32, 48, 128]) {
     const page = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
-    await page.setContent('<!doctype html><body style="margin:0;background:transparent">' + mark(size) + '</body>');
+    const artwork = size === 128 ? 96 : size;
+    await page.setContent('<!doctype html><body style="margin:0;background:transparent;display:grid;place-items:center;width:' + size + 'px;height:' + size + 'px">' + mark(artwork) + '</body>');
     await page.screenshot({ path: path.join(out, size + ".png"), omitBackground: true, clip: { x: 0, y: 0, width: size, height: size } });
     await page.close();
   }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PLATFORMS, REPO_URL, activePreset, presetRule, type PresetName } from "../lib/score";
+import { PLATFORMS, REPO_URL, activePreset, isAllowlisted, presetRule, type PresetName } from "../lib/score";
 import { t } from "../lib/i18n";
 import { Hero, Icon, Mark, PowerButton, PresetControl, Row, StarLink, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
@@ -7,6 +7,8 @@ import { SITES, useFilterState } from "./state";
 export function PopupApp() {
   const { settings, ready, skips, active, update, allowCurrent } = useFilterState();
   const [kept, setKept] = useState(false);
+  const [keepError, setKeepError] = useState(false);
+  const creatorKept = kept || Boolean(active?.creatorId && active.platform && isAllowlisted(settings, active.platform, active.creatorId));
   const preset = activePreset(settings.rule);
   const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
   const classes = ["popup", ready ? "ready" : "", settings.enabled ? "" : "paused"].filter(Boolean).join(" ");
@@ -36,12 +38,15 @@ export function PopupApp() {
           ))}
         </div>
         {active?.creatorId ? (
-          <button type="button" className="action" disabled={kept} onClick={() => void allowCurrent().then(() => setKept(true))}>
-            <Icon name={kept ? "check" : "user"} size={14} />
-            {kept ? t("creatorKept") : t("keepCreator")}
+          <button type="button" className="action" disabled={creatorKept} onClick={() => {
+            setKeepError(false);
+            void allowCurrent().then(() => setKept(true)).catch(() => setKeepError(true));
+          }}>
+            <Icon name={creatorKept ? "check" : "user"} size={14} />
+            {creatorKept ? t("creatorKept") : t("keepCreator")}
           </button>
         ) : null}
-        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{t("signedOut")}</p> : null}
+        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{t("signedOut")}</p> : keepError ? <p className="note" role="alert">{t("keepError")}</p> : null}
       </div>
       <footer className="foot">
         <button type="button" className="link" onClick={() => void chrome.runtime.openOptionsPage()}>
@@ -54,4 +59,3 @@ export function PopupApp() {
     </div>
   );
 }
-

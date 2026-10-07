@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { ICONS, type IconName } from "../lib/icons";
 import { formatCount, parseCount, stepValue } from "../lib/numbers";
 import { PRESETS, PRESET_LIKES, type PresetName } from "../lib/score";
@@ -62,9 +62,9 @@ export function Tile(props: { name: IconName; active?: boolean }) {
   );
 }
 
-export function Row(props: { icon: IconName; title: ReactNode; on?: boolean; onToggle?: (next: boolean) => void; label: string; children?: ReactNode }) {
+export function Row(props: { icon: IconName; title: ReactNode; on?: boolean; onToggle?: (next: boolean) => void; label: string; children?: ReactNode; className?: string }) {
   return (
-    <div className="row" role={props.onToggle ? "group" : undefined}>
+    <div className={["row", props.on === false ? "off" : "", props.className ?? ""].join(" ")} role={props.onToggle ? "group" : undefined} aria-label={props.onToggle ? props.label : undefined}>
       <Tile name={props.icon} active={props.on} />
       <span className="row-title">{props.title}</span>
       {props.children}
@@ -85,7 +85,7 @@ export function PresetControl(props: { value: PresetName | null; labels: Record<
     focusRef.current[next]?.focus();
   }
   return (
-    <div className="presets" role="radiogroup" onKeyDown={onKey}>
+    <div className="presets" role="radiogroup" aria-label={t("rulesTitle")} onKeyDown={onKey}>
       <span className="thumb-slide" style={{ transform: "translateX(" + Math.max(index, 0) * 100 + "%)", opacity: index < 0 ? 0 : 1 }} />
       {PRESETS.map((name, position) => (
         <button key={name} ref={(node) => { focusRef.current[position] = node; }} type="button" role="radio" title={t("presetTitle", formatCount(PRESET_LIKES[name]))} aria-checked={props.value === name} tabIndex={props.value === name || (index < 0 && position === 1) ? 0 : -1} className={props.value === name ? "preset on" : "preset"} onClick={() => props.onChange(name)}>
@@ -102,41 +102,65 @@ export function PresetControl(props: { value: PresetName | null; labels: Record<
 
 export function NumberStepper(props: { value: number; disabled?: boolean; label: string; onChange: (next: number) => void }) {
   const [draft, setDraft] = useState<string | null>(null);
-  useEffect(() => setDraft(null), [props.value]);
+  const [invalid, setInvalid] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const selectAfterFocus = useRef(false);
+  const cancelBlur = useRef(false);
+  const errorId = useId();
+  useEffect(() => { setDraft(null); setInvalid(false); }, [props.value]);
+  useLayoutEffect(() => {
+    if (!selectAfterFocus.current) return;
+    selectAfterFocus.current = false;
+    input.current?.select();
+  }, [draft]);
   function commit() {
+    if (cancelBlur.current) { cancelBlur.current = false; return; }
     if (draft == null) return;
     const parsed = parseCount(draft);
+    if (parsed == null) { setInvalid(true); return; }
+    setInvalid(false);
     setDraft(null);
     if (parsed != null && parsed !== props.value) props.onChange(parsed);
   }
   return (
+    <div className="number-control">
     <div className={props.disabled ? "stepper disabled" : "stepper"}>
-      <button type="button" className="step" aria-label={t("lessAria")} disabled={props.disabled} onClick={() => props.onChange(stepValue(props.value, -1))}>
+      <button type="button" className="step" aria-label={t("lessAria") + " · " + props.label} disabled={props.disabled} onClick={() => props.onChange(stepValue(props.value, -1))}>
         <Icon name="minus" size={14} />
       </button>
       <input
+        ref={input}
         className="amount"
         inputMode="numeric"
         aria-label={props.label}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? errorId : undefined}
+        title={props.value.toLocaleString()}
         disabled={props.disabled}
         value={draft ?? formatCount(props.value)}
         onFocus={(event) => {
-          setDraft(String(props.value));
-          event.currentTarget.select();
+          cancelBlur.current = false;
+          selectAfterFocus.current = true;
+          setDraft(draft ?? String(props.value));
+          if (draft != null) event.currentTarget.select();
         }}
-        onChange={(event) => setDraft(event.target.value)}
+        onChange={(event) => { setDraft(event.target.value); setInvalid(false); }}
         onBlur={commit}
         onKeyDown={(event) => {
           if (event.key === "Enter") event.currentTarget.blur();
           if (event.key === "Escape") {
+            cancelBlur.current = true;
             setDraft(null);
+            setInvalid(false);
             event.currentTarget.blur();
           }
         }}
       />
-      <button type="button" className="step" aria-label={t("moreAria")} disabled={props.disabled} onClick={() => props.onChange(stepValue(props.value, 1))}>
+      <button type="button" className="step" aria-label={t("moreAria") + " · " + props.label} disabled={props.disabled} onClick={() => props.onChange(stepValue(props.value, 1))}>
         <Icon name="plus" size={14} />
       </button>
+    </div>
+    {invalid ? <span className="number-error" id={errorId} role="alert">{t("invalidNumber")}</span> : null}
     </div>
   );
 }
