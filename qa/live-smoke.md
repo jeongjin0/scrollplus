@@ -66,3 +66,15 @@ Local evidence: `qa/tmp/release-031-defaults/report.json` with raw videos and ch
 The final package also passes 42 unit tests and 10 browser tests. Built YouTube, TikTok and Instagram scripts are exercised on controlled DOM fixtures, including setting changes, cross-frame/malformed message rejection, skip count, Undo and saved creators. Those fixtures establish our script behavior; they do not establish current signed-in Instagram compatibility. The last changes after the live default run are the message guards and compact-number locale fix, both covered by regressions; the guards were present in the real Undo run.
 
 See [release-readiness.md](release-readiness.md) for the exact artifact and remaining signed-in release gates, and [ui-audit.md](ui-audit.md) for the screenshot review.
+
+## 2026-10-07, version 0.3.2
+
+Fresh isolated Chrome, final built extension, shipped defaults (likes below 5,000; comments/views off). Each feed ran for 90 seconds.
+
+- YouTube Shorts: 17 distinct active videos, all with known likes. Four were below the minimum (703, 244, 2,668 and 818); all four advanced automatically with reason chips. The other 13 stayed until the test scrolled. No page errors.
+- TikTok For You, signed out: six sampled items and three distinct reason chips (3.7K, 1.8K and 4.7K likes in English notation). The report records one unambiguous automatic transition from the 1,790-like item. Some short-lived items moved between samples, so the chip count must not be reported as three independently verified transitions. A login overlay limited the run. The same `a.init is not a function` login-bundle error occurred; the 0.3.1 no-extension control already reproduced it at the same location.
+- Instagram Reels: redirected to `/accounts/login/`; signed-in behavior remains unverified.
+
+Local evidence is retained in `qa/tmp/release-032-defaults/report.json`, chip frames and original videos. The existing review clips and live Undo evidence were captured on 0.3.1; UI and Undo behavior are unchanged in this patch.
+
+The final 0.3.2 package passed typecheck, 42 unit tests and 13 browser tests. Three new native-browser regressions reproduce and fix the reused-XHR observation bug and check that host fetch/XHR results survive observer failures. The built TikTok fixture now reads counts from a relative feed request. See [network-observer.md](network-observer.md) for the exact contracts. These controlled tests do not replace signed-in live QA.

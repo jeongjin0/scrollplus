@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2 – 2026-10-07
+
+- Reused XMLHttpRequests have one observer rather than accumulating listeners on every send. Responses are read at completion before ordinary load callbacks can reopen the request.
+- Network observers match the browser's actual response URL, so relative feed API requests are read too. Native XHR `send` and `open` arguments are preserved; fetch keeps its original Promise, Response, headers and body.
+- Native browser regressions cover XHR reuse, fetch identity, invalid JSON and observer failures. The built TikTok adapter fixture now gets its counts through a relative feed request instead of embedded data.
+- Filtering defaults and UI are unchanged. Signed-in Instagram and TikTok live QA is still pending.
+
 ## 0.3.1 – 2026-10-07
 
 - Undo remembers the skipped video after the next item becomes active. Settings changes apply to the current video, and Continue/Lower still work after a long pause.

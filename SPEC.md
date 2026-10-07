@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.1 release preparation. Signed-in Instagram and TikTok QA remains pending. Decisions below are locked.
+Status: 0.3.2 beta preparation. Signed-in Instagram and TikTok QA remains pending. Decisions below are locked.
 
 ## Product
 
@@ -31,7 +31,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.1
+- Version: 0.3.2
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
