@@ -32,7 +32,7 @@ YouTube Shorts and logged-out TikTok have been checked on real feeds with the de
 
 ## Install
 
-It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.2 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.2): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.3 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.3): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
 To build it yourself:
 
@@ -59,6 +59,8 @@ node scripts/capture-ui.mjs  # capture English and Korean UI
 ```
 
 The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+For a longer real-feed check in an isolated profile, see [long feed QA](qa/soak.md).
 
 ## Privacy
 

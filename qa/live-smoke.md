@@ -78,3 +78,19 @@ Fresh isolated Chrome, final built extension, shipped defaults (likes below 5,00
 Local evidence is retained in `qa/tmp/release-032-defaults/report.json`, chip frames and original videos. The existing review clips and live Undo evidence were captured on 0.3.1; UI and Undo behavior are unchanged in this patch.
 
 The final 0.3.2 package passed typecheck, 42 unit tests and 13 browser tests. Three new native-browser regressions reproduce and fix the reused-XHR observation bug and check that host fetch/XHR results survive observer failures. The built TikTok fixture now reads counts from a relative feed request. See [network-observer.md](network-observer.md) for the exact contracts. These controlled tests do not replace signed-in live QA.
+
+### Additional 0.3.2 TikTok conditions, 2026-10-07
+
+Fresh isolated, signed-out Chrome profiles; custom comments-only and views-only rules entered through the actual Settings UI. These are boundary/action checks, not shipped-default runs.
+
+- Comments: a 686-comment video stayed at minimum 686, skipped at 687 with the real reason chip, returned through Undo and stayed for 3.5 seconds. Keeping its creator persisted. On a fresh direct video page, it remained with 686 comments under a 1,372 minimum and no extra skip; the counter was 1.
+- Views: a 3,600,000-view video stayed at the equal minimum and skipped at 3,600,001 with the views reason chip. Real Undo restored it. A site navigation invalidated the final creator evaluation, so only that step was recovered using the same task profile and its already-saved creator. On a fresh direct page with the minimum 7,200,000, the 3,600,000-view video stayed for 6.5 seconds and the counter remained 1.
+- The known TikTok login-bundle `a.init is not a function` error occurred in the comments and recovery runs. These working paths do not establish a clean signed-in feed pass.
+
+Reports, original recordings and frames: `qa/tmp/live-metrics-032-1791365591471/report.json` and `views/kept-recovery/report.json`. Failed/transient evidence is preserved alongside the recovered check.
+
+## 2026-10-07, version 0.3.3
+
+Optional grid filtering had a separate reversibility bug: lowering the minimum or disabling grid filtering left a previously hidden card hidden. The built-extension regression failed before the fix and passes afterward. Passing and unknown-count cards stay visible, and the site's own hidden card is preserved. See [grid-filtering.md](grid-filtering.md).
+
+The final 0.3.3 package passed typecheck, 42 unit tests, 14 browser tests and package validation. Active-player behavior and UI are unchanged. A fresh shipped-default YouTube run is now executing for 24 hours from this exact ZIP; initial samples and a low-like skip are recorded, but its final result is pending. See [soak.md](soak.md). Signed-in Instagram/TikTok and ordinary human day-use remain unverified.

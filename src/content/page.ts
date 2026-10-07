@@ -74,8 +74,11 @@ export function gridAnchors(pattern: RegExp): Array<{ id: string; element: HTMLE
     if (!(link instanceof HTMLAnchorElement)) continue;
     const match = link.href.match(pattern);
     if (!match?.[1] || seen.has(match[1])) continue;
-    const rect = link.getBoundingClientRect();
-    if (rect.height < 24 || rect.height > window.innerHeight * 0.6) continue;
+    // Our hidden cards have no box, but must still be returned so settings can restore them.
+    if (link.getAttribute("data-scrollplus-grid") !== "skip") {
+      const rect = link.getBoundingClientRect();
+      if (rect.height < 24 || rect.height > window.innerHeight * 0.6) continue;
+    }
     seen.add(match[1]);
     found.push({ id: match[1], element: link });
   }

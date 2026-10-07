@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 – 2026-10-07
+
+- Cards hidden by optional grid filtering are rechecked even when they have no layout box. Lowering a minimum or turning grid filtering off restores them immediately; cards hidden by the site remain untouched.
+- A built-extension regression covers restoration, passing cards and missing counts. Actual signed-out TikTok checks now cover custom comments/views, equal-count boundaries, Undo and a saved creator on a fresh page.
+- Defaults and UI are unchanged. Signed-in Instagram and TikTok QA remains pending.
+
 ## 0.3.2 – 2026-10-07
 
 - Reused XMLHttpRequests have one observer rather than accumulating listeners on every send. Responses are read at completion before ordinary load callbacks can reopen the request.
