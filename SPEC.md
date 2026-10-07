@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.3 beta preparation. Signed-in Instagram and TikTok QA remains pending. Decisions below are locked.
+Status: 0.3.3 GitHub beta published. Core signed-in Instagram Reels and TikTok For You paths were checked in Aside Chromium 153; long-duration QA and ordinary human day-use remain pending. See qa/signed-in-smoke.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -262,7 +262,7 @@ The work is done only when all of these are true:
 2. Playwright fixture tests prove a skip with its reason chip, the 6-skip pause, undo, and fail-open when metrics are missing.
 3. Playwright tests on the built extension prove the defaults on a fresh profile, preset changes, site and power switches, typed numbers, Custom detection, and Reset.
 4. The production build is green, the unpacked extension loads, and a zip exists.
-5. qa/live-smoke.md records a dated YouTube Shorts run with the shipped defaults. Instagram stays unverified unless a signed-in session exists. Do not mark it passed.
+5. qa/live-smoke.md records a dated YouTube Shorts run with the shipped defaults. Signed-in claims must cite actual live evidence, browser/version and tested paths; fixtures do not establish signed-in compatibility. qa/signed-in-smoke.md records the current scoped Reels and For You checks.
 6. The popup fits without scrolling at 1x and 2x, in English and Korean.
 7. Fixture pages show no console errors caused by the extension.
 8. Store copy and images exist, and no image implies affiliation.

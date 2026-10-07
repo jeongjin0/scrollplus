@@ -28,7 +28,7 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
-YouTube Shorts and logged-out TikTok have been checked on real feeds with the default rule. Instagram's signed-in Reels adapter is experimental and still needs a live signed-in check. See [release readiness](qa/release-readiness.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope and limits.
+The default rule has been checked on real YouTube Shorts, signed-in TikTok For You, and signed-in Instagram Reels. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope.
 
 ## Install
 
