@@ -17,10 +17,10 @@ const LANGS = {
   en: {
     ui: "en", locale: "en-US", dropKo: true,
     shots: path.join(root, "store/screenshots"), tileFile: path.join(root, "store/tile.png"), marqueeFile: path.join(root, "store/marquee.png"),
-    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Adjust your like count anytime."],
+    popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Choose your minimum like count."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
     chip: ["Skipped. <em>Undo</em> in one tap.", "Every skip tells you why, and you can take it back."],
-    tile: "Skips Shorts, Reels &amp; TikToks <em>under your like count.</em>",
+    tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
   },
   ko: {
     ui: "ko", locale: "ko-KR", dropKo: false,
