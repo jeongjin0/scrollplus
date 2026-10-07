@@ -1,6 +1,6 @@
 # Release readiness · 0.3.5
 
-Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. An exact-ZIP real YouTube check passes; historical signed-in 0.3.3/0.3.4 checks below are not new 0.3.5 evidence. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
+Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. Exact-ZIP real YouTube checks pass in isolated Chrome for Testing and official Chrome 154; historical signed-in 0.3.3/0.3.4 checks below are not new 0.3.5 evidence. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
@@ -14,6 +14,7 @@ Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 pa
 | UI | Pass for the checked flows | [Screenshot audit](ui-audit.md), plus fresh 0.3.5 EN/KO captures: popup 320×356 at 1x/2x, narrow settings without overflow, updated privacy footer; page errors empty |
 | YouTube default rule | Pass in one 0.3.2 live run | 17 Shorts in 90 seconds; four below 5,000 likes (703, 244, 2,668, 818), all skipped with reason chips; no page errors |
 | YouTube Undo and reload | Pass in one exact-0.3.5-ZIP live run | [Session regression](session-undo.md): 807-like Short skipped at 5,000, Undo restored it, fresh reload kept it for eight seconds, count stayed 1, empty creator allowlist and no page errors |
+| Official Chrome 154 YouTube | Pass for a short signed-out native check | [Native check](session-undo.md#official-google-chrome-154-check): 986-like default skip and Undo, same video at 997 likes retained after normal refresh, count stayed 4 and no saved creators; Reset resumed filtering. Existing browser was not restarted; temporary extension and Developer Mode were restored afterward. No native page-error collector or day-use result |
 | TikTok default rule, signed out | Limited pass on 0.3.2 | Six sampled items, three reason chips, one unambiguous automatic transition from the 1,790-like video. The sampler missed some short-lived items; a login overlay limited the run |
 | TikTok custom comments/views, Undo and kept creator | Pass for recorded 0.3.2 signed-out paths | [Live boundary checks](live-smoke.md); 686 comments and 3.6M views, equal minimum stays, below minimum skips, Undo restores, kept creator survives fresh page. Active-player code unchanged in 0.3.3 |
 | TikTok runtime error | Reproduced without extension | `a.init is not a function` at the same TikTok login-bundle location in a fresh 90-second no-extension control. It does not require the extension to occur; the site overlay still limits signed-out QA |
