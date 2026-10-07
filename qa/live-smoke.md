@@ -104,3 +104,13 @@ TikTok recommendation/profile previews are now excluded from active-player filte
 The exact ZIP was checked in actual signed-in Aside Chromium 153: Following recommendation exclusion, a 2,660-like video-page default skip and a fresh Undo restoration. Positive live Following skipping is not established because this account's route contained creator recommendations. See [the preview report](tiktok-previews.md) for the evidence and scope.
 
 The earlier 0.3.3 long run ended after 3h7m: its QA runner treated a normal refresh as fatal after the feed stopped moving. Evidence is preserved; no extension-crash or full-duration pass is inferred. The fixed runner passed two new browser contracts (21 tests total) and a two-minute real refresh check before a fresh 24-hour 0.3.4 successor started. See [long-feed QA](soak.md).
+
+## 2026-10-08, version 0.3.5
+
+Fresh, signed-out Chrome for Testing profile using the exact 0.3.5 ZIP identified in [release readiness](release-readiness.md). Shipped defaults were verified: likes minimum 5,000, comments/views off, all sites enabled and no saved creators.
+
+- TikTok For You: six items with known likes were sampled. The 3,827-like video advanced automatically to an 8,429-like video, with the reason chip showing `넘김 · 좋아요 3.8천` and Undo. No page errors were collected.
+- A signup Terms dialog blocked further useful feed scrolling after about 30 seconds. The 90-second recording does not establish 90 seconds of unobstructed feed use. No terms were accepted, no account was created and no Undo action was performed.
+- The finite run ended naturally and all thirteen recorded task-owned processes ended. This is a limited default-rule check, not signed-in, positive Following, long-term reliability or ordinary day-use evidence.
+
+Local evidence: `qa/tmp/tiktok-live-035-signedout/report.json`, `verdict.json`, `cleanup.json`, the chip and final frames, and the original recording. They are retained locally and ignored by Git. The 26-second review clip is a trimmed/transcoded copy; the original recording is preserved.

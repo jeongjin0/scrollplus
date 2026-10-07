@@ -28,7 +28,7 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
-The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo through a reload. Signed-in TikTok For You and Instagram Reels were checked on earlier betas. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope. Session retention checks are in [session Undo QA](qa/session-undo.md).
+The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo through a reload, and in a short signed-out TikTok For You run. TikTok's signup overlay limited further testing. Signed-in TikTok For You and Instagram Reels were checked on earlier betas. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope. Session retention checks are in [session Undo QA](qa/session-undo.md).
 
 ## Install
 
