@@ -6,7 +6,7 @@ Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. The 0.3.4 packag
 | --- | --- | --- |
 | TypeScript | Pass | `npm run compile` |
 | Unit tests | 42 passed | `npm test`; rules, parsing, extraction, engine regressions |
-| Browser tests | 19 passed | `npm run test:e2e`; native fetch/XHR contracts, grid restoration, TikTok preview exclusion and Following/video-route coverage, actual built scripts on controlled fixtures, popup/settings, concurrent storage writes |
+| Browser tests | 21 passed | `npm run test:e2e`; native fetch/XHR contracts, grid restoration, TikTok preview exclusion and Following/video-route coverage, actual built scripts on controlled fixtures, popup/settings, concurrent storage writes, navigation-safe QA and bounded feed recovery |
 | Grid restoration regression | Pass | [Before/after evidence](grid-filtering.md); cards return after lowering the minimum or disabling optional grid filtering; host-hidden cards are preserved |
 | Network observer regression | Pass | [Before/after evidence](network-observer.md); reused XHR no longer loses/duplicates responses; relative feed requests reach the built TikTok adapter |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage permission, three host permissions, localized strings, entry files, icon bytes and image dimensions |
@@ -22,7 +22,7 @@ Checked on 2026-10-07, macOS ARM64, built Chrome MV3 extension. The 0.3.4 packag
 | TikTok signed-in For You | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): 2,639-like default skip, Undo, creator, identified Strict skip and low-like ads kept; actual Aside Chromium 153 |
 | TikTok preview exclusion and video-page skip/Undo | Pass for recorded 0.3.4 paths | [Preview regression and live check](tiktok-previews.md): actual Following recommendation preview has no current creator and no skips; 2,660-like video skips at default, Undo restores the same video |
 | TikTok signed-in Following feed | Not established live | The existing account showed creator recommendations instead of a video feed. Positive feed paths are covered by built-script fixtures; no account engagement was used to create a feed |
-| 24-hour YouTube default-rule QA | Running, not passed | [Long feed QA](soak.md); immutable 0.3.3 ZIP, fresh profile, initial actual samples and skip recorded. YouTube scripts and background counter are byte-identical in 0.3.4; this is not a whole-package 0.3.4 day-use pass. Does not replace ordinary human day-use |
+| 24-hour YouTube default-rule QA | Running, not passed | [Long feed QA](soak.md); new exact 0.3.4 ZIP/fresh profile, full duration unchanged. The earlier 0.3.3 attempt ended after 3h7m because its runner treated refresh as fatal; partial evidence retained. Navigation recovery now passes real browser and two-minute YouTube checks. Does not replace ordinary human day-use |
 | Chrome Web Store | Not submitted | [Listing and submission checklist](../store/submission-checklist.md) prepared |
 
 ## Artifact

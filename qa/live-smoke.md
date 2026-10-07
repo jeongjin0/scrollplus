@@ -102,3 +102,5 @@ Core signed-in Instagram Reels and TikTok For You paths were then verified using
 TikTok recommendation/profile previews are now excluded from active-player filtering. The built-extension regression failed before the fix, then passed alongside For You, Following and video-route skip/Undo/creator fixtures. Typecheck, 42 unit tests, 19 browser tests and final package validation passed.
 
 The exact ZIP was checked in actual signed-in Aside Chromium 153: Following recommendation exclusion, a 2,660-like video-page default skip and a fresh Undo restoration. Positive live Following skipping is not established because this account's route contained creator recommendations. See [the preview report](tiktok-previews.md) for the evidence and scope.
+
+The earlier 0.3.3 long run ended after 3h7m: its QA runner treated a normal refresh as fatal after the feed stopped moving. Evidence is preserved; no extension-crash or full-duration pass is inferred. The fixed runner passed two new browser contracts (21 tests total) and a two-minute real refresh check before a fresh 24-hour 0.3.4 successor started. See [long-feed QA](soak.md).
