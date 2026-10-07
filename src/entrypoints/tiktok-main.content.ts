@@ -13,11 +13,11 @@ export default defineContentScript({
       try {
         const active = tiktokActive();
         const items = [...cache.values()];
-        window.postMessage({ source: "slf", type: "cache", items }, "*");
+        window.postMessage({ source: "scrollplus", type: "cache", items }, "*");
         if (!active) return;
         const known = cache.get(active.id);
         window.postMessage({
-          source: "slf",
+          source: "scrollplus",
           type: "item",
           item: known
             ? { platform: "tiktok", surface: "player", ...known, creatorId: known.creatorId ?? active.creatorId }
@@ -46,7 +46,7 @@ export default defineContentScript({
     document.addEventListener("DOMContentLoaded", readEmbedded);
     window.addEventListener("message", (event) => {
       const data = event.data as { source?: string; type?: string; key?: string } | null;
-      if (!data || data.source !== "slf" || data.type !== "advance") return;
+      if (!data || data.source !== "scrollplus" || data.type !== "advance") return;
       try {
         moveFeed(data.key === "ArrowUp" ? "prev" : "next");
       } catch {

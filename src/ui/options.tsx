@@ -1,7 +1,7 @@
 import { COVERAGE, DEFAULT_SETTINGS, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
 import type { IconName } from "../lib/icons";
 import { t } from "../lib/i18n";
-import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile } from "./kit";
+import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
 
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
@@ -21,7 +21,7 @@ export function OptionsApp() {
         <header className="bar">
           <div className="brand">
             <Mark size={30} />
-            <h1>{t("extName")}</h1>
+            <Wordmark />
           </div>
           <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} text={settings.enabled ? t("statusOn") : t("statusOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
         </header>

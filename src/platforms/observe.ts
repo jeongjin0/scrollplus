@@ -1,5 +1,5 @@
 export function observeJsonResponses(match: (url: string) => boolean, ingest: (data: unknown) => void): void {
-  const marker = "__slfObserve";
+  const marker = "__scrollplusObserve";
   const holder = window as unknown as Record<string, boolean>;
   if (holder[marker]) return;
   holder[marker] = true;
@@ -33,13 +33,13 @@ export function observeJsonResponses(match: (url: string) => boolean, ingest: (d
   const originalOpen = XMLHttpRequest.prototype.open;
   const originalSend = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.open = function (method: string, url: string | URL, async?: boolean, username?: string | null, password?: string | null): void {
-    (this as XMLHttpRequest & { __slfUrl?: string }).__slfUrl = String(url);
+    (this as XMLHttpRequest & { __scrollplusUrl?: string }).__scrollplusUrl = String(url);
     originalOpen.call(this, method, url, async ?? true, username, password);
   };
   XMLHttpRequest.prototype.send = function (body?: Document | XMLHttpRequestBodyInit | null): void {
     this.addEventListener("load", () => {
       try {
-        const url = (this as XMLHttpRequest & { __slfUrl?: string }).__slfUrl || "";
+        const url = (this as XMLHttpRequest & { __scrollplusUrl?: string }).__scrollplusUrl || "";
         if (!match(url)) return;
         if (this.responseType === "json") {
           ingest(this.response);

@@ -1,6 +1,6 @@
 # Privacy
 
-Short-Form Like Filter does not collect, transmit, or sell user data. There is no account and no server.
+ScrollPlus does not collect, transmit, or sell user data. There is no account and no server.
 
 The extension reads view, like, and comment counts that YouTube, TikTok, or Instagram has already loaded in the page you are viewing. Those counts are used on your device to decide whether to move to the next video. They are not stored.
 
@@ -11,4 +11,4 @@ Chrome storage on this device holds only:
 
 The daily count resets at local midnight. It does not store watch history or video ids. A creator you choose to keep is stored in `settings` until you remove it.
 
-Contact: https://github.com/jeongjin0/short-form-like-filter
+Contact: https://github.com/jeongjin0/scrollplus

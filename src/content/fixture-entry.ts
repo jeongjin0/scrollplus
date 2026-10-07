@@ -61,7 +61,7 @@ function show(partial: Partial<EngineItem> & { id: string; metrics: Metrics | nu
 
 declare global {
   interface Window {
-    __slf: {
+    __scrollplus: {
       show: typeof show;
       setBlockedMenu: (open: boolean) => void;
       settings: Settings;
@@ -69,7 +69,7 @@ declare global {
   }
 }
 
-window.__slf = {
+window.__scrollplus = {
   show,
   setBlockedMenu: (open: boolean) => {
     const menu = document.querySelector("#menu");

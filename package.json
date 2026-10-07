@@ -1,6 +1,6 @@
 {
-  "name": "short-form-like-filter",
-  "version": "0.2.1",
+  "name": "scrollplus",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {

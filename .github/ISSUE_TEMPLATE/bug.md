@@ -13,7 +13,7 @@ YouTube Shorts, TikTok, or Instagram Reels
 
 ## Extension version
 
-For example 0.2.1. You can find it on chrome://extensions.
+For example 0.3.0. You can find it on chrome://extensions.
 
 ## Your rule
 

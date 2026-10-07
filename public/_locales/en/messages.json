@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "Short-Form Like Filter"
+    "message": "ScrollPlus – Skip low-like short videos"
   },
   "extDesc": {
     "message": "Skips Shorts, Reels, and TikToks with too few likes. On from the moment you install."
   },
   "powerOn": {
-    "message": "Filter is on"
+    "message": "ScrollPlus is on"
   },
   "powerOff": {
-    "message": "Filter is off"
+    "message": "ScrollPlus is off"
   },
   "presetLenient": {
     "message": "Lenient"
@@ -163,5 +163,8 @@
   },
   "starTitle": {
     "message": "Star this project on GitHub"
+  },
+  "appName": {
+    "message": "ScrollPlus"
   }
 }

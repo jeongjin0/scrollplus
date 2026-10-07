@@ -1,15 +1,16 @@
-<p align="center"><img src="public/icon/128.png" width="72" height="72" alt="Short-Form Like Filter"></p>
+<p align="center"><img src="public/icon/128.png" width="72" height="72" alt="ScrollPlus"></p>
 
-<h1 align="center">Short-Form Like Filter</h1>
+<h1 align="center">ScrollPlus</h1>
 
-<p align="center"><b>Skips YouTube Shorts, TikToks, and Instagram Reels with too few likes.</b><br>
-A Chrome extension. Installed means on. No account, no setup.</p>
+<p align="center"><b>Skip low-like short videos.</b><br>
+A Chrome extension that skips YouTube Shorts, TikToks, and Instagram Reels with too few likes.<br>
+Installed means on. No account, no setup.</p>
 
 <p align="center"><img src="store/screenshots/popup.png" alt="The popup" width="720"></p>
 
 ## What it does
 
-Scroll like you always do. When a video has fewer likes than your minimum, the extension moves to the next one and tells you why, with an Undo that lasts a few seconds.
+Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why, with an Undo that lasts a few seconds.
 
 The default is simple: **skip anything under 5,000 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
@@ -30,8 +31,8 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 It is not on the Chrome Web Store yet. To try it:
 
 ```bash
-git clone https://github.com/jeongjin0/short-form-like-filter.git
-cd short-form-like-filter
+git clone https://github.com/jeongjin0/scrollplus.git
+cd scrollplus
 npm install
 npm run build
 ```
@@ -52,9 +53,9 @@ The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contribu
 
 ## Privacy
 
-It reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
+ScrollPlus reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
 
-Not affiliated with YouTube, TikTok, or Instagram.
+ScrollPlus is not affiliated with YouTube, TikTok, or Instagram.
 
 ## License
 

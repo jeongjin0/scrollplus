@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PLATFORMS, REPO_URL, activePreset, presetRule, type PresetName } from "../lib/score";
 import { t } from "../lib/i18n";
-import { Hero, Icon, Mark, PowerButton, PresetControl, Row, StarLink } from "./kit";
+import { Hero, Icon, Mark, PowerButton, PresetControl, Row, StarLink, Wordmark } from "./kit";
 import { SITES, useFilterState } from "./state";
 
 export function PopupApp() {
@@ -16,7 +16,7 @@ export function PopupApp() {
       <header className="bar">
         <div className="brand">
           <Mark size={24} />
-          <h1>{t("extName")}</h1>
+          <Wordmark />
         </div>
         <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
       </header>

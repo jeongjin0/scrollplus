@@ -6,9 +6,10 @@ export default defineConfig({
   vite: () => ({ plugins: [react()] }),
   manifest: {
     name: '__MSG_extName__',
+    short_name: '__MSG_appName__',
     description: '__MSG_extDesc__',
     default_locale: 'en',
-    version: "0.2.1",
+    version: "0.3.0",
     permissions: ['storage'],
     host_permissions: [
       'https://www.youtube.com/*',
@@ -16,7 +17,7 @@ export default defineConfig({
       'https://www.instagram.com/*',
     ],
     action: {
-      default_title: '__MSG_extName__',
+      default_title: '__MSG_appName__',
     },
     icons: {
       16: 'icon/16.png',

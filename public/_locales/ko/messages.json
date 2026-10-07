@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "숏폼 좋아요 필터"
+    "message": "ScrollPlus – 좋아요 적은 숏폼 건너뛰기"
   },
   "extDesc": {
     "message": "좋아요가 적은 쇼츠, 릴스, 틱톡을 넘깁니다. 설치하면 바로 켜집니다."
   },
   "powerOn": {
-    "message": "필터 켜짐"
+    "message": "ScrollPlus 켜짐"
   },
   "powerOff": {
-    "message": "필터 꺼짐"
+    "message": "ScrollPlus 꺼짐"
   },
   "presetLenient": {
     "message": "느슨"
@@ -163,5 +163,8 @@
   },
   "starTitle": {
     "message": "GitHub에서 별표 남기기"
+  },
+  "appName": {
+    "message": "ScrollPlus"
   }
 }

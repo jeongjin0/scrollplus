@@ -26,6 +26,7 @@ h1, h2, p { margin: 0; }
 .popup.ready, .page.ready { opacity: 1; }
 .bar { display: flex; align-items: center; justify-content: space-between; }
 .brand { display: flex; align-items: center; gap: 8px; }
+.plus { color: var(--accent); }
 .brand h1 { font-size: 18px; font-weight: 650; letter-spacing: -0.02em; line-height: 1; }
 .power { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); display: grid; place-items: center; transition: background var(--t) var(--ease), color var(--t) var(--ease), border-color var(--t) var(--ease); }
 .power:hover { border-color: var(--text); color: var(--text); }

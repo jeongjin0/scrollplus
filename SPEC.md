@@ -1,12 +1,12 @@
-# Short-Form Like Filter specification
+# ScrollPlus specification
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: shipped as 0.2.1. Decisions below are locked.
+Status: shipped as 0.3.0. Decisions below are locked.
 
 ## Product
 
-Short-Form Like Filter is a Manifest V3 Chromium extension. After install, with no account and no setup, it skips Shorts, Reels, and TikToks that have too few likes while the user scrolls short-form feeds.
+ScrollPlus is a Manifest V3 Chromium extension. After install, with no account and no setup, it skips Shorts, Reels, and TikToks that have too few likes while the user scrolls short-form feeds.
 
 Platforms:
 
@@ -22,14 +22,16 @@ Korean line: 설치하면 바로 켜집니다. 좋아요가 적은 쇼츠, 릴�
 
 ## Name
 
-Short-Form Like Filter. Korean: 숏폼 좋아요 필터. The name says the role: it filters short-form video by likes. It was chosen to be found by what it does, not as a brand. The earlier working name was Kept. The name lives in the locale files (extName) and is shown in the toolbar tooltip, the popup, and the options page.
+ScrollPlus, in both languages. The owner chose it: short, easy to say, and it names no service, so it cannot read as official. In the wordmark "Plus" is set in the accent color. The role is carried by the store title, "ScrollPlus – Skip low-like short videos" / "ScrollPlus – 좋아요 적은 숏폼 건너뛰기". Earlier working names were Kept and Short-Form Like Filter.
+
+The locale files hold two strings: extName is the manifest name and the store title, and appName is the short name shown in the toolbar tooltip, the popup, and the options page.
 
 ## Repository
 
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
-- Public GitHub repo: github.com/jeongjin0/short-form-like-filter
+- Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.2.1
+- Version: 0.3.0
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -171,7 +173,7 @@ The GitHub button shows a star icon and the word GitHub, with the tooltip "Star 
 - Surface #1A1B17, raised surface #24251F
 - Text #F4F1EA
 - Muted text #A8A396
-- Accent #FF4D2E, used for the mark, the on state, the active preset, the star, and the skip chip
+- Accent #FF4D2E, used for the mark, "Plus" in the wordmark, the on state, the active preset, the star, and the skip chip
 
 Cards have 14px corners. Controls are at least 32px tall in the popup and 34px in options. Every control has a visible keyboard focus ring and an accessible name. Icons are one set, drawn on a 16px grid with a 1.5px stroke. No purple gradients, glassmorphism, or runtime web fonts. UI text uses ui-sans-serif.
 
@@ -236,7 +238,7 @@ Repository files:
 - qa/live-smoke.md
 - qa/calibration.md
 
-Store title: Short-Form Like Filter
+Store title: ScrollPlus – Skip low-like short videos. It names the role and no service.
 
 Store assets, rendered by scripts/render-store.mjs:
 

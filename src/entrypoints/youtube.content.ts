@@ -20,6 +20,6 @@ export default defineContentScript({
 });
 
 function requestMove(key: "ArrowDown" | "ArrowUp"): boolean {
-  window.postMessage({ source: "slf", type: "advance", key }, "*");
+  window.postMessage({ source: "scrollplus", type: "advance", key }, "*");
   return true;
 }

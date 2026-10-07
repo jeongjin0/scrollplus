@@ -3,7 +3,7 @@ import { startFilter } from "../content/controller";
 import { gridAnchors, moveUntilIdChanges, tiktokActive, tiktokMarker } from "../content/page";
 
 function requestMove(key: "ArrowDown" | "ArrowUp"): boolean {
-  window.postMessage({ source: "slf", type: "advance", key }, "*");
+  window.postMessage({ source: "scrollplus", type: "advance", key }, "*");
   return true;
 }
 

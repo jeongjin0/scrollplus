@@ -17,6 +17,12 @@ export function Icon(props: { name: IconName; size?: number }) {
   );
 }
 
+export function Wordmark() {
+  const name = t("appName");
+  const split = name.lastIndexOf("Plus");
+  return <h1>{split > 0 ? <>{name.slice(0, split)}<span className="plus">Plus</span></> : name}</h1>;
+}
+
 export function Mark(props: { size?: number }) {
   const size = props.size ?? 22;
   return (

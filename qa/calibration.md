@@ -1,6 +1,6 @@
 # Preset basis
 
-This project's working name was Kept until 0.2.1. Older entries below use it.
+Before 0.3.0 this project was called Kept, and briefly Short-Form Like Filter. Older entries below use those names.
 
 Date: 2026-10-07
 
