@@ -34,6 +34,8 @@ The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo thro
 
 It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [GitHub beta releases page](https://github.com/jeongjin0/scrollplus/releases): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
+To update a beta, replace the contents of the unpacked folder you already loaded with the new ZIP's files, then click Reload on the ScrollPlus card in `chrome://extensions`. Keep only one copy enabled. Extension reloads clear temporary Undo choices.
+
 To build it yourself:
 
 ```bash
