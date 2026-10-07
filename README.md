@@ -30,7 +30,9 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ## Install
 
-It is not on the Chrome Web Store yet. To try it:
+It is not on the Chrome Web Store yet. The quickest way to try it is the zip on the [latest release](https://github.com/jeongjin0/scrollplus/releases/latest): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+
+To build it yourself:
 
 ```bash
 git clone https://github.com/jeongjin0/scrollplus.git

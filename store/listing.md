@@ -2,6 +2,8 @@
 
 Do not submit this listing from the repository automation. It is the copy for a later manual upload.
 
+Images: store/screenshots (English) and store/screenshots/ko (Korean), tiles store/tile.png and store/tile-ko.png, all rendered by npm run assets. The submission steps are in submission-checklist.md.
+
 The title is the manifest name (extName in the locale files). It says the role in plain words and names no service, so it cannot read as official or as keyword stuffing. The three services are named once each in the description, as facts.
 
 ## English

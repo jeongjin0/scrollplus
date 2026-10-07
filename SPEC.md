@@ -243,8 +243,7 @@ Store title: ScrollPlus – Skip low-like short videos. It names the role and no
 Store assets, rendered by scripts/render-store.mjs:
 
 - icons at 16, 32, 48, and 128
-- one 440 by 280 tile
-- three 1280 by 800 screenshots
+- one 440 by 280 tile and three 1280 by 800 screenshots, in English and in Korean (store/screenshots/ko and store/tile-ko.png)
 - English and Korean listing copy, including the single-purpose sentence used for review
 
 Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels that have too few likes, using counts already on the page.
