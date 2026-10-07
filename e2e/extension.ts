@@ -28,9 +28,18 @@ export async function launch(language?: "en" | "ko", profile?: string) {
       };
     }, { language, messages });
   }
-  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker");
-  await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get("settings")).settings?.enabled)).toBe(true);
-  return { context, worker, id: new URL(worker.url()).host, profile: dir };
+  try {
+    const isExtension = (worker: { url(): string }) => worker.url().startsWith("chrome-extension://");
+    const worker = context.serviceWorkers().find(isExtension) ?? await context.waitForEvent("serviceworker", { predicate: isExtension });
+    await expect.poll(() => worker.evaluate(async () => {
+      const local = globalThis.chrome?.storage?.local;
+      return typeof local?.get === "function" ? (await local.get("settings")).settings?.enabled : false;
+    }), { message: "extension worker has initialized storage" }).toBe(true);
+    return { context, worker, id: new URL(worker.url()).host, profile: dir };
+  } catch (error) {
+    await context.close().catch(() => {});
+    throw error;
+  }
 }
 
 export async function open(context: BrowserContext, id: string, file: string, scale = 1) {
