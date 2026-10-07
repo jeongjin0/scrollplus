@@ -16,11 +16,11 @@ Scroll like you always do. When a video has fewer likes than your minimum, Scrol
 
 The default is simple: **skip anything under 5,000 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
-| Preset | Korean | Skips videos under |
-| --- | --- | --- |
-| Lenient | 느슨 | 1,000 likes |
-| Balanced (default) | 기본 | 5,000 likes |
-| Strict | 엄격 | 20,000 likes |
+| Preset | Skips videos under |
+| --- | --- |
+| Lenient | 1,000 likes |
+| Balanced (default) | 5,000 likes |
+| Strict | 20,000 likes |
 
 In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `5k`, `2만`, `1,000`.
 
