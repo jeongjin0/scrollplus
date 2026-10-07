@@ -53,7 +53,7 @@ test("popup fits without scrolling at 1x and 2x", async () => {
 test("options exposes the detail controls", async () => {
   const { context, page } = await openExtensionPage(1, "options.html");
   try {
-    await expect(page.locator("body")).toContainText(/Advanced cutoffs|세부 기준/);
+    await expect(page.locator("body")).toContainText(/Conditions|조건/);
     await expect(page.locator("body")).toContainText(/does not collect or transmit|수집하거나 전송하지 않습니다/);
     await expect(page.locator("a.star")).toHaveAttribute("href", "https://github.com/jeongjin0/kept");
   } finally {

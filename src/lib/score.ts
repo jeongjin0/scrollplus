@@ -27,6 +27,22 @@ export interface AdvancedSettings {
   instagram?: PlatformCutoff;
 }
 
+export type Signal = "likes" | "comments" | "shares" | "saves";
+
+export interface Signals {
+  likes: boolean;
+  comments: boolean;
+  shares: boolean;
+  saves: boolean;
+}
+
+export const DEFAULT_SIGNALS: Signals = {
+  likes: true,
+  comments: true,
+  shares: true,
+  saves: true,
+};
+
 export interface Settings {
   enabled: boolean;
   sensitivity: Sensitivity;
@@ -35,6 +51,7 @@ export interface Settings {
   showSkipChip: boolean;
   allowlist: AllowEntry[];
   advanced: AdvancedSettings | null;
+  signals: Signals;
 }
 
 export const REPO_URL = "https://github.com/jeongjin0/kept";
@@ -56,6 +73,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showSkipChip: true,
   allowlist: [],
   advanced: null,
+  signals: DEFAULT_SIGNALS,
 };
 
 export interface DailySkips {
@@ -93,21 +111,26 @@ export function cutoffFor(settings: Settings, platform: Platform): PlatformCutof
   return settings.advanced?.[platform] ?? PROVISIONAL_CUTOFFS[platform];
 }
 
+export function effectiveLimit(settings: Settings, platform: Platform): number {
+  return cutoffFor(settings, platform).balancedCutoff * sensitivityMultiplier(settings.sensitivity);
+}
+
 function finite(value: number | null | undefined): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
-export function engagementScore(metrics: Metrics): number | null {
+export function engagementScore(metrics: Metrics, signals: Signals = DEFAULT_SIGNALS): number | null {
   if (!finite(metrics.views) || metrics.views <= 0) return null;
-  const parts: Array<[number | null, number]> = [
-    [metrics.likes, 1],
-    [metrics.comments, 3],
-    [metrics.shares, 4],
-    [metrics.saves, 4],
+  const parts: Array<[Signal, number | null, number]> = [
+    ["likes", metrics.likes, 1],
+    ["comments", metrics.comments, 3],
+    ["shares", metrics.shares, 4],
+    ["saves", metrics.saves, 4],
   ];
   let numerator = 0;
   let any = false;
-  for (const [value, weight] of parts) {
+  for (const [signal, value, weight] of parts) {
+    if (!signals[signal]) continue;
     if (!finite(value)) continue;
     numerator += value * weight;
     any = true;
@@ -163,16 +186,20 @@ export function decide(input: DecideInput): Decision {
   if (surface === "grid" && !settings.filterGrids) return { action: "keep", reason: "grid-off" };
   if (!finite(metrics.views)) return { action: "keep", reason: "no-views" };
   if (metrics.views <= 0) return { action: "keep", reason: "unscored" };
-  if (metrics.views >= 800 && metrics.likes === 0 && metrics.comments === 0 && metrics.shares === 0) {
-    return { action: "skip", reason: "zero-engagement" };
-  }
+  if (isZeroEngagement(metrics, settings.signals)) return { action: "skip", reason: "zero-engagement" };
   const cutoff = cutoffFor(settings, platform);
   if (metrics.views < cutoff.sampleFloor) return { action: "keep", reason: "sample-floor" };
-  const score = engagementScore(metrics);
+  const score = engagementScore(metrics, settings.signals);
   if (score == null) return { action: "keep", reason: "unscored" };
   const limit = cutoff.balancedCutoff * sensitivityMultiplier(settings.sensitivity);
   if (score < limit) return { action: "skip", reason: "below-cutoff" };
   return { action: "keep", reason: "above-cutoff" };
+}
+
+function isZeroEngagement(metrics: Metrics, signals: Signals): boolean {
+  if (!finite(metrics.views) || metrics.views < 800) return false;
+  const required = (["likes", "comments", "shares"] as const).filter((signal) => signals[signal]);
+  return required.length > 0 && required.every((signal) => metrics[signal] === 0);
 }
 
 function isPlatform(value: unknown): value is Platform {
@@ -207,6 +234,7 @@ export function normalizeSettings(value: unknown): Settings {
     }
     advanced = Object.keys(next).length ? next : null;
   }
+  const signals = normalizeSignals(raw.signals);
   return {
     enabled: raw.enabled !== false,
     sensitivity,
@@ -219,10 +247,20 @@ export function normalizeSettings(value: unknown): Settings {
     showSkipChip: raw.showSkipChip !== false,
     allowlist,
     advanced,
+    signals,
+  };
+}
+
+function normalizeSignals(value: unknown): Signals {
+  const raw = value && typeof value === "object" ? (value as Partial<Signals>) : {};
+  return {
+    likes: raw.likes !== false,
+    comments: raw.comments !== false,
+    shares: raw.shares !== false,
+    saves: raw.saves !== false,
   };
 }
 
 export function emptyMetrics(): Metrics {
   return { views: null, likes: null, comments: null, shares: null, saves: null };
 }
-

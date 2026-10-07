@@ -48,10 +48,39 @@
     "message": "최소 조회"
   },
   "cutoff": {
-    "message": "기준 %"
+    "message": "기본 기준 %"
   },
-  "advanced": {
-    "message": "세부 기준"
+  "conditions": {
+    "message": "조건"
+  },
+  "reactions": {
+    "message": "반응"
+  },
+  "reactionNote": {
+    "message": "고른 반응만 점수에 넣습니다. 페이지에 없는 수는 0으로 보지 않습니다."
+  },
+  "presetNote": {
+    "message": "느슨은 기본의 절반, 엄격은 두 배입니다. 아래 숫자는 기본 기준입니다."
+  },
+  "lead": {
+    "message": "설치하면 기본으로 켜집니다. 조건은 여기서만 바꿉니다."
+  },
+  "useDefault": {
+    "message": "이 사이트는 기본값"
+  },
+  "allowEmpty": {
+    "message": "아직 없습니다."
+  },
+  "signalLikes": { "message": "좋아요" },
+  "signalComments": { "message": "댓글" },
+  "signalShares": { "message": "공유" },
+  "signalSaves": { "message": "저장" },
+  "liveRule": {
+    "message": "$FLOOR$회가 넘고 $PERCENT$보다 약하면 넘깁니다.",
+    "placeholders": {
+      "floor": { "content": "$1", "example": "2,000" },
+      "percent": { "content": "$2", "example": "0.8%" }
+    }
   },
   "remove": {
     "message": "제거"

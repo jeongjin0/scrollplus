@@ -1,17 +1,20 @@
-import type { Platform } from "../lib/score";
-import { Master, Mark, PlatformSwitches, SensitivityControl } from "./controls";
-import { useKeptState } from "./state";
+import { DEFAULT_SETTINGS, DEFAULT_SIGNALS, cutoffFor, effectiveLimit, type Platform } from "../lib/score";
+import { Master, Mark, SensitivityControl, SignalChips } from "./controls";
+import { formatPercent, useKeptState } from "./state";
 
 const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
 
 export function OptionsApp() {
-  const { settings, skips, active, copy, patch, allowCurrent, cutoffFor } = useKeptState();
+  const { settings, skips, active, copy, patch, allowCurrent } = useKeptState();
   return (
     <main className="options">
       <div className="sheet">
         <header className="top">
           <Mark />
-          <h1>Kept</h1>
+          <div>
+            <h1>Kept</h1>
+            <p className="note">{copy.lead}</p>
+          </div>
         </header>
         <Master enabled={settings.enabled} onLabel={copy.on} offLabel={copy.off} onToggle={() => void patch({ enabled: !settings.enabled })} />
         <SensitivityControl
@@ -19,61 +22,75 @@ export function OptionsApp() {
           labels={{ lenient: copy.lenient, balanced: copy.balanced, strict: copy.strict }}
           onChange={(sensitivity) => void patch({ sensitivity })}
         />
-        <PlatformSwitches
-          settings={settings}
-          labels={{ youtube: copy.youtube, tiktok: copy.tiktok, instagram: copy.instagram }}
-          onToggle={(platform) => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}
-        />
+        <p className="note">{copy.presetNote}</p>
         <p className="count">{copy.skippedToday(skips)}</p>
-        {active?.creatorId ? <button className="text-button" onClick={() => void allowCurrent()}>{copy.keepCreator}</button> : null}
-        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{copy.signedOut}</p> : null}
-        <label className="check">
-          <input type="checkbox" checked={settings.filterGrids} onChange={(event) => void patch({ filterGrids: event.target.checked })} />
-          {copy.filterGrids}
-        </label>
-        <label className="check">
-          <input type="checkbox" checked={settings.showSkipChip} onChange={(event) => void patch({ showSkipChip: event.target.checked })} />
-          {copy.showChip}
-        </label>
-        <section className="panel">
-          <h2>{copy.allowlist}</h2>
-          {settings.allowlist.length === 0 ? <p className="note">—</p> : settings.allowlist.map((entry) => (
-            <div className="allow" key={entry.platform + entry.id}>
-              <span>{entry.platform} · {entry.id}</span>
-              <button className="text-button" onClick={() => void patch({ allowlist: settings.allowlist.filter((item) => item !== entry) })}>{copy.remove}</button>
-            </div>
-          ))}
-        </section>
-        <section className="panel">
-          <h2>{copy.advanced}</h2>
+        <section className="stack">
+          <h2>{copy.conditions}</h2>
           {PLATFORMS.map((platform) => {
             const cutoff = cutoffFor(settings, platform);
+            const custom = settings.advanced?.[platform] != null;
             return (
-              <div key={platform}>
-                <strong>{platform}</strong>
+              <article className={settings.platforms[platform] ? "panel" : "panel off"} key={platform}>
+                <div className="row">
+                  <h3>{copy.platform[platform]}</h3>
+                  <button type="button" className={settings.platforms[platform] ? "mini on" : "mini"} aria-pressed={settings.platforms[platform]} onClick={() => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}>
+                    {settings.platforms[platform] ? copy.on : copy.off}
+                  </button>
+                </div>
+                <p className="rule">{copy.liveRule(formatCount(cutoff.sampleFloor), formatPercent(effectiveLimit(settings, platform)))}</p>
                 <div className="fields">
                   <label>
                     {copy.sampleFloor}
-                    <input type="number" min={0} value={cutoff.sampleFloor} onChange={(event) => updateCutoff(platform, Number(event.target.value), cutoff.balancedCutoff)} />
+                    <input type="number" min={0} value={cutoff.sampleFloor} onChange={(event) => updateCutoff(platform, event.target.value, cutoff.balancedCutoff, "floor")} />
                   </label>
                   <label>
                     {copy.cutoff}
-                    <input type="number" min={0} step={0.1} value={Number((cutoff.balancedCutoff * 100).toFixed(2))} onChange={(event) => updateCutoff(platform, cutoff.sampleFloor, Number(event.target.value) / 100)} />
+                    <input type="number" min={0} step={0.1} value={Number((cutoff.balancedCutoff * 100).toFixed(2))} onChange={(event) => updateCutoff(platform, event.target.value, cutoff.sampleFloor, "bar")} />
                   </label>
                 </div>
-              </div>
+                {custom ? <button type="button" className="text-button" onClick={() => clearPlatform(platform)}>{copy.useDefault}</button> : null}
+              </article>
             );
           })}
         </section>
-        <button className="text-button" onClick={() => void patch({ enabled: true, sensitivity: "balanced", platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, allowlist: [], advanced: null })}>{copy.reset}</button>
+        <section className="panel">
+          <h2>{copy.reactions}</h2>
+          <p className="note">{copy.reactionNote}</p>
+          <SignalChips
+            signals={settings.signals}
+            labels={copy.signal}
+            onToggle={(signal) => void patch({ signals: { ...settings.signals, [signal]: !settings.signals[signal] } })}
+          />
+        </section>
+        <div className="choices">
+          <button type="button" className={settings.filterGrids ? "signal on" : "signal"} aria-pressed={settings.filterGrids} onClick={() => void patch({ filterGrids: !settings.filterGrids })}>{copy.filterGrids}</button>
+          <button type="button" className={settings.showSkipChip ? "signal on" : "signal"} aria-pressed={settings.showSkipChip} onClick={() => void patch({ showSkipChip: !settings.showSkipChip })}>{copy.showChip}</button>
+        </div>
+        {active?.creatorId ? <button className="text-button" onClick={() => void allowCurrent()}>{copy.keepCreator}</button> : null}
+        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{copy.signedOut}</p> : null}
+        <section className="panel">
+          <h2>{copy.allowlist}</h2>
+          {settings.allowlist.length === 0 ? <p className="note">{copy.allowEmpty}</p> : settings.allowlist.map((entry) => (
+            <div className="allow" key={entry.platform + entry.id}>
+              <span>{copy.short[entry.platform]} · {entry.id}</span>
+              <button className="text-button" onClick={() => void patch({ allowlist: settings.allowlist.filter((item) => item.platform !== entry.platform || item.id !== entry.id) })}>{copy.remove}</button>
+            </div>
+          ))}
+        </section>
+        <button className="text-button" onClick={() => void patch({ ...DEFAULT_SETTINGS, signals: { ...DEFAULT_SIGNALS }, platforms: { ...DEFAULT_SETTINGS.platforms } })}>{copy.reset}</button>
         <p className="privacy">{copy.privacy}</p>
         <a className="star" href={copy.repo} target="_blank" rel="noreferrer">{copy.star}</a>
       </div>
     </main>
   );
 
-  function updateCutoff(platform: Platform, sampleFloor: number, balancedCutoff: number) {
-    if (!Number.isFinite(sampleFloor) || !Number.isFinite(balancedCutoff)) return;
+  function updateCutoff(platform: Platform, raw: string, other: number, field: "floor" | "bar") {
+    if (raw.trim() === "") return;
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value < 0) return;
+    const current = cutoffFor(settings, platform);
+    const sampleFloor = field === "floor" ? value : current.sampleFloor;
+    const balancedCutoff = field === "bar" ? value / 100 : other;
     void patch({
       advanced: {
         ...(settings.advanced ?? {}),
@@ -81,4 +98,14 @@ export function OptionsApp() {
       },
     });
   }
+
+  function clearPlatform(platform: Platform) {
+    const next = { ...(settings.advanced ?? {}) };
+    delete next[platform];
+    void patch({ advanced: Object.keys(next).length ? next : null });
+  }
+}
+
+function formatCount(value: number): string {
+  return Math.round(value).toLocaleString("en-US");
 }

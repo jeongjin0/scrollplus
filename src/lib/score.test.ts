@@ -20,6 +20,10 @@ describe("engagementScore", () => {
     expect(engagementScore(metrics({ views: 0, likes: 10 }))).toBeNull();
     expect(engagementScore(metrics({ views: 5000 }))).toBeNull();
   });
+  it("ignores a reaction the user turned off", () => {
+    const signals = { ...DEFAULT_SETTINGS.signals, comments: false };
+    expect(engagementScore(metrics({ views: 1000, likes: 10, comments: 10 }), signals)).toBe(10 / 1000);
+  });
 });
 
 describe("decide", () => {
@@ -40,6 +44,10 @@ describe("decide", () => {
   });
   it("does not treat a missing field as zero engagement", () => {
     expect(decide({ ...base, settings: settings(), metrics: metrics({ views: 900, likes: 0, comments: null, shares: 0 }) })).toEqual({ action: "keep", reason: "sample-floor" });
+  });
+  it("does not require a reaction the user turned off", () => {
+    const signals = { ...DEFAULT_SETTINGS.signals, comments: false };
+    expect(decide({ ...base, settings: settings({ signals }), metrics: metrics({ views: 900, likes: 0, comments: null, shares: 0 }) }).reason).toBe("zero-engagement");
   });
   it("keeps when the numerator is missing", () => {
     expect(decide({ ...base, settings: settings(), metrics: metrics({ views: 5000 }) })).toEqual({ action: "keep", reason: "unscored" });

@@ -54,7 +54,8 @@ On install, write these defaults and apply them immediately. The extension must 
       "filterGrids": false,
       "showSkipChip": true,
       "allowlist": [],
-      "advanced": null
+      "advanced": null,
+      "signals": { "likes": true, "comments": true, "shares": true, "saves": true }
     }
 
 advanced null means the calibrated preset cutoffs are used. A saved advanced object replaces the cutoff and sample floor for that platform only.
@@ -67,7 +68,7 @@ Use this score when views is a number greater than zero:
 
     (likes + comments * 3 + shares * 4 + saves * 4) / views
 
-Omit a numerator field when it is null. Do not treat null as zero. Views of zero or null cannot produce a score.
+Omit a numerator field when it is null or when that reaction is turned off in settings. Do not treat null as zero. Views of zero or null cannot produce a score. All four reactions start on.
 
 Provisional Balanced cutoffs are a starting point, not a researched constant. Public engagement averages disagree, and YouTube has counted a Shorts view at play start since 2025-03-31, so a raw view floor is the wrong default.
 
@@ -79,7 +80,7 @@ Provisional Balanced cutoffs are a starting point, not a researched constant. Pu
 
 - Lenient uses half the cutoff. Strict uses double the cutoff. The sample floor does not change with sensitivity.
 - Skip when a score exists, views are at or above the sample floor, and the score is below the cutoff.
-- Also skip when views are at least 800 and likes, comments, and shares are all present and all zero. Saves may be null.
+- Also skip when views are at least 800 and every enabled reaction among likes, comments, and shares is present and zero. Saves may be null. A turned-off reaction is not required.
 - If views are null, keep the video.
 - If the score cannot be computed, keep the video.
 - If the creator is allowlisted, keep the video.
@@ -131,23 +132,25 @@ Match on that id. The popup can remove entries. The allowlist survives restarts.
 
 ## Popup and options
 
-Popup size is 320 by 420 and does not scroll in the default state.
+The popup is 320 wide and no taller than 420. It does not scroll in the default state.
 
 Popup contains only:
 
 - Wordmark: Kept
 - Master status, acting as the on/off switch
 - Segmented control: Lenient, Balanced, Strict. Korean: 느슨, 기본, 엄격
-- Three platform switches. Changes apply immediately. No save button.
+- One row of three site chips: YouTube, TikTok, Reels. Changes apply immediately. No save button.
+- One line showing the live bar for each site that is on.
+- A conditions link that opens the options page.
 - Today's skip count, for example "18 skipped today" / "오늘 18개 넘김"
 - "Keep this creator" when a supported video is active
 - Footer link: "Star on GitHub" / "GitHub에 Star"
 
 If Instagram metrics are unavailable because the user is signed out, the popup says "Instagram is signed out. Nothing is hidden." Korean: "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다." Do not show this as a modal on instagram.com.
 
-Options contains the popup controls plus allowlist management, the grid filter, the chip toggle, per-platform sample floor and cutoff, reset to defaults, a one-line privacy statement, and the same Star link.
+Options contains the master switch, the three presets, and the conditions. Each site has its own on/off control, minimum plays, and Balanced bar. Lenient stays half of that bar and Strict stays double. The reaction chips choose which of likes, comments, shares, and saves enter the score. Options also has allowlist management, the grid filter, the chip toggle, reset to defaults, a one-line privacy statement, and the same Star link.
 
-Reset restores the defaults in this spec and the calibrated cutoffs.
+Reset restores the defaults in this spec, including all four reactions and the calibrated cutoffs.
 
 The toolbar icon has no number badge.
 

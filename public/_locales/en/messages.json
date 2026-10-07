@@ -45,13 +45,42 @@
     "message": "Creators to keep"
   },
   "sampleFloor": {
-    "message": "Sample floor"
+    "message": "Minimum plays"
   },
   "cutoff": {
-    "message": "Cutoff %"
+    "message": "Balanced bar %"
   },
-  "advanced": {
-    "message": "Advanced cutoffs"
+  "conditions": {
+    "message": "Conditions"
+  },
+  "reactions": {
+    "message": "Reactions"
+  },
+  "reactionNote": {
+    "message": "Only selected reactions count. A missing count is not treated as zero."
+  },
+  "presetNote": {
+    "message": "Lenient is half of Balanced. Strict is double. The numbers below are the Balanced bar."
+  },
+  "lead": {
+    "message": "It is already on. Change the conditions here."
+  },
+  "useDefault": {
+    "message": "Use the preset for this site"
+  },
+  "allowEmpty": {
+    "message": "None yet."
+  },
+  "signalLikes": { "message": "Likes" },
+  "signalComments": { "message": "Comments" },
+  "signalShares": { "message": "Shares" },
+  "signalSaves": { "message": "Saves" },
+  "liveRule": {
+    "message": "Past $FLOOR$ plays, skip anything under $PERCENT$.",
+    "placeholders": {
+      "floor": { "content": "$1", "example": "2,000" },
+      "percent": { "content": "$2", "example": "0.8%" }
+    }
   },
   "remove": {
     "message": "Remove"
