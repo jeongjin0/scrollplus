@@ -23,6 +23,14 @@ The test launcher now selects an extension worker and polls for its storage API 
 
 An isolated, intentionally failed extension-page check verified that manually launched contexts retain frame snapshots and the actual error in a valid trace ZIP. This checks diagnostics, not product behavior. The current-browser release-ZIP control passed all 23 cases with the updated launcher and tracing enabled.
 
+### CI setup deadlines
+
+An observed [hosted branch job](https://github.com/jeongjin0/scrollplus/actions/runs/37665127912/job/112942286446) remained in system dependency installation for over 90 minutes before any browser tests ran. Its completed counterpart installed those dependencies in 100 seconds; the current-browser install, including its download, took about eight minutes. These observations do not establish the cause of the delayed job.
+
+Future CI jobs have a 60-minute limit, with 30 minutes for Playwright dependency/browser installation and 10 minutes for the pinned Chrome 120 download. A deadline failure remains a failed check. Every existing test, assertion and 30-second test limit remains in force; tests are neither omitted nor made optional. [GitHub documents the job and step deadline settings](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes).
+
+The separate 24-hour real-feed check runs on the task host outside this workflow. These CI limits do not shorten or restart that check.
+
 ## macOS 27 limitation
 
 The official mac-arm64 Chrome 120.0.6099.109 download was checked against its vendor MD5 and ZIP integrity. Its version command succeeded, but browser tests on macOS 27 ARM64 exited with `SIGTRAP` before a page opened. A separate fresh-profile, no-extension `about:blank` control reproduced the same exit without Playwright. Thus the extension is not required for this startup failure; its underlying cause was not established. This attempt is neither a Chrome 120/macOS compatibility pass nor an extension regression. No OS security settings or existing browser profiles were changed.

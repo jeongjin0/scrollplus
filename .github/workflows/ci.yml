@@ -7,6 +7,7 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -27,6 +28,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -36,6 +38,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium
+        timeout-minutes: 30
       - run: xvfb-run -a npm run test:e2e
       - uses: actions/upload-artifact@v7.0.1
         if: failure()
@@ -46,6 +49,7 @@ jobs:
 
   minimum-chrome:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -55,7 +59,9 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install-deps chromium
+        timeout-minutes: 30
       - name: Install Chrome for Testing 120
+        timeout-minutes: 10
         run: |
           browser_dir="$RUNNER_TEMP/scrollplus-chrome-120"
           mkdir -p "$browser_dir"
