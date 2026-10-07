@@ -4,9 +4,10 @@ import os from "node:os";
 import path from "node:path";
 
 export async function launch(language?: "en" | "ko", profile?: string) {
-  const extension = path.resolve(".output/chrome-mv3");
+  const extension = path.resolve(process.env.SCROLLPLUS_EXTENSION_PATH ?? ".output/chrome-mv3");
   const dir = profile ?? fs.mkdtempSync(path.join(os.tmpdir(), "scrollplus-ext-"));
   const context = await chromium.launchPersistentContext(dir, {
+    executablePath: process.env.SCROLLPLUS_CHROME_EXECUTABLE,
     headless: false,
     args: ["--disable-extensions-except=" + extension, "--load-extension=" + extension],
   });

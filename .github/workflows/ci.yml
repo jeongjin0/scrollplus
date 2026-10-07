@@ -37,3 +37,28 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: xvfb-run -a npm run test:e2e
+
+  minimum-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install-deps chromium
+      - name: Install Chrome for Testing 120
+        run: |
+          browser_dir="$RUNNER_TEMP/scrollplus-chrome-120"
+          mkdir -p "$browser_dir"
+          curl --fail --location --retry 3 --output "$browser_dir/chrome.zip" \
+            https://storage.googleapis.com/chrome-for-testing-public/120.0.6099.109/linux64/chrome-linux64.zip
+          unzip -q "$browser_dir/chrome.zip" -d "$browser_dir"
+          executable="$browser_dir/chrome-linux64/chrome"
+          actual_version="$("$executable" --version)"
+          [[ "$actual_version" == *"120.0.6099.109"* ]]
+          printf '%s\n' "$actual_version"
+          printf 'SCROLLPLUS_CHROME_EXECUTABLE=%s\n' "$executable" >> "$GITHUB_ENV"
+      - run: xvfb-run -a npm run test:e2e
