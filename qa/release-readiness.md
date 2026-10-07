@@ -7,6 +7,7 @@ Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 pa
 | TypeScript | Pass | `npm run compile` |
 | Unit tests | 44 passed | `npm test`; rules, parsing, extraction, engine regressions |
 | Browser tests | 23 passed | `npm run test:e2e`; native fetch/XHR contracts, grid restoration, TikTok preview exclusion and Following/video-route coverage, actual built scripts on controlled fixtures, popup/settings, concurrent storage writes, navigation-safe QA and bounded feed recovery; Undo reload/new-tab/Strict/Reset on five adapter routes, concurrent RAM writes and actual browser restart |
+| Minimum Chrome 120 | 23 passed on Linux | [Compatibility checks](chrome-compatibility.md); official Chrome for Testing 120.0.6099.109 runs the same suite in CI. Controlled fixtures establish the checked runtime/UI behavior; current signed-in websites and Chrome 120 on macOS 27 are not established |
 | Grid restoration regression | Pass | [Before/after evidence](grid-filtering.md); cards return after lowering the minimum or disabling optional grid filtering; host-hidden cards are preserved |
 | Network observer regression | Pass | [Before/after evidence](network-observer.md); reused XHR no longer loses/duplicates responses; relative feed requests reach the built TikTok adapter |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage permission, three host permissions, localized strings, entry files, icon bytes and image dimensions |
