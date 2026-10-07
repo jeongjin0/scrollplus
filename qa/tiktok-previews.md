@@ -25,6 +25,6 @@ The account's Following route contained recommendations and no vertical feed, so
 
 Typecheck, 42 unit tests, 19 browser tests and final ZIP/package validation pass. Runtime scripts used by the browser suite match the final package; the manifest version was corrected to 0.3.4 before package validation and live installation. Defaults, UI and permissions are unchanged.
 
-The 0.3.3 and 0.3.4 ZIPs were compared entry by entry. YouTube MAIN/isolated scripts and the background counter are byte-identical; the existing [24-hour check](soak.md) continues on its immutable 0.3.3 package. This is not a full-day 0.3.4 package pass. Remaining gates are in [release readiness](release-readiness.md).
+The 0.3.3 and 0.3.4 ZIPs were compared entry by entry. YouTube MAIN/isolated scripts and the background counter are byte-identical; the earlier [24-hour attempt](soak.md) ended early when its QA runner treated a refresh as fatal. Its partial evidence is preserved, and a new full-duration 0.3.4 run is active after runner recovery checks. No full-day pass is claimed. Remaining gates are in [release readiness](release-readiness.md).
 
 Local evidence is retained under `qa/tmp/following-preflight-033-20261007`, `qa/tmp/tiktok-preview-regression-034` and `qa/tmp/aside-live-034-20261007`, not served wholesale or committed.
