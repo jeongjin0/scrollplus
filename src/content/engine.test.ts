@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -31,6 +31,10 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true) {
     advance: async () => {
       calls += 1;
       advances.push(latest);
+      duringAdvance?.((item) => {
+        latest = item.id;
+        engine.onItem(item);
+      });
       return advanceResult;
     },
     retreat: async () => {
@@ -108,6 +112,24 @@ describe("engine", () => {
     expect(box.advances).toEqual([]);
   });
 
+  it("skips when metrics arrive during the grace period", async () => {
+    const box = harness();
+    box.show({ ...low("a"), metrics: null });
+    box.flush(900);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("does not skip when metrics arrive after the grace period", async () => {
+    const box = harness();
+    box.show({ ...low("a"), metrics: null });
+    box.flush(2000);
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual([]);
+  });
+
   it("skips once metrics arrive", async () => {
     const box = harness();
     box.show({ ...low("a"), metrics: null });
@@ -116,6 +138,22 @@ describe("engine", () => {
     await box.drain();
     expect(box.advances).toEqual(["a"]);
     expect(box.chips.at(-1)).toBe("skipped");
+  });
+
+  it("keeps the skip chip after the next video stays", async () => {
+    const box = harness({}, true, (show) => {
+      show({
+        ...low("b"),
+        metrics: { views: 10000, likes: 800, comments: 20, shares: 10, saves: null },
+      });
+    });
+    box.show(low("a"));
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    expect(box.skips).toBe(1);
+    expect(box.chips.at(-1)).toBe("skipped");
+    box.flush(2500);
+    expect(box.chips.at(-1)).toBe("none");
   });
 
   it("pauses after six consecutive skips", async () => {
@@ -157,8 +195,19 @@ describe("engine", () => {
     const box = harness({}, false);
     box.show(low("a"));
     await box.drain();
+    expect(box.calls).toBe(1);
+    box.flush(400);
+    await box.drain();
+    box.flush(400);
+    await box.drain();
+    box.flush(5200);
+    await box.drain();
+    const calls = box.calls;
+    expect(calls).toBeGreaterThan(1);
     box.engine.poke();
     await box.drain();
-    expect(box.calls).toBe(1);
+    box.flush(1000);
+    await box.drain();
+    expect(box.calls).toBe(calls);
   });
 });

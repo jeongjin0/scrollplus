@@ -104,8 +104,8 @@ When filterGrids is on, use the same scorer. A card that only exposes a view cou
 
 This applies to the active vertical player only.
 
-- Wait up to 700ms for metrics. If they do not arrive, keep the video. Never skip blind.
-- Advance with the site's own next control, or the same key the site already uses for next. Do not delete DOM nodes. Do not restyle the host page.
+- Wait up to 700ms for metrics. If they arrive within 2 seconds of the video opening, score them. After that, keep the video. Never skip blind.
+- Advance with the site's own next control. On YouTube, click that control from the page script; an isolated-world click does not change the Short. If the control is not ready, retry until 5 seconds after the video opened, then stop. Do not delete DOM nodes. Do not restyle the host page.
 - At least 450ms between automatic advances. Never advance in parallel.
 - Stop after 6 consecutive skips. Show a non-modal chip: "The next ones are under your bar." Korean: "다음 영상도 기준 아래입니다."
 - Actions on that chip: "Keep going" / "이어서 보기" resets the cap for another 6. "Lower the bar" / "기준 낮추기" moves Strict to Balanced, or Balanced to Lenient, then continues. On Lenient, only "Keep going" is shown.
@@ -251,4 +251,3 @@ The work is done only when all of these are true:
 This block is for the human starting the Codex goal. It is not an extra product requirement.
 
     Build Kept from /Users/jeongjin/Developer/edgethink/kept/SPEC.md. That file is the spec. Read it before coding and again before you call the work done. Create the public MIT repo github.com/jeongjin0/kept. Do not submit to the Chrome Web Store. Done means npm test and the production build are green, the zip and store assets exist, and qa/live-smoke.md records a real YouTube Shorts smoke. If a rule is missing from SPEC.md, do not invent a feature.
-

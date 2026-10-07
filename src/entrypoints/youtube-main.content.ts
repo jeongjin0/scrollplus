@@ -7,7 +7,6 @@ export default defineContentScript({
   runAt: "document_start",
   world: "MAIN",
   main() {
-    let last = "";
     let latest: unknown = null;
     const publish = (player?: unknown) => {
       try {
@@ -16,9 +15,6 @@ export default defineContentScript({
         const source = player ?? latest ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
         const extracted = extractYouTube(source);
         if (!extracted || extracted.id !== id) return;
-        const key = JSON.stringify(extracted.metrics) + extracted.creatorId;
-        if (key === last) return;
-        last = key;
         window.postMessage({ source: "kept", type: "item", item: { platform: "youtube", surface: "player", ...extracted } }, "*");
       } catch {
         /* leave the page alone */
@@ -28,6 +24,13 @@ export default defineContentScript({
       const detail = (event as CustomEvent<{ response?: { playerResponse?: unknown } }>).detail;
       latest = detail?.response?.playerResponse ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
       publish(latest);
+    });
+    window.addEventListener("message", (event) => {
+      const data = event.data as { source?: string; type?: string; key?: string } | null;
+      if (!data || data.source !== "kept" || data.type !== "advance") return;
+      const selector = data.key === "ArrowUp" ? "#navigation-button-up button" : "#navigation-button-down button";
+      const button = document.querySelector(selector);
+      if (button instanceof HTMLElement) button.click();
     });
     window.setInterval(() => publish(), 500);
   },

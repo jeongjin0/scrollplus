@@ -28,9 +28,12 @@ export interface EngineDeps {
 }
 
 const METRIC_WAIT_MS = 700;
+const METRIC_GRACE_MS = 2000;
 const ADVANCE_GAP_MS = 450;
 const CHIP_HOLD_MS = 2500;
 const SKIP_CAP = 6;
+const RETRY_GAP_MS = 400;
+const RETRY_FOR_MS = 5000;
 
 export function createEngine(deps: EngineDeps) {
   let current: EngineItem | null = null;
@@ -44,6 +47,7 @@ export function createEngine(deps: EngineDeps) {
   const sessionKeep = new Set<string>();
   const finished = new Set<string>();
   let lastAdvanceAt = Number.NEGATIVE_INFINITY;
+  let seenAt = Number.NEGATIVE_INFINITY;
 
   function clearWait() {
     if (waitTimer != null) deps.cancel(waitTimer);
@@ -92,12 +96,21 @@ export function createEngine(deps: EngineDeps) {
     } finally {
       advancing = false;
     }
-    if (current?.id !== item.id) return;
-    finished.add(item.id);
     if (!moved) {
-      deps.render(null);
+      if (current?.id !== item.id) return;
+      if (deps.now() - seenAt >= RETRY_FOR_MS) {
+        finished.add(item.id);
+        deps.render(null);
+        return;
+      }
+      if (gapTimer != null) deps.cancel(gapTimer);
+      gapTimer = deps.schedule(() => {
+        gapTimer = null;
+        void performSkip(item);
+      }, RETRY_GAP_MS);
       return;
     }
+    finished.add(item.id);
     lastAdvanceAt = deps.now();
     consecutive += 1;
     deps.onSkipped();
@@ -120,10 +133,16 @@ export function createEngine(deps: EngineDeps) {
       kind: item.kind,
     });
     if (decision.action === "keep") {
+      const waiting = decision.reason === "no-metrics" || decision.reason === "no-views" || decision.reason === "unscored";
+      if (waiting && deps.now() - seenAt < METRIC_GRACE_MS) return;
       finished.add(item.id);
       consecutive = 0;
       paused = false;
-      deps.render(null);
+      if (chipTimer == null) deps.render(null);
+      return;
+    }
+    if (deps.now() - seenAt >= METRIC_GRACE_MS) {
+      finished.add(item.id);
       return;
     }
     if (paused) {
@@ -145,6 +164,7 @@ export function createEngine(deps: EngineDeps) {
     onItem(item: EngineItem) {
       const changed = current?.id !== item.id;
       current = item;
+      if (changed) seenAt = deps.now();
       if (sessionKeep.has(item.id)) {
         clearWait();
         deps.render(null);
@@ -172,6 +192,8 @@ export function createEngine(deps: EngineDeps) {
       if (gapTimer != null) deps.cancel(gapTimer);
       gapTimer = null;
       skipQueuedFor = null;
+      if (chipTimer != null) deps.cancel(chipTimer);
+      chipTimer = null;
       consecutive = Math.max(0, consecutive - 1);
       paused = false;
       deps.render(null);
