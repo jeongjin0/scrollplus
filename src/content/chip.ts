@@ -52,7 +52,7 @@ export function mountChip(actions: { undo: () => void; keepGoing: () => void; lo
   function ensure(): void {
     if (host && root) return;
     host = document.createElement("div");
-    host.id = "kept-chip-host";
+    host.id = "slf-chip-host";
     host.style.position = "fixed";
     host.style.left = "50%";
     host.style.bottom = "32px";

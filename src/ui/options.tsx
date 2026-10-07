@@ -2,12 +2,12 @@ import { COVERAGE, DEFAULT_SETTINGS, METRICS, PLATFORMS, REPO_URL, activePreset,
 import type { IconName } from "../lib/icons";
 import { t } from "../lib/i18n";
 import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile } from "./kit";
-import { SITES, useKeptState } from "./state";
+import { SITES, useFilterState } from "./state";
 
 const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
 
 export function OptionsApp() {
-  const { settings, ready, skips, update } = useKeptState();
+  const { settings, ready, skips, update } = useFilterState();
   const preset = activePreset(settings.rule);
   const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
 
@@ -21,7 +21,7 @@ export function OptionsApp() {
         <header className="bar">
           <div className="brand">
             <Mark size={30} />
-            <h1>Kept</h1>
+            <h1>{t("extName")}</h1>
           </div>
           <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} text={settings.enabled ? t("statusOn") : t("statusOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
         </header>

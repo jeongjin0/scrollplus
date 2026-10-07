@@ -1,18 +1,15 @@
-<p align="center"><img src="public/icon/128.png" width="72" height="72" alt="Kept"></p>
+<p align="center"><img src="public/icon/128.png" width="72" height="72" alt="Short-Form Like Filter"></p>
 
-<h1 align="center">Kept</h1>
+<h1 align="center">Short-Form Like Filter</h1>
 
-<p align="center"><b>Weak videos skip themselves.</b><br>
-A Chrome extension that skips YouTube Shorts, TikToks, and Instagram Reels with too few likes.<br>
-Installed means on. No account, no setup.</p>
+<p align="center"><b>Skips YouTube Shorts, TikToks, and Instagram Reels with too few likes.</b><br>
+A Chrome extension. Installed means on. No account, no setup.</p>
 
-<p align="center"><a href="https://github.com/jeongjin0/kept"><b>★ Star Kept on GitHub</b></a> if it saves you a few scrolls.</p>
-
-<p align="center"><img src="store/screenshots/popup.png" alt="The Kept popup" width="720"></p>
+<p align="center"><img src="store/screenshots/popup.png" alt="The popup" width="720"></p>
 
 ## What it does
 
-Scroll like you always do. When a video has fewer likes than your minimum, Kept moves to the next one and tells you why, with an Undo that lasts a few seconds.
+Scroll like you always do. When a video has fewer likes than your minimum, the extension moves to the next one and tells you why, with an Undo that lasts a few seconds.
 
 The default is simple: **skip anything under 5,000 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
@@ -24,17 +21,17 @@ The default is simple: **skip anything under 5,000 likes**. Pick a different lev
 
 In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `5k`, `2만`, `1,000`.
 
-If a count is missing, the video stays. Kept never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
+If a count is missing, the video stays. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
 ## Install
 
-Kept is not on the Chrome Web Store yet. To try it:
+It is not on the Chrome Web Store yet. To try it:
 
 ```bash
-git clone https://github.com/jeongjin0/kept.git
-cd kept
+git clone https://github.com/jeongjin0/short-form-like-filter.git
+cd short-form-like-filter
 npm install
 npm run build
 ```
@@ -55,10 +52,10 @@ The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contribu
 
 ## Privacy
 
-Kept reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
+It reads the counts the page has already loaded and decides on your device. Settings and today's skip count stay in Chrome storage. Nothing is collected or sent anywhere. See [PRIVACY.md](PRIVACY.md).
 
-Kept is not affiliated with YouTube, TikTok, or Instagram.
+Not affiliated with YouTube, TikTok, or Instagram.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). If it saves you some scrolling, a ⭐ on this repo helps other people find it.

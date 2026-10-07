@@ -8,7 +8,7 @@ export default defineConfig({
     name: '__MSG_extName__',
     description: '__MSG_extDesc__',
     default_locale: 'en',
-    version: "0.2.0",
+    version: "0.2.1",
     permissions: ['storage'],
     host_permissions: [
       'https://www.youtube.com/*',
@@ -16,7 +16,7 @@ export default defineConfig({
       'https://www.instagram.com/*',
     ],
     action: {
-      default_title: 'Kept',
+      default_title: '__MSG_extName__',
     },
     icons: {
       16: 'icon/16.png',

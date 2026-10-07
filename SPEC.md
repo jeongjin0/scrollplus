@@ -1,12 +1,12 @@
-# Kept specification
+# Short-Form Like Filter specification
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: shipped as 0.2.0. Decisions below are locked.
+Status: shipped as 0.2.1. Decisions below are locked.
 
 ## Product
 
-Kept is a Manifest V3 Chromium extension. After install, with no account and no setup, it skips Shorts, Reels, and TikToks that have too few likes while the user scrolls short-form feeds.
+Short-Form Like Filter is a Manifest V3 Chromium extension. After install, with no account and no setup, it skips Shorts, Reels, and TikToks that have too few likes while the user scrolls short-form feeds.
 
 Platforms:
 
@@ -14,18 +14,22 @@ Platforms:
 - TikTok on https://www.tiktok.com/ For You, Following, and video pages
 - Instagram Reels on https://www.instagram.com/ when the user is already signed in
 
-The scroll stays. Kept never empties a feed, never hides all shorts, and never blocks the sites.
+The scroll stays. The extension never empties a feed, never hides all shorts, and never blocks the sites.
 
 English line: Weak videos skip themselves.
 
 Korean line: 설치하면 바로 켜집니다. 좋아요가 적은 쇼츠, 릴스, 틱톡을 넘깁니다.
 
+## Name
+
+Short-Form Like Filter. Korean: 숏폼 좋아요 필터. The name says the role: it filters short-form video by likes. It was chosen to be found by what it does, not as a brand. The earlier working name was Kept. The name lives in the locale files (extName) and is shown in the toolbar tooltip, the popup, and the options page.
+
 ## Repository
 
-- Local directory: /Users/jeongjin/Developer/edgethink/kept
-- Public GitHub repo: github.com/jeongjin0/kept
+- Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
+- Public GitHub repo: github.com/jeongjin0/short-form-like-filter
 - License: MIT
-- Version: 0.2.0
+- Version: 0.2.1
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -136,13 +140,13 @@ The popup is 320 wide and no taller than 420. It does not scroll, including when
 
 Popup contains only:
 
-- Wordmark with the app mark, and a round power button for the master switch
+- The app mark and the name, and a round power button for the master switch
 - Today's skip count, large, with the label "skipped today" / "오늘 넘김"
 - The preset control: Lenient, Balanced, Strict, each showing its like count
 - Three site rows, each with an original icon, the site name, and a switch. No other text in the row.
 - "Keep this creator" when a supported video is active
 - The signed-out note when it applies
-- Footer: a Settings link, with a Custom badge when the rule matches no preset, and a Star on GitHub button
+- Footer: a Settings link, with a Custom badge when the rule matches no preset, and a GitHub button
 
 If Instagram metrics are unavailable because the user is signed out, the popup says "Instagram is signed out. Nothing is hidden." Korean: "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다." Do not show this as a modal on instagram.com.
 
@@ -154,12 +158,12 @@ Options, top to bottom:
 - Sites: the three site rows
 - Behavior: also filter lists and grids, and show the skip chip
 - Creators to keep: the list with a remove button, or an empty state
-- Reset to defaults, which keeps the allowlist, and the Star on GitHub button
+- Reset to defaults, which keeps the allowlist, and the GitHub button
 - A one-line privacy statement
 
 Changes apply immediately. There is no save button. The toolbar icon has no number badge.
 
-Star on GitHub opens the public repo in a new tab. It appears in the popup, the options page, and the README. It is never injected into a host site.
+The GitHub button shows a star icon and the word GitHub, with the tooltip "Star this project on GitHub" / "GitHub에서 별표 남기기". The interface never says "Star us". It opens the public repo in a new tab and appears in the popup and the options page. It is never injected into a host site.
 
 ## Visual system
 
@@ -200,11 +204,11 @@ Read metrics the page has already loaded. Do not call private APIs yourself.
 - TikTok: read __UNIVERSAL_DATA_FOR_REHYDRATION__, SIGI_STATE when present, and feed JSON the page itself requested. Use playCount, diggCount, and commentCount. The active video is the id in the URL on a video page, and on For You it is the id in the player wrapper's element id (xgwrapper-N-ID), with the creator from the author link in the same feed item.
 - Instagram: read reel counts in responses Instagram already requested for the page. Use like, comment, and play or view counts. If counts are hidden or the user is signed out, keep every reel.
 
-A fetch observer must call the original fetch and return the original response untouched. Errors in Kept must not break the host page.
+A fetch observer must call the original fetch and return the original response untouched. Errors in the extension must not break the host page.
 
-PRIVACY.md states that Kept does not collect, transmit, or sell user data, lists the storage keys, and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
+PRIVACY.md states that the extension does not collect, transmit, or sell user data, lists the storage keys, and gives the GitHub repo as the contact. The same statement belongs in the options page and store/listing.md.
 
-README and the store listing say Kept is not affiliated with YouTube, TikTok, or Instagram.
+README and the store listing say the extension is not affiliated with YouTube, TikTok, or Instagram.
 
 ## Implementation
 
@@ -220,7 +224,7 @@ README and the store listing say Kept is not affiliated with YouTube, TikTok, or
 
 Repository files:
 
-- README.md with what it does, unpacked install, development, privacy, the affiliation disclaimer, and the Star link
+- README.md with what it does, unpacked install, development, privacy, the affiliation disclaimer, and a link to the repo
 - LICENSE, MIT
 - PRIVACY.md
 - CONTRIBUTING.md
@@ -232,7 +236,7 @@ Repository files:
 - qa/live-smoke.md
 - qa/calibration.md
 
-Store title: Kept — Skip low-like Shorts, Reels & TikTok
+Store title: Short-Form Like Filter
 
 Store assets, rendered by scripts/render-store.mjs:
 
@@ -253,7 +257,7 @@ The work is done only when all of these are true:
 4. The production build is green, the unpacked extension loads, and a zip exists.
 5. qa/live-smoke.md records a dated YouTube Shorts run with the shipped defaults. Instagram stays unverified unless a signed-in session exists. Do not mark it passed.
 6. The popup fits without scrolling at 1x and 2x, in English and Korean.
-7. Fixture pages show no Kept-caused console errors.
+7. Fixture pages show no console errors caused by the extension.
 8. Store copy and images exist, and no image implies affiliation.
 9. The public GitHub repo exists and contains this spec, the source, the license, and the privacy policy, and CI is green.
 10. Nothing in the non-goals list was shipped.

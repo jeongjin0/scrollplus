@@ -1,12 +1,12 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { startKept } from "../content/controller";
+import { startFilter } from "../content/controller";
 import { gridAnchors, moveUntilIdChanges, youtubeShortId } from "../content/page";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
   runAt: "document_start",
   main() {
-    startKept({
+    startFilter({
       platform: "youtube",
       readActive: () => {
         const id = youtubeShortId();
@@ -20,6 +20,6 @@ export default defineContentScript({
 });
 
 function requestMove(key: "ArrowDown" | "ArrowUp"): boolean {
-  window.postMessage({ source: "kept", type: "advance", key }, "*");
+  window.postMessage({ source: "slf", type: "advance", key }, "*");
   return true;
 }

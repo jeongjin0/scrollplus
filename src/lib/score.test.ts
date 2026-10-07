@@ -57,7 +57,7 @@ describe("decide", () => {
   it("keeps allowlisted creators and matches instagram names without case", () => {
     const low = metrics({ likes: 0 });
     expect(decide({ ...base, settings: settings({ allowlist: [{ platform: "youtube", id: "channel" }] }), metrics: low })).toEqual({ action: "keep", reason: "allowlist" });
-    expect(decide({ ...base, platform: "instagram", creatorId: "Kept.User", settings: settings({ allowlist: [{ platform: "instagram", id: "kept.user" }] }), metrics: low }).action).toBe("keep");
+    expect(decide({ ...base, platform: "instagram", creatorId: "Some.User", settings: settings({ allowlist: [{ platform: "instagram", id: "some.user" }] }), metrics: low }).action).toBe("keep");
   });
   it("keeps ads, carousels, and anything switched off", () => {
     const low = metrics({ likes: 0 });

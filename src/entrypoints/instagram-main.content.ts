@@ -12,12 +12,12 @@ export default defineContentScript({
     const seenScripts = new Set<string>();
     const publish = () => {
       try {
-        window.postMessage({ source: "kept", type: "cache", items: [...cache.values()] }, "*");
+        window.postMessage({ source: "slf", type: "cache", items: [...cache.values()] }, "*");
         const id = instagramReelId();
         if (!id) return;
         const known = cache.get(id);
         if (!known) return;
-        window.postMessage({ source: "kept", type: "item", item: { platform: "instagram", surface: "player", ...known } }, "*");
+        window.postMessage({ source: "slf", type: "item", item: { platform: "instagram", surface: "player", ...known } }, "*");
       } catch {
         /* leave the page alone */
       }

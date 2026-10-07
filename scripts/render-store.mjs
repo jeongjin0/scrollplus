@@ -59,20 +59,21 @@ async function captureChip() {
     document.body.style.visibility = "hidden";
     document.body.style.background = "transparent";
     document.documentElement.style.background = "transparent";
-    window.__kept.show({ id: "weak", metrics: { views: 91200, likes: 312, comments: 4, shares: 0, saves: null } });
+    window.__slf.show({ id: "weak", metrics: { views: 91200, likes: 312, comments: 4, shares: 0, saves: null } });
   });
   await page.waitForFunction(() => {
-    const host = document.querySelector("#kept-chip-host");
+    const host = document.querySelector("#slf-chip-host");
     return !!host && !!host.shadowRoot && !!host.shadowRoot.querySelector(".chip");
   });
   await page.waitForTimeout(260);
-  const box = await page.locator("#kept-chip-host").boundingBox();
+  const box = await page.locator("#slf-chip-host").boundingBox();
   const pad = 36;
   await page.screenshot({ path: path.join(work, "chip.png"), omitBackground: true, clip: { x: box.x - pad, y: box.y - pad, width: box.width + pad * 2, height: box.height + pad * 2 } });
   await browser.close();
   return { w: box.width + pad * 2, h: box.height + pad * 2 };
 }
 
+const NAME = "Short-Form Like Filter";
 const MARK = '<svg viewBox="0 0 24 24" width="SIZE" height="SIZE"><rect width="24" height="24" rx="6.5" fill="#FF4D2E"/><path d="M7 18.2V8.6A1.6 1.6 0 0 1 8.6 7h6.8A1.6 1.6 0 0 1 17 8.6v9.6" fill="none" stroke="#10110F" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="1.6" fill="#10110F"/></svg>';
 
 const BASE_CSS = [
@@ -92,7 +93,7 @@ function page(body, extra = "") {
   return '<!doctype html><meta charset="utf-8"><style>' + BASE_CSS + extra + '</style><div class="stage">' + body + "</div>";
 }
 
-const brand = '<div class="brand">' + MARK.replaceAll("SIZE", "36") + "Kept</div>";
+const brand = '<div class="brand">' + MARK.replaceAll("SIZE", "36") + NAME + "</div>";
 
 async function compose() {
   const rules = await capture();
@@ -107,7 +108,7 @@ async function compose() {
   jobs.push({
     file: "popup.png",
     html: page(
-      '<div class="copy">' + brand + "<h1>Weak videos <em>skip themselves.</em></h1><p>Set a like count once. Kept moves on for you.</p></div>" +
+      '<div class="copy">' + brand + "<h1>Weak videos <em>skip themselves.</em></h1><p>Set a like count once. It moves on for you.</p></div>" +
       '<div class="shot" style="left:700px;top:96px"><img src="' + uri(path.join(work, "popup.png")) + '" width="480"></div>'),
   });
 
@@ -144,7 +145,7 @@ async function compose() {
   // Tile 440x280
   const tile = await context.newPage();
   await tile.setViewportSize({ width: 440, height: 280 });
-  await tile.setContent('<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0}html,body{width:440px;height:280px;background:radial-gradient(260px 200px at 90% 0%,rgba(255,77,46,.22),transparent 70%),#10110F;color:#F4F1EA;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}.t{position:absolute;left:32px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:18px}.row{display:flex;align-items:center;gap:12px;font-size:30px;font-weight:700;letter-spacing:-.03em}h2{font-size:26px;line-height:1.15;font-weight:650;letter-spacing:-.03em;max-width:330px;color:#F4F1EA;text-wrap:balance}h2 em{font-style:normal;color:#FF4D2E}</style><div class="t"><div class="row">' + MARK.replaceAll("SIZE", "44") + 'Kept</div><h2>Weak videos <em>skip themselves.</em></h2></div>');
+  await tile.setContent('<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box;margin:0}html,body{width:440px;height:280px;background:radial-gradient(260px 200px at 90% 0%,rgba(255,77,46,.22),transparent 70%),#10110F;color:#F4F1EA;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}.t{position:absolute;left:32px;right:32px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:16px}h2{font-size:34px;line-height:1.05;font-weight:700;letter-spacing:-.035em}p{font-size:17px;line-height:1.35;color:#A8A396;max-width:340px;text-wrap:balance}p em{font-style:normal;color:#FF4D2E}</style><div class="t">' + MARK.replaceAll("SIZE", "48") + '<h2>Short-Form<br>Like Filter</h2><p>Skips Shorts, Reels &amp; TikToks <em>under your like count.</em></p></div>');
   await tile.screenshot({ path: path.join(root, "store/tile.png") });
   await browser.close();
   return rules;

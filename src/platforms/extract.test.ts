@@ -17,16 +17,16 @@ describe("extractors", () => {
 
   it("reads tiktok stats", () => {
     const items = extractTikTok({
-      item: { id: "99", author: { uniqueId: "@kept" }, stats: { playCount: 5000, diggCount: 100, commentCount: 2, shareCount: 1, collectCount: 3 } },
+      item: { id: "99", author: { uniqueId: "@creator" }, stats: { playCount: 5000, diggCount: 100, commentCount: 2, shareCount: 1, collectCount: 3 } },
     });
-    expect(items[0]).toMatchObject({ id: "99", creatorId: "kept", metrics: { views: 5000, likes: 100, comments: 2, shares: 1, saves: 3 } });
+    expect(items[0]).toMatchObject({ id: "99", creatorId: "creator", metrics: { views: 5000, likes: 100, comments: 2, shares: 1, saves: 3 } });
   });
 
   it("reads instagram reel counts", () => {
     const items = extractInstagram({
-      media: { code: "ABC", like_count: 10, comment_count: 1, play_count: 2500, user: { username: "Kept" } },
+      media: { code: "ABC", like_count: 10, comment_count: 1, play_count: 2500, user: { username: "Creator" } },
     });
-    expect(items[0]).toMatchObject({ id: "ABC", creatorId: "Kept", metrics: { views: 2500, likes: 10, comments: 1 } });
+    expect(items[0]).toMatchObject({ id: "ABC", creatorId: "Creator", metrics: { views: 2500, likes: 10, comments: 1 } });
   });
 
   it('reads counts from the microformat when video details omit them', () => {

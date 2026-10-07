@@ -53,7 +53,7 @@ export interface Settings {
   allowlist: AllowEntry[];
 }
 
-export const REPO_URL = "https://github.com/jeongjin0/kept";
+export const REPO_URL = "https://github.com/jeongjin0/short-form-like-filter";
 export const STORAGE_SETTINGS = "settings";
 export const STORAGE_DAILY = "dailySkips";
 

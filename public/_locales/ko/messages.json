@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "Kept"
+    "message": "숏폼 좋아요 필터"
   },
   "extDesc": {
     "message": "좋아요가 적은 쇼츠, 릴스, 틱톡을 넘깁니다. 설치하면 바로 켜집니다."
   },
   "powerOn": {
-    "message": "Kept 켜짐"
+    "message": "필터 켜짐"
   },
   "powerOff": {
-    "message": "Kept 꺼짐"
+    "message": "필터 꺼짐"
   },
   "presetLenient": {
     "message": "느슨"
@@ -36,7 +36,7 @@
     "message": "세부 설정"
   },
   "star": {
-    "message": "GitHub에 Star"
+    "message": "GitHub"
   },
   "signedOut": {
     "message": "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다."
@@ -160,5 +160,8 @@
         "example": "5천"
       }
     }
+  },
+  "starTitle": {
+    "message": "GitHub에서 별표 남기기"
   }
 }

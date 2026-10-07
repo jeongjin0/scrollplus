@@ -1,6 +1,6 @@
 {
-  "name": "kept",
-  "version": "0.2.0",
+  "name": "short-form-like-filter",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {

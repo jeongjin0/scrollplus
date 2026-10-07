@@ -61,7 +61,7 @@ function show(partial: Partial<EngineItem> & { id: string; metrics: Metrics | nu
 
 declare global {
   interface Window {
-    __kept: {
+    __slf: {
       show: typeof show;
       setBlockedMenu: (open: boolean) => void;
       settings: Settings;
@@ -69,7 +69,7 @@ declare global {
   }
 }
 
-window.__kept = {
+window.__slf = {
   show,
   setBlockedMenu: (open: boolean) => {
     const menu = document.querySelector("#menu");

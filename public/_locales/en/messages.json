@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "Kept"
+    "message": "Short-Form Like Filter"
   },
   "extDesc": {
-    "message": "Skip Shorts, Reels, and TikToks with too few likes. On from the moment you install."
+    "message": "Skips Shorts, Reels, and TikToks with too few likes. On from the moment you install."
   },
   "powerOn": {
-    "message": "Kept is on"
+    "message": "Filter is on"
   },
   "powerOff": {
-    "message": "Kept is off"
+    "message": "Filter is off"
   },
   "presetLenient": {
     "message": "Lenient"
@@ -36,7 +36,7 @@
     "message": "Settings"
   },
   "star": {
-    "message": "Star on GitHub"
+    "message": "GitHub"
   },
   "signedOut": {
     "message": "Instagram is signed out. Nothing is hidden."
@@ -105,7 +105,7 @@
     "message": "Reset to defaults"
   },
   "privacy": {
-    "message": "Settings and today's count stay on this device. Kept collects and sends nothing."
+    "message": "Settings and today's count stay on this device. Nothing is collected or sent."
   },
   "chipLikes": {
     "message": "Skipped · $COUNT$ likes",
@@ -160,5 +160,8 @@
         "example": "5K"
       }
     }
+  },
+  "starTitle": {
+    "message": "Star this project on GitHub"
   }
 }

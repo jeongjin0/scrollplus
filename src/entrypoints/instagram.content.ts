@@ -1,5 +1,5 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { startKept } from "../content/controller";
+import { startFilter } from "../content/controller";
 import { gridAnchors, instagramReelId, moveUntilIdChanges, visibleVideo } from "../content/page";
 
 function press(key: "ArrowDown" | "ArrowUp"): boolean {
@@ -25,7 +25,7 @@ export default defineContentScript({
   matches: ["https://www.instagram.com/*"],
   runAt: "document_start",
   main() {
-    startKept({
+    startFilter({
       platform: "instagram",
       readActive: () => {
         const id = instagramReelId();

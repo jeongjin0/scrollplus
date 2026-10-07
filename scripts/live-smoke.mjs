@@ -63,7 +63,7 @@ const report = { youtube: [], tiktok: [], notes: [] };
 try {
   const page = context.pages()[0] || await context.newPage();
   await page.addInitScript(() => {
-    window.__keptLast = null;
+    window.__slfLast = null;
     document.addEventListener("yt-navigate-finish", (event) => {
       const player = event.detail && event.detail.response && event.detail.response.playerResponse;
       if (!player) return;
@@ -71,7 +71,7 @@ try {
       const micro = (player.microformat && player.microformat.playerMicroformatRenderer) || {};
       const views = micro.viewCount != null ? Number(micro.viewCount) : (details.viewCount != null ? Number(details.viewCount) : null);
       const likes = micro.likeCount != null ? Number(micro.likeCount) : null;
-      window.__keptLast = {
+      window.__slfLast = {
         id: details.videoId || null,
         views: Number.isFinite(views) ? views : null,
         likes: Number.isFinite(likes) ? likes : null,
@@ -112,10 +112,10 @@ try {
         if (value && typeof value === "object") stack.push(value);
       }
     }
-    const host = document.querySelector("#kept-chip-host");
+    const host = document.querySelector("#slf-chip-host");
     const chipNode = host && host.shadowRoot ? host.shadowRoot.querySelector(".chip") : null;
     const chip = chipNode ? (chipNode.textContent || "").trim() : "";
-    const last = window.__keptLast;
+    const last = window.__slfLast;
     const same = last && last.id === id;
     return {
       id,
@@ -189,7 +189,7 @@ try {
         }
       } catch { /* ignore */ }
     }
-    const host = document.querySelector("#kept-chip-host");
+    const host = document.querySelector("#slf-chip-host");
     const chipNode = host && host.shadowRoot ? host.shadowRoot.querySelector(".chip") : null;
     const chip = chipNode ? (chipNode.textContent || "").trim() : "";
     return {

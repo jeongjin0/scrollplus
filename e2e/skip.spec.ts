@@ -1,6 +1,6 @@
 declare global {
   interface Window {
-    __kept: { show: (item: { id: string; metrics: { views: number; likes: number; comments: number; shares: number; saves: null } | null }) => void };
+    __slf: { show: (item: { id: string; metrics: { views: number; likes: number; comments: number; shares: number; saves: null } | null }) => void };
   }
 }
 import { expect, test } from "@playwright/test";
@@ -15,24 +15,24 @@ test("fixture skips, pauses, undoes, and fails open without console errors", asy
   });
   await page.goto("/player.html");
 
-  await page.evaluate(() => window.__kept.show({ id: "quiet", metrics: null }));
+  await page.evaluate(() => window.__slf.show({ id: "quiet", metrics: null }));
   await page.waitForTimeout(800);
   await expect(page.locator("#advances")).toHaveText("0");
 
-  await page.evaluate((metrics) => window.__kept.show({ id: "low", metrics }), low);
+  await page.evaluate((metrics) => window.__slf.show({ id: "low", metrics }), low);
   await expect(page.locator("#advances")).toHaveText("1");
-  await expect(page.locator("#kept-chip-host")).toContainText("Skipped · 10 likes");
+  await expect(page.locator("#slf-chip-host")).toContainText("Skipped · 10 likes");
   await page.getByRole("button", { name: "Undo" }).click();
   await expect(page.locator("#retreats")).toHaveText("1");
-  await page.evaluate((metrics) => window.__kept.show({ id: "low", metrics }), low);
+  await page.evaluate((metrics) => window.__slf.show({ id: "low", metrics }), low);
   await expect(page.locator("#advances")).toHaveText("1");
 
   for (let index = 1; index <= 6; index += 1) {
-    await page.evaluate(({ metrics, index }) => window.__kept.show({ id: "v" + index, metrics }), { metrics: low, index });
+    await page.evaluate(({ metrics, index }) => window.__slf.show({ id: "v" + index, metrics }), { metrics: low, index });
     await page.waitForTimeout(700);
   }
-  await page.evaluate((metrics) => window.__kept.show({ id: "v7", metrics }), low);
+  await page.evaluate((metrics) => window.__slf.show({ id: "v7", metrics }), low);
   await expect(page.locator("#advances")).toHaveText("7");
-  await expect(page.locator("#kept-chip-host")).toContainText("under your bar");
+  await expect(page.locator("#slf-chip-host")).toContainText("under your bar");
   expect(errors).toEqual([]);
 });

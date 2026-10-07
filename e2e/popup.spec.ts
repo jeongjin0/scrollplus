@@ -5,7 +5,7 @@ import path from "node:path";
 
 async function launch() {
   const extension = path.resolve(".output/chrome-mv3");
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "kept-ext-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "slf-ext-"));
   const context = await chromium.launchPersistentContext(dir, {
     headless: false,
     args: ["--disable-extensions-except=" + extension, "--load-extension=" + extension],
@@ -60,8 +60,8 @@ test("popup fits without scrolling at 1x and 2x, even with the optional rows", a
       expect(box?.plain).toBeLessThanOrEqual(420);
       expect(box?.full).toBeLessThanOrEqual(420);
       expect(box?.fits).toBe(true);
-      expect(box?.star).toBe("https://github.com/jeongjin0/kept");
-      expect(box?.text).toContain("Kept");
+      expect(box?.star).toBe("https://github.com/jeongjin0/short-form-like-filter");
+      expect(box?.text).toMatch(/Like Filter|좋아요 필터/);
       await page.close();
     }
   } finally {
@@ -84,7 +84,7 @@ test("a fresh install already skips under 5K likes, and the popup changes the ru
     await page.getByRole("switch", { name: "TikTok" }).click();
     await expect.poll(async () => (await stored(page)).platforms.tiktok).toBe(false);
 
-    await page.getByRole("button", { name: /Kept is on|Kept 켜짐/ }).click();
+    await page.getByRole("button", { name: /Filter is on|필터 켜짐/ }).click();
     await expect.poll(async () => (await stored(page)).enabled).toBe(false);
   } finally {
     await context.close();
@@ -96,8 +96,8 @@ test("settings accept typed numbers and mark the popup as custom", async () => {
   try {
     const options = await open(context, id, "options.html");
     await expect(options.locator("body")).toContainText(/Rules|기준/);
-    await expect(options.locator("body")).toContainText(/Kept collects and sends nothing|수집하거나 전송하지 않습니다/);
-    await expect(options.locator("a.star")).toHaveAttribute("href", "https://github.com/jeongjin0/kept");
+    await expect(options.locator("body")).toContainText(/Nothing is collected or sent|수집하거나 전송하지 않습니다/);
+    await expect(options.locator("a.star")).toHaveAttribute("href", "https://github.com/jeongjin0/short-form-like-filter");
 
     const likes = options.getByLabel(/Minimum Likes|좋아요 최소 개수/);
     await likes.click();

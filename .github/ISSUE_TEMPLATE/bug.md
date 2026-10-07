@@ -1,6 +1,6 @@
 ---
 name: Bug
-about: A Kept rule is not behaving as specified
+about: A rule is not behaving as specified
 title: ""
 labels: bug
 ---
@@ -11,9 +11,9 @@ labels: bug
 
 YouTube Shorts, TikTok, or Instagram Reels
 
-## Kept version
+## Extension version
 
-For example 0.2.0. You can find it on chrome://extensions.
+For example 0.2.1. You can find it on chrome://extensions.
 
 ## Your rule
 

@@ -20,7 +20,7 @@ interface ItemMessage {
   items?: ExtractedItem[];
 }
 
-export function startKept(adapter: Adapter): void {
+export function startFilter(adapter: Adapter): void {
   let settings: Settings = DEFAULT_SETTINGS;
   const cache = new Map<string, ExtractedItem>();
   let pointerDown = false;
@@ -82,9 +82,9 @@ export function startKept(adapter: Adapter): void {
     for (const card of cards) {
       const known = cache.get(card.id);
       if (!settings.filterGrids || !known) {
-        if (card.element.getAttribute("data-kept-grid") === "skip") {
+        if (card.element.getAttribute("data-slf-grid") === "skip") {
           card.element.removeAttribute("hidden");
-          card.element.removeAttribute("data-kept-grid");
+          card.element.removeAttribute("data-slf-grid");
         }
         continue;
       }
@@ -98,10 +98,10 @@ export function startKept(adapter: Adapter): void {
       });
       if (decision.action === "skip") {
         card.element.setAttribute("hidden", "");
-        card.element.setAttribute("data-kept-grid", "skip");
-      } else if (card.element.getAttribute("data-kept-grid") === "skip") {
+        card.element.setAttribute("data-slf-grid", "skip");
+      } else if (card.element.getAttribute("data-slf-grid") === "skip") {
         card.element.removeAttribute("hidden");
-        card.element.removeAttribute("data-kept-grid");
+        card.element.removeAttribute("data-slf-grid");
       }
     }
   }
@@ -109,7 +109,7 @@ export function startKept(adapter: Adapter): void {
   window.addEventListener("message", (event) => {
     if (event.source !== window) return;
     const data = event.data as ItemMessage;
-    if (!data || data.source !== "kept" || data.item?.platform && data.item.platform !== adapter.platform && data.type === "item") return;
+    if (!data || data.source !== "slf" || data.item?.platform && data.item.platform !== adapter.platform && data.type === "item") return;
     if (data.type === "item" && data.item && (!data.item.platform || data.item.platform === adapter.platform)) {
       const previous = cache.get(data.item.id);
       cache.set(data.item.id, {
@@ -139,11 +139,11 @@ export function startKept(adapter: Adapter): void {
   window.addEventListener("focusout", () => engine.poke(), true);
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type === "kept:context") {
+    if (message?.type === "slf:context") {
       sendResponse(context());
       return false;
     }
-    if (message?.type === "kept:allow") {
+    if (message?.type === "slf:allow") {
       const creatorId = context().creatorId;
       if (creatorId) {
         const id = adapter.platform === "instagram" ? creatorId.toLowerCase() : creatorId.replace(/^@/, "");
@@ -180,7 +180,7 @@ export function startKept(adapter: Adapter): void {
 function typing(): boolean {
   const element = document.activeElement;
   if (!(element instanceof HTMLElement)) return false;
-  if (element.closest("#kept-chip-host")) return false;
+  if (element.closest("#slf-chip-host")) return false;
   return element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.isContentEditable;
 }
 

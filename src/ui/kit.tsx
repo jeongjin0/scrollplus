@@ -137,7 +137,7 @@ export function NumberStepper(props: { value: number; disabled?: boolean; label:
 
 export function StarLink(props: { href: string }) {
   return (
-    <a className="star" href={props.href} target="_blank" rel="noreferrer">
+    <a className="star" href={props.href} target="_blank" rel="noreferrer" title={t("starTitle")}>
       <Icon name="star" size={14} />
       {t("star")}
     </a>

@@ -1,5 +1,7 @@
 # Live smoke
 
+This project's working name was Kept until 0.2.1. Older entries below use it.
+
 Date: 2026-10-06
 
 Instagram Reels was not verified. The smoke browser had no signed-in Instagram session, so nothing was marked as passed there.

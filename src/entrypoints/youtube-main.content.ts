@@ -15,7 +15,7 @@ export default defineContentScript({
         const source = player ?? latest ?? (window as Window & { ytInitialPlayerResponse?: unknown }).ytInitialPlayerResponse;
         const extracted = extractYouTube(source);
         if (!extracted || extracted.id !== id) return;
-        window.postMessage({ source: "kept", type: "item", item: { platform: "youtube", surface: "player", ...extracted } }, "*");
+        window.postMessage({ source: "slf", type: "item", item: { platform: "youtube", surface: "player", ...extracted } }, "*");
       } catch {
         /* leave the page alone */
       }
@@ -27,7 +27,7 @@ export default defineContentScript({
     });
     window.addEventListener("message", (event) => {
       const data = event.data as { source?: string; type?: string; key?: string } | null;
-      if (!data || data.source !== "kept" || data.type !== "advance") return;
+      if (!data || data.source !== "slf" || data.type !== "advance") return;
       const selector = data.key === "ArrowUp" ? "#navigation-button-up button" : "#navigation-button-down button";
       const button = document.querySelector(selector);
       if (button instanceof HTMLElement) button.click();

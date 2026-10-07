@@ -1,5 +1,7 @@
 # Preset basis
 
+This project's working name was Kept until 0.2.1. Older entries below use it.
+
 Date: 2026-10-07
 
 The rule is a like count, so the presets are round numbers a person can read at a glance: 1K, 5K, and 20K. They were picked by looking at how many sampled videos each would skip. These are small logged-out samples, not a study. They show the order of magnitude, nothing more.

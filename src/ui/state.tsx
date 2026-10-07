@@ -15,7 +15,7 @@ export const SITES: Record<Platform, { name: string; icon: IconName }> = {
   instagram: { name: "Instagram Reels", icon: "reels" },
 };
 
-export function useKeptState() {
+export function useFilterState() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [ready, setReady] = useState(false);
   const [skips, setSkips] = useState(0);
@@ -61,7 +61,7 @@ export function useKeptState() {
   const allowCurrent = useCallback(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab?.id == null) return;
-    await chrome.tabs.sendMessage(tab.id, { type: "kept:allow" });
+    await chrome.tabs.sendMessage(tab.id, { type: "slf:allow" });
   }, []);
 
   return { settings, ready, skips, active, update, allowCurrent };
@@ -71,7 +71,7 @@ async function askActive(): Promise<ActiveState | null> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab?.id == null) return null;
   try {
-    const response = await chrome.tabs.sendMessage(tab.id, { type: "kept:context" });
+    const response = await chrome.tabs.sendMessage(tab.id, { type: "slf:context" });
     if (!response || typeof response !== "object") return null;
     return response as ActiveState;
   } catch {
