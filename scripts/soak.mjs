@@ -35,7 +35,13 @@ const write = () => {
 };
 write();
 try {
-  context = await chromium.launchPersistentContext(path.join(output, 'profile'), { headless: false, viewport: { width: 1280, height: 800 }, args: ['--disable-extensions-except=' + extension, '--load-extension=' + extension, '--no-first-run'] });
+  // Save the final count and frame before closing the browser. Playwright's
+  // default signal handlers otherwise close it as soon as Node is signalled.
+  context = await chromium.launchPersistentContext(path.join(output, 'profile'), {
+    headless: false, handleSIGINT: false, handleSIGTERM: false,
+    viewport: { width: 1280, height: 800 },
+    args: ['--disable-extensions-except=' + extension, '--load-extension=' + extension, '--no-first-run'],
+  });
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
   await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings?.enabled)).toBe(true);
   const settingsPage = await context.newPage();
