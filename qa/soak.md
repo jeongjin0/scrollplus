@@ -16,3 +16,5 @@ Use a new output directory for every run; the script refuses an existing profile
 Started from the exact tested ZIP (SHA-256 `dd2ed7042783a53044fc682cf759e674b0622301d548fedb98da6f85d331e2a1`) in a fresh isolated profile. Target duration: 24 hours. Initial real-feed samples and a default-rule skip were recorded with no page errors. The full-duration result is pending; no day-use pass is claimed.
 
 The immutable extension, profile, report and process log are retained locally under `qa/tmp/soak-033-20261007`. The existing review page receives only the small summary JSON, never the profile or raw QA directory.
+
+The 0.3.4 ZIP was compared entry by entry with this run’s immutable 0.3.3 ZIP. The YouTube MAIN script, isolated script and background counter are byte-identical. The same run continues; it is still a 0.3.3 package run, and is not evidence of whole-package 0.3.4 day-use or signed-in TikTok/Instagram endurance.

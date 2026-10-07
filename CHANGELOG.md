@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4 – 2026-10-07
+
+- TikTok creator recommendation previews and profile/grid hover previews are no longer treated as active feed videos. This prevents next-video attempts and incorrect current-creator actions on those surfaces while grid filtering is off.
+- Built-extension regressions cover preview exclusion and skip, Undo, and creator persistence on For You, Following, and individual video routes.
+- Defaults, UI and permissions are unchanged. Live QA scope and remaining release gates are recorded in [release readiness](qa/release-readiness.md).
+
 ## 0.3.3 – 2026-10-07
 
 - Cards hidden by optional grid filtering are rechecked even when they have no layout box. Lowering a minimum or turning grid filtering off restores them immediately; cards hidden by the site remain untouched.

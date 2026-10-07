@@ -28,11 +28,11 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
-The default rule has been checked on real YouTube Shorts, signed-in TikTok For You, and signed-in Instagram Reels. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope.
+The default rule has been checked on real YouTube Shorts, signed-in TikTok For You, and signed-in Instagram Reels. The signed-in checks used Aside's Chromium 153 browser; broader compatibility and day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope.
 
 ## Install
 
-It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.3 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.3): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
+It is not on the Chrome Web Store yet. The quickest way to try the current beta is the zip on the [0.3.4 release](https://github.com/jeongjin0/scrollplus/releases/tag/v0.3.4): unzip it, open `chrome://extensions`, turn on Developer mode, and choose Load unpacked.
 
 To build it yourself:
 

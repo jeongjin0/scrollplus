@@ -6,11 +6,12 @@ export function instagramReelId(): string | null {
   return location.pathname.match(/\/reels?\/([A-Za-z0-9_-]+)/)?.[1] ?? null;
 }
 
-export function visibleVideo(): HTMLVideoElement | null {
+export function visibleVideo(eligible: (video: HTMLVideoElement) => boolean = () => true): HTMLVideoElement | null {
   const videos = document.querySelectorAll("video");
   let best: HTMLVideoElement | null = null;
   let bestRatio = 0;
   for (const video of videos) {
+    if (!eligible(video)) continue;
     const rect = video.getBoundingClientRect();
     if (rect.height < 40) continue;
     const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
@@ -26,7 +27,10 @@ export function visibleVideo(): HTMLVideoElement | null {
 export function tiktokActive(): { id: string; creatorId: string | null } | null {
   const fromUrl = location.pathname.match(/@([^/]+)\/video\/(\d+)/);
   if (fromUrl) return { creatorId: fromUrl[1], id: fromUrl[2] };
-  const video = visibleVideo();
+  // Profile/search hover previews are grids, even when their player has a video ID.
+  if (!/^\/(?:foryou|following)?\/?$/.test(location.pathname)) return null;
+  // An empty Following feed contains autoplaying creator recommendation cards.
+  const video = visibleVideo(video => !video.closest('[data-e2e="recommend-card"]'));
   if (!video) return null;
   const wrapper = video.closest('[id^="xgwrapper-"]');
   const wrapped = wrapper ? wrapper.id.match(/^xgwrapper-\d+-(\d+)$/) : null;
