@@ -96,3 +96,9 @@ Optional grid filtering had a separate reversibility bug: lowering the minimum o
 The final 0.3.3 package passed typecheck, 42 unit tests, 14 browser tests and package validation. Active-player behavior and UI are unchanged. A fresh shipped-default YouTube run is executing for 24 hours from this exact ZIP; its final result is pending. See [soak.md](soak.md).
 
 Core signed-in Instagram Reels and TikTok For You paths were then verified using this exact package in Aside Chromium 153. Reels: default skips, actual Undo, persisted creator, Reset/away/back and missing views. TikTok: a 2,639-like default skip, Undo, creator, a separately identified 9,931-like Strict skip and low-like ads kept. See [signed-in-smoke.md](signed-in-smoke.md) for individual counters, sampling limits and browser scope. These results supersede the earlier lack of a usable signed-in session; they do not establish ordinary human day-use or all Google Chrome signed-in flows.
+
+## 2026-10-07, version 0.3.4
+
+TikTok recommendation/profile previews are now excluded from active-player filtering. The built-extension regression failed before the fix, then passed alongside For You, Following and video-route skip/Undo/creator fixtures. Typecheck, 42 unit tests, 19 browser tests and final package validation passed.
+
+The exact ZIP was checked in actual signed-in Aside Chromium 153: Following recommendation exclusion, a 2,660-like video-page default skip and a fresh Undo restoration. Positive live Following skipping is not established because this account's route contained creator recommendations. See [the preview report](tiktok-previews.md) for the evidence and scope.

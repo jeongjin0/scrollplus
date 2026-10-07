@@ -6,6 +6,8 @@ import { launch, open, stored } from "./extension";
 const platforms = [
   { name: "youtube", url: "https://www.youtube.com/shorts/first", ids: ["first", "second"], creator: "UCcreator" },
   { name: "tiktok", url: "https://www.tiktok.com/foryou", ids: ["111", "222"], creator: "creator" },
+  { name: "tiktok", url: "https://www.tiktok.com/following", ids: ["111", "222"], creator: "creator" },
+  { name: "tiktok", url: "https://www.tiktok.com/@creator/video/111", ids: ["111", "222"], creator: "creator" },
   { name: "instagram", url: "https://www.instagram.com/reel/first/", ids: ["first", "second"], creator: "creator" },
 ] as const;
 
@@ -37,6 +39,7 @@ function fixture(platform: typeof platforms[number]) {
         document.dispatchEvent(new Event("yt-navigate-finish"));
       } else if (platform.name === "tiktok") {
         document.querySelector("[id^='xgwrapper']").id = "xgwrapper-0-" + item.id;
+        if (platform.url.includes("/video/")) history.replaceState({}, "", "/@" + platform.creator + "/video/" + item.id);
       } else {
         history.replaceState({}, "", "/reel/" + item.id + "/");
       }
@@ -48,7 +51,7 @@ function fixture(platform: typeof platforms[number]) {
 }
 
 for (const platform of platforms) {
-  test(`${platform.name}: built scripts apply settings, skip, undo, and keep a creator`, async () => {
+  test(`${platform.name} ${new URL(platform.url).pathname}: built scripts apply settings, skip, undo, and keep a creator`, async () => {
     const { context, worker, id } = await launch();
     try {
       await worker.evaluate(async () => {

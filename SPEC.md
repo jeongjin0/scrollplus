@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.3 GitHub beta published. Core signed-in Instagram Reels and TikTok For You paths were checked in Aside Chromium 153; long-duration QA and ordinary human day-use remain pending. See qa/signed-in-smoke.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.3.4 GitHub beta. Core signed-in Instagram Reels and TikTok For You paths were checked on 0.3.3 in Aside Chromium 153; 0.3.4 additionally fixes TikTok preview classification and checks actual video-page skipping and Undo. Long-duration QA, positive-path live Following QA and ordinary human day-use remain pending. See qa/signed-in-smoke.md, qa/tiktok-previews.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -13,6 +13,8 @@ Platforms:
 - YouTube Shorts on https://www.youtube.com/shorts/
 - TikTok on https://www.tiktok.com/ For You, Following, and video pages
 - Instagram Reels on https://www.instagram.com/ when the user is already signed in
+
+TikTok creator recommendation cards and profile/search previews are not active players. Optional grid filtering remains a separate setting.
 
 The scroll stays. The extension never empties a feed, never hides all shorts, and never blocks the sites.
 
@@ -31,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.3
+- Version: 0.3.4
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
