@@ -1,102 +1,126 @@
-import { DEFAULT_SETTINGS, ruleFor, type Platform } from "../lib/score";
-import { Knob, Mark, Master, SensitivityControl } from "./controls";
-import { Icon } from "./icons";
-import { useKeptState } from "./state";
+import { COVERAGE, DEFAULT_SETTINGS, METRICS, PLATFORMS, REPO_URL, activePreset, presetRule, type Metric, type PresetName } from "../lib/score";
+import type { IconName } from "../lib/icons";
+import { t } from "../lib/i18n";
+import { Hero, Icon, Mark, NumberStepper, PowerButton, PresetControl, Row, StarLink, Tile } from "./kit";
+import { SITES, useKeptState } from "./state";
 
-const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
+const METRIC_ICON: Record<Metric, IconName> = { likes: "heart", comments: "comment", views: "eye" };
 
 export function OptionsApp() {
-  const { settings, skips, active, copy, patch, allowCurrent } = useKeptState();
+  const { settings, ready, skips, update } = useKeptState();
+  const preset = activePreset(settings.rule);
+  const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
+
+  function setCondition(metric: Metric, change: { on?: boolean; min?: number }) {
+    update((current) => ({ ...current, rule: { ...current.rule, [metric]: { ...current.rule[metric], ...change } } }));
+  }
+
   return (
-    <main className="options">
+    <main className={ready ? "page ready" : "page"}>
       <div className="sheet">
-        <header className="top">
-          <Mark />
-          <div>
+        <header className="bar">
+          <div className="brand">
+            <Mark size={30} />
             <h1>Kept</h1>
-            <p className="note">{copy.lead}</p>
           </div>
+          <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} text={settings.enabled ? t("statusOn") : t("statusOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
         </header>
-        <Master enabled={settings.enabled} onLabel={copy.on} offLabel={copy.off} onToggle={() => void patch({ enabled: !settings.enabled })} />
-        <SensitivityControl
-          value={settings.sensitivity}
-          labels={{ lenient: copy.lenient, balanced: copy.balanced, strict: copy.strict }}
-          onChange={(sensitivity) => void patch({ sensitivity })}
-        />
-        <p className="note">{copy.presetNote}</p>
-        <p className="count">{copy.skippedToday(skips)}</p>
-        <section className="stack">
-          <h2>{copy.conditions}</h2>
-          {PLATFORMS.map((platform) => {
-            const rule = ruleFor(settings, platform);
-            const custom = settings.advanced?.[platform] != null;
-            return (
-              <article className={settings.platforms[platform] ? "panel" : "panel off"} key={platform}>
-                <div className="row">
-                  <h3 className="id"><Icon name={platform === "instagram" ? "reels" : platform} />{copy.platform[platform]}</h3>
-                  <button type="button" className="switch" role="switch" aria-checked={settings.platforms[platform]} aria-label={copy.platform[platform]} onClick={() => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}>
-                    <Knob on={settings.platforms[platform]} />
+
+        <Hero count={skips} />
+
+        <section>
+          <h2>{t("rulesTitle")}</h2>
+          <p className="lead">{t("rulesLead")}</p>
+          <div className="card">
+            <div className="pad">
+              <PresetControl value={preset} labels={labels} onChange={(name) => update((current) => ({ ...current, rule: presetRule(name, current.rule) }))} />
+            </div>
+            {METRICS.map((metric) => {
+              const condition = settings.rule[metric];
+              const partial = COVERAGE[metric].length < PLATFORMS.length;
+              const names = COVERAGE[metric].map((platform) => SITES[platform].name).join(", ");
+              return (
+                <Row
+                  key={metric}
+                  icon={METRIC_ICON[metric]}
+                  on={condition.on}
+                  label={t(metric)}
+                  onToggle={(on) => setCondition(metric, { on })}
+                  title={
+                    <>
+                      {t(metric)}
+                      {partial ? (
+                        <span className="covers" title={t("appliesTo", names)} aria-label={t("appliesTo", names)}>
+                          {COVERAGE[metric].map((platform) => <Icon key={platform} name={SITES[platform].icon} size={12} />)}
+                        </span>
+                      ) : null}
+                    </>
+                  }
+                >
+                  <NumberStepper value={condition.min} disabled={!condition.on} label={t("amount", t(metric))} onChange={(min) => setCondition(metric, { min })} />
+                </Row>
+              );
+            })}
+          </div>
+        </section>
+
+        <section>
+          <h2>{t("sitesTitle")}</h2>
+          <div className="card">
+            {PLATFORMS.map((platform) => (
+              <Row
+                key={platform}
+                icon={SITES[platform].icon}
+                title={SITES[platform].name}
+                on={settings.platforms[platform]}
+                label={SITES[platform].name}
+                onToggle={(next) => update((current) => ({ ...current, platforms: { ...current.platforms, [platform]: next } }))}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2>{t("behaviorTitle")}</h2>
+          <div className="card">
+            <Row icon="grid" title={t("filterGrids")} on={settings.filterGrids} label={t("filterGrids")} onToggle={(next) => update((current) => ({ ...current, filterGrids: next }))} />
+            <Row icon="pill" title={t("showChip")} on={settings.showSkipChip} label={t("showChip")} onToggle={(next) => update((current) => ({ ...current, showSkipChip: next }))} />
+          </div>
+        </section>
+
+        <section>
+          <h2>{t("allowTitle")}</h2>
+          <div className="card">
+            {settings.allowlist.length === 0 ? (
+              <div className="empty">
+                <Tile name="user" active={false} />
+                <span>{t("allowEmpty")}</span>
+              </div>
+            ) : (
+              settings.allowlist.map((entry) => (
+                <div className="row" key={entry.platform + entry.id}>
+                  <Tile name={SITES[entry.platform].icon} />
+                  <span className="row-title">{entry.id}</span>
+                  <button type="button" className="icon-button" aria-label={t("remove")} title={t("remove")} onClick={() => update((current) => ({ ...current, allowlist: current.allowlist.filter((item) => item.platform !== entry.platform || item.id !== entry.id) }))}>
+                    <Icon name="trash" size={15} />
                   </button>
                 </div>
-                <p className="rule">{copy.liveRule(formatCount(rule.sampleFloor), formatCount(rule.minLikes))}</p>
-                <div className="fields">
-                  <label>
-                    {copy.sampleFloor}
-                    <input type="number" min={0} step={1} value={rule.sampleFloor} onChange={(event) => updateRule(platform, event.target.value, "floor")} />
-                  </label>
-                  <label>
-                    {copy.cutoff}
-                    <input type="number" min={0} step={1} value={rule.minLikes} onChange={(event) => updateRule(platform, event.target.value, "likes")} />
-                  </label>
-                </div>
-                {custom ? <button type="button" className="text-button" onClick={() => clearPlatform(platform)}>{copy.useDefault}</button> : null}
-              </article>
-            );
-          })}
+              ))
+            )}
+          </div>
         </section>
-        <div className="choices">
-          <button type="button" className={settings.filterGrids ? "signal on" : "signal"} aria-pressed={settings.filterGrids} onClick={() => void patch({ filterGrids: !settings.filterGrids })}><Icon name="grid" />{copy.filterGrids}</button>
-          <button type="button" className={settings.showSkipChip ? "signal on" : "signal"} aria-pressed={settings.showSkipChip} onClick={() => void patch({ showSkipChip: !settings.showSkipChip })}><Icon name="chip" />{copy.showChip}</button>
-        </div>
-        {active?.creatorId ? <button className="text-button" onClick={() => void allowCurrent()}>{copy.keepCreator}</button> : null}
-        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{copy.signedOut}</p> : null}
-        <section className="panel">
-          <h2>{copy.allowlist}</h2>
-          {settings.allowlist.length === 0 ? <p className="note">{copy.allowEmpty}</p> : settings.allowlist.map((entry) => (
-            <div className="allow" key={entry.platform + entry.id}>
-              <span>{copy.short[entry.platform]} · {entry.id}</span>
-              <button className="text-button" onClick={() => void patch({ allowlist: settings.allowlist.filter((item) => item.platform !== entry.platform || item.id !== entry.id) })}>{copy.remove}</button>
-            </div>
-          ))}
-        </section>
-        <button className="text-button" onClick={() => void patch({ ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms } })}>{copy.reset}</button>
-        <p className="privacy">{copy.privacy}</p>
-        <a className="star icon-link" href={copy.repo} target="_blank" rel="noreferrer"><Icon name="star" />{copy.star}</a>
+
+        <footer className="end">
+          <div className="end-row">
+            <button type="button" className="link" onClick={() => update((current) => ({ ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: current.allowlist }))}>
+              <Icon name="reset" size={14} />
+              {t("reset")}
+            </button>
+            <StarLink href={REPO_URL} />
+          </div>
+          <p className="privacy">{t("privacy")}</p>
+        </footer>
       </div>
     </main>
   );
-
-  function updateRule(platform: Platform, raw: string, field: "floor" | "likes") {
-    if (raw.trim() === "") return;
-    const value = Number(raw);
-    if (!Number.isFinite(value) || value < 0) return;
-    const current = settings.advanced?.[platform] ?? {};
-    const next = field === "floor" ? { ...current, sampleFloor: value } : { ...current, minLikes: value };
-    void patch({
-      advanced: {
-        ...(settings.advanced ?? {}),
-        [platform]: next,
-      },
-    });
-  }
-
-  function clearPlatform(platform: Platform) {
-    const next = { ...(settings.advanced ?? {}) };
-    delete next[platform];
-    void patch({ advanced: Object.keys(next).length ? next : null });
-  }
-}
-
-function formatCount(value: number): string {
-  return Math.round(value).toLocaleString("en-US");
 }

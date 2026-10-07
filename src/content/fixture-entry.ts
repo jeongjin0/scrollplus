@@ -1,10 +1,11 @@
 import { createEngine, type EngineItem } from "./engine";
 import { mountChip } from "./chip";
-import { DEFAULT_SETTINGS, type Metrics, type Settings } from "../lib/score";
+import { DEFAULT_SETTINGS, presetRule, type Metrics, type Settings } from "../lib/score";
 
 let settings: Settings = {
   ...DEFAULT_SETTINGS,
   platforms: { ...DEFAULT_SETTINGS.platforms },
+  rule: presetRule("balanced"),
   allowlist: [],
 };
 let advances = 0;
@@ -34,8 +35,8 @@ const engine = createEngine({
     return true;
   },
   onSkipped: () => {},
-  setSensitivity: (next) => {
-    settings = { ...settings, sensitivity: next };
+  setRule: (next) => {
+    settings = { ...settings, rule: next };
   },
   isBlocked: () => {
     const active = document.activeElement;
@@ -77,5 +78,3 @@ window.__kept = {
   settings,
 };
 
-const low = { views: 10000, likes: 10, comments: 0, shares: 0, saves: null };
-document.querySelector("#run-skip")?.addEventListener("click", () => show({ id: "low", metrics: low }));

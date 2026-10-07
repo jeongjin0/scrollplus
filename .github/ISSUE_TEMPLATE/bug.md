@@ -13,4 +13,8 @@ YouTube Shorts, TikTok, or Instagram Reels
 
 ## Kept version
 
-0.1.0
+For example 0.2.0. You can find it on chrome://extensions.
+
+## Your rule
+
+The preset, or the numbers you set in Settings.

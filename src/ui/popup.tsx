@@ -1,47 +1,57 @@
-import type { Platform } from "../lib/score";
-import { ruleFor } from "../lib/score";
-import { Master, Mark, SensitivityControl, SiteRows } from "./controls";
-import { Icon } from "./icons";
-import { useKeptState } from "./state";
-
-const PLATFORMS: Platform[] = ["youtube", "tiktok", "instagram"];
+import { useState } from "react";
+import { PLATFORMS, REPO_URL, activePreset, presetRule, type PresetName } from "../lib/score";
+import { t } from "../lib/i18n";
+import { Hero, Icon, Mark, PowerButton, PresetControl, Row, StarLink } from "./kit";
+import { SITES, useKeptState } from "./state";
 
 export function PopupApp() {
-  const { settings, skips, active, copy, patch, allowCurrent } = useKeptState();
-  const likesFor = (platform: Platform) => ruleFor(settings, platform).minLikes;
-  const counts = PLATFORMS.map(likesFor);
-  const same = new Set(counts).size === 1;
-  const detail = Object.fromEntries(PLATFORMS.map((platform) => [
-    platform,
-    settings.platforms[platform] ? copy.under(likesFor(platform)) : copy.off,
-  ])) as Record<Platform, string>;
+  const { settings, ready, skips, active, update, allowCurrent } = useKeptState();
+  const [kept, setKept] = useState(false);
+  const preset = activePreset(settings.rule);
+  const labels: Record<PresetName, string> = { lenient: t("presetLenient"), balanced: t("presetBalanced"), strict: t("presetStrict") };
+  const classes = ["popup", ready ? "ready" : "", settings.enabled ? "" : "paused"].filter(Boolean).join(" ");
+
   return (
-    <div className="popup">
-      <header className="top">
-        <Mark />
-        <h1>Kept</h1>
+    <div className={classes}>
+      <header className="bar">
+        <div className="brand">
+          <Mark size={24} />
+          <h1>Kept</h1>
+        </div>
+        <PowerButton on={settings.enabled} label={settings.enabled ? t("powerOn") : t("powerOff")} onChange={(enabled) => update((current) => ({ ...current, enabled }))} />
       </header>
-      <Master enabled={settings.enabled} onLabel={copy.on} offLabel={copy.off} onToggle={() => void patch({ enabled: !settings.enabled })} />
-      <SensitivityControl
-        value={settings.sensitivity}
-        labels={{ lenient: copy.lenient, balanced: copy.balanced, strict: copy.strict }}
-        onChange={(sensitivity) => void patch({ sensitivity })}
-      />
-      <p className="hint">
-        <span>{copy.approxLead}</span>
-        <b>{same ? copy.under(counts[0]) : copy.approx(counts[0], counts[1], counts[2])}</b>
-      </p>
-      <SiteRows
-        enabled={settings.platforms}
-        labels={copy.short}
-        detail={detail}
-        onToggle={(platform) => void patch({ platforms: { ...settings.platforms, [platform]: !settings.platforms[platform] } })}
-      />
-      <p className="count">{copy.skippedToday(skips)}</p>
-      {active?.creatorId ? <button className="text-button" onClick={() => void allowCurrent()}>{copy.keepCreator}</button> : null}
-      {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{copy.signedOut}</p> : null}
-      <button className="text-button icon-link" onClick={() => void chrome.runtime.openOptionsPage()}><Icon name="sliders" />{copy.conditions}</button>
-      <a className="star icon-link" href={copy.repo} target="_blank" rel="noreferrer"><Icon name="star" />{copy.star}</a>
+      <div className="body">
+        <Hero count={skips} />
+        <PresetControl value={preset} labels={labels} onChange={(name) => update((current) => ({ ...current, rule: presetRule(name, current.rule) }))} />
+        <div className="card">
+          {PLATFORMS.map((platform) => (
+            <Row
+              key={platform}
+              icon={SITES[platform].icon}
+              title={SITES[platform].name}
+              on={settings.platforms[platform]}
+              label={SITES[platform].name}
+              onToggle={(next) => update((current) => ({ ...current, platforms: { ...current.platforms, [platform]: next } }))}
+            />
+          ))}
+        </div>
+        {active?.creatorId ? (
+          <button type="button" className="action" disabled={kept} onClick={() => void allowCurrent().then(() => setKept(true))}>
+            <Icon name={kept ? "check" : "user"} size={14} />
+            {kept ? t("creatorKept") : t("keepCreator")}
+          </button>
+        ) : null}
+        {active?.platform === "instagram" && active.instagramSignedOut ? <p className="note">{t("signedOut")}</p> : null}
+      </div>
+      <footer className="foot">
+        <button type="button" className="link" onClick={() => void chrome.runtime.openOptionsPage()}>
+          <Icon name="sliders" size={14} />
+          {t("settings")}
+          {preset ? null : <span className="badge">{t("custom")}</span>}
+        </button>
+        <StarLink href={REPO_URL} />
+      </footer>
     </div>
   );
 }
+

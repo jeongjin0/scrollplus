@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createEngine, type EngineItem } from "./engine";
-import { DEFAULT_SETTINGS, type Settings } from "../lib/score";
+import { DEFAULT_SETTINGS, presetRule, type Settings } from "../lib/score";
 
 function low(id: string): EngineItem {
   return {
@@ -14,13 +14,14 @@ function low(id: string): EngineItem {
 }
 
 function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void) {
-  const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, allowlist: [], ...partial };
+  const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
   const tasks: Array<{ id: number; at: number; fn: () => void }> = [];
   const advances: string[] = [];
   const retreats: string[] = [];
   const chips: string[] = [];
+  const models: unknown[] = [];
   let skips = 0;
   let blocked = false;
   let latest = "";
@@ -44,12 +45,13 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
     onSkipped: () => {
       skips += 1;
     },
-    setSensitivity: (next) => {
-      settings.sensitivity = next;
+    setRule: (next) => {
+      settings.rule = next;
     },
     isBlocked: () => blocked,
     render: (chip) => {
       chips.push(chip ? chip.mode : "none");
+      models.push(chip);
     },
     schedule: (fn, ms) => {
       const id = seq;
@@ -95,6 +97,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
     advances,
     retreats,
     chips,
+    models,
     get skips() { return skips; },
     get calls() { return calls; },
     setBlocked(value: boolean) { blocked = value; },
@@ -144,7 +147,7 @@ describe("engine", () => {
     const box = harness({}, true, (show) => {
       show({
         ...low("b"),
-        metrics: { views: 10000, likes: 800, comments: 20, shares: 10, saves: null },
+        metrics: { views: 900000, likes: 40000, comments: 200, shares: 10, saves: null },
       });
     });
     box.show(low("a"));
@@ -152,6 +155,7 @@ describe("engine", () => {
     expect(box.advances).toEqual(["a"]);
     expect(box.skips).toBe(1);
     expect(box.chips.at(-1)).toBe("skipped");
+    expect(box.models.at(-1)).toEqual({ mode: "skipped", metric: "likes", value: 10 });
     box.flush(2500);
     expect(box.chips.at(-1)).toBe("none");
   });

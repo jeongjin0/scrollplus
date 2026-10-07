@@ -28,8 +28,15 @@ export function tiktokActive(): { id: string; creatorId: string | null } | null 
   if (fromUrl) return { creatorId: fromUrl[1], id: fromUrl[2] };
   const video = visibleVideo();
   if (!video) return null;
+  const wrapper = video.closest('[id^="xgwrapper-"]');
+  const wrapped = wrapper ? wrapper.id.match(/^xgwrapper-\d+-(\d+)$/) : null;
   let node: HTMLElement | null = video;
   for (let depth = 0; depth < 12 && node; depth += 1) {
+    if (wrapped) {
+      const author = node.querySelector('a[href^="/@"]');
+      const handle = author ? author.getAttribute("href")?.match(/^\/@([^/?#]+)/) : null;
+      if (handle) return { creatorId: handle[1], id: wrapped[1] };
+    }
     const link = node.querySelector('a[href*="/video/"]');
     if (link instanceof HTMLAnchorElement) {
       const full = link.href.match(/@([^/]+)\/video\/(\d+)/);
@@ -39,7 +46,25 @@ export function tiktokActive(): { id: string; creatorId: string | null } | null 
     }
     node = node.parentElement;
   }
-  return null;
+  return wrapped ? { creatorId: null, id: wrapped[1] } : null;
+}
+
+// Which TikTok item the feed shows right now. While the next video is still loading its
+// player is empty and has no id, so fall back to the feed item that is most on screen.
+export function tiktokMarker(): string | null {
+  const active = tiktokActive();
+  if (active) return active.id;
+  let best: string | null = null;
+  let bestVisible = 0;
+  for (const item of document.querySelectorAll('[data-e2e="recommend-list-item-container"]')) {
+    const rect = item.getBoundingClientRect();
+    const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+    if (visible > bestVisible) {
+      bestVisible = visible;
+      best = item.id || null;
+    }
+  }
+  return best ? "item:" + best : null;
 }
 
 export function gridAnchors(pattern: RegExp): Array<{ id: string; element: HTMLElement }> {
@@ -89,7 +114,7 @@ export function moveUntilIdChanges(press: () => boolean, readId: () => string | 
         resolve(true);
         return;
       }
-      if (Date.now() - started > 1200) {
+      if (Date.now() - started > 1800) {
         window.clearInterval(timer);
         resolve(false);
       }

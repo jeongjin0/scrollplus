@@ -4,36 +4,40 @@ Do not submit this listing from the repository automation. It is the copy for a 
 
 ## English
 
-Title: Kept — Quality filter for Shorts, Reels & TikTok
+Title: Kept — Skip low-like Shorts, Reels & TikTok
 
-Summary: Skip low-response Shorts, Reels, and TikToks while the scroll stays.
+Summary: Skips Shorts, Reels, and TikToks with too few likes. On from the moment you install.
 
 Description:
 
-Kept hides nothing until a video has enough plays to judge. Then it skips videos whose likes, comments, shares, and saves are weak, and leaves the rest alone.
+Kept skips the Shorts, Reels, and TikToks nobody liked, so you spend your scroll on the ones people did.
 
-Install it and the Balanced filter is already on for YouTube Shorts, TikTok, and Instagram Reels. There is no account and no setup. Open the popup only if you want Lenient, Balanced, or Strict, or you want to turn one site off.
+Install it and it is already on for YouTube Shorts, TikTok, and Instagram Reels. The default is simple: videos under 5,000 likes are skipped. There is no account and no setup.
 
-If the counts are missing, Kept keeps the video. Grids and shelves are left alone unless you opt in. A creator you want to keep can be saved from the popup.
+Want a different level? Open the popup and pick Lenient (under 1,000 likes), Balanced (under 5,000), or Strict (under 20,000). Want your own numbers? Settings lets you set the minimum for likes, comments, and views, switch a site off, and keep creators you like.
 
-Kept is not affiliated with YouTube, TikTok, or Instagram. Counts stay on your device. The extension does not collect or transmit data.
+Every skip tells you why, for example "Skipped · 312 likes", with an Undo. If a count is missing, the video stays. After six skips in a row Kept stops and asks, so a quiet feed never turns into a runaway one.
 
-Single purpose: skip low-response YouTube Shorts, TikTok videos, and Instagram Reels using counts already on the page.
+Kept is not affiliated with YouTube, TikTok, or Instagram. Counts stay on your device. The extension does not collect or transmit data. Open source, MIT: https://github.com/jeongjin0/kept
+
+Single purpose: skip YouTube Shorts, TikTok videos, and Instagram Reels that have too few likes, using counts already on the page.
 
 ## Korean
 
-제목: Kept — 쇼츠, 릴스, 틱톡 품질 필터
+제목: Kept — 좋아요 적은 쇼츠·릴스·틱톡 건너뛰기
 
-요약: 스크롤은 유지하고, 반응이 약한 영상만 넘깁니다.
+요약: 좋아요가 적은 쇼츠, 릴스, 틱톡을 넘깁니다. 설치하면 바로 켜집니다.
 
 설명:
 
-Kept는 조회가 충분해지기 전에는 영상을 넘기지 않습니다. 그 다음, 좋아요·댓글·공유·저장이 약한 영상만 건너뜁니다.
+Kept는 아무도 좋아하지 않은 쇼츠, 릴스, 틱톡을 넘겨 줍니다. 스크롤은 사람들이 좋아한 영상에 쓰세요.
 
-설치하면 유튜브 쇼츠, 틱톡, 인스타그램 릴스에 기본 필터가 바로 켜집니다. 계정과 첫 설정은 없습니다. 느슨, 기본, 엄격이나 사이트별 스위치는 팝업에서만 바꾸면 됩니다.
+설치하면 유튜브 쇼츠, 틱톡, 인스타그램 릴스에 바로 켜집니다. 기본은 간단합니다. 좋아요가 5천 개 미만이면 넘깁니다. 계정도, 첫 설정도 없습니다.
 
-수치를 읽지 못하면 영상을 그대로 둡니다. 그리드와 선반은 직접 켜기 전에는 건드리지 않습니다.
+다른 기준이 필요하면 팝업에서 느슨(1천 미만), 기본(5천 미만), 엄격(2만 미만) 중에서 고르세요. 직접 정하고 싶다면 세부 설정에서 좋아요, 댓글, 조회수의 최소 개수를 입력하고, 사이트를 끄거나 계속 보고 싶은 제작자를 지정할 수 있습니다.
 
-Kept는 YouTube, TikTok, Instagram과 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다.
+넘길 때마다 이유가 표시됩니다. 예: "넘김 · 좋아요 312" 그리고 되돌리기 버튼이 나옵니다. 수치를 읽지 못하면 영상은 그대로 둡니다. 연속으로 여섯 번 넘기면 멈추고 물어봅니다.
 
-단일 목적: 페이지에 이미 있는 수치로 반응이 약한 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다.
+Kept는 YouTube, TikTok, Instagram과 관계가 없습니다. 수치는 기기 안에서만 쓰며, 수집하거나 전송하지 않습니다. 오픈소스(MIT): https://github.com/jeongjin0/kept
+
+단일 목적: 페이지에 이미 있는 수치로 좋아요가 적은 유튜브 쇼츠, 틱톡, 인스타그램 릴스를 넘깁니다.

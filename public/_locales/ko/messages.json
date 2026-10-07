@@ -3,25 +3,37 @@
     "message": "Kept"
   },
   "extDesc": {
-    "message": "쇼츠, 릴스, 틱톡에서 반응이 약한 영상을 넘깁니다."
+    "message": "좋아요가 적은 쇼츠, 릴스, 틱톡을 넘깁니다. 설치하면 바로 켜집니다."
   },
-  "on": {
-    "message": "켜짐"
+  "powerOn": {
+    "message": "Kept 켜짐"
   },
-  "off": {
-    "message": "꺼짐"
+  "powerOff": {
+    "message": "Kept 꺼짐"
   },
-  "lenient": {
+  "presetLenient": {
     "message": "느슨"
   },
-  "balanced": {
+  "presetBalanced": {
     "message": "기본"
   },
-  "strict": {
+  "presetStrict": {
     "message": "엄격"
+  },
+  "custom": {
+    "message": "직접"
+  },
+  "skippedToday": {
+    "message": "오늘 넘김"
   },
   "keepCreator": {
     "message": "이 제작자는 유지"
+  },
+  "creatorKept": {
+    "message": "제작자 유지됨"
+  },
+  "settings": {
+    "message": "세부 설정"
   },
   "star": {
     "message": "GitHub에 Star"
@@ -29,64 +41,98 @@
   "signedOut": {
     "message": "인스타그램에 로그인되어 있지 않습니다. 숨기지 않습니다."
   },
-  "privacy": {
-    "message": "설정과 오늘 넘긴 횟수만 이 기기에 저장합니다. 데이터는 수집하거나 전송하지 않습니다."
+  "rulesTitle": {
+    "message": "기준"
+  },
+  "rulesLead": {
+    "message": "하나라도 못 미치면 넘깁니다."
+  },
+  "likes": {
+    "message": "좋아요"
+  },
+  "comments": {
+    "message": "댓글"
+  },
+  "views": {
+    "message": "조회수"
+  },
+  "amount": {
+    "message": "$NAME$ 최소 개수",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "좋아요"
+      }
+    }
+  },
+  "moreAria": {
+    "message": "늘리기"
+  },
+  "lessAria": {
+    "message": "줄이기"
+  },
+  "appliesTo": {
+    "message": "$SITES$에서 적용됩니다",
+    "placeholders": {
+      "sites": {
+        "content": "$1",
+        "example": "틱톡, 릴스"
+      }
+    }
+  },
+  "sitesTitle": {
+    "message": "사이트"
+  },
+  "behaviorTitle": {
+    "message": "동작"
   },
   "filterGrids": {
-    "message": "그리드도 거르기"
+    "message": "목록·그리드에서도 거르기"
   },
   "showChip": {
     "message": "넘김 표시"
   },
-  "reset": {
-    "message": "기본값으로"
-  },
-  "allowlist": {
+  "allowTitle": {
     "message": "유지할 제작자"
   },
-  "sampleFloor": {
-    "message": "최소 조회"
-  },
-  "cutoff": {
-    "message": "좋아요 개수"
-  },
-  "conditions": {
-    "message": "조건"
-  },
-  "reactions": {
-    "message": "반응"
-  },
-  "reactionNote": {
-    "message": "고른 반응만 점수에 넣습니다. 페이지에 없는 수는 0으로 보지 않습니다."
-  },
-  "presetNote": {
-    "message": "조회가 최소보다 적으면 아직 넘기지 않습니다. 좋아요 수를 모르면 그대로 둡니다."
-  },
-  "lead": {
-    "message": "설치하면 기본으로 켜집니다. 좋아요 개수는 여기서 바꿉니다."
-  },
-  "useDefault": {
-    "message": "이 사이트는 기본값"
-  },
   "allowEmpty": {
-    "message": "아직 없습니다."
-  },
-  "signalLikes": { "message": "좋아요" },
-  "signalComments": { "message": "댓글" },
-  "signalShares": { "message": "공유" },
-  "signalSaves": { "message": "저장" },
-  "liveRule": {
-    "message": "조회 $FLOOR$이 넘었는데 좋아요가 $LIKES$개 미만이면 넘깁니다.",
-    "placeholders": {
-      "floor": { "content": "$1", "example": "2,000" },
-      "likes": { "content": "$2", "example": "1,000" }
-    }
+    "message": "아직 없어요. 영상을 보다가 팝업에서 추가하세요."
   },
   "remove": {
-    "message": "제거"
+    "message": "삭제"
   },
-  "skipped": {
-    "message": "넘김"
+  "reset": {
+    "message": "기본값으로 되돌리기"
+  },
+  "privacy": {
+    "message": "설정과 오늘 넘긴 횟수만 이 기기에 저장합니다. 수집하거나 전송하지 않습니다."
+  },
+  "chipLikes": {
+    "message": "넘김 · 좋아요 $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "312"
+      }
+    }
+  },
+  "chipComments": {
+    "message": "넘김 · 댓글 $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "chipViews": {
+    "message": "넘김 · 조회수 $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4.2천"
+      }
+    }
   },
   "undo": {
     "message": "되돌리기"
@@ -100,12 +146,18 @@
   "lowerBar": {
     "message": "기준 낮추기"
   },
-  "skippedToday": {
-    "message": "오늘 $COUNT$개 넘김",
+  "statusOn": {
+    "message": "켜짐"
+  },
+  "statusOff": {
+    "message": "꺼짐"
+  },
+  "presetTitle": {
+    "message": "좋아요가 $COUNT$ 미만이면 넘깁니다",
     "placeholders": {
       "count": {
         "content": "$1",
-        "example": "18"
+        "example": "5천"
       }
     }
   }

@@ -37,8 +37,8 @@ export function startKept(adapter: Adapter): void {
     onSkipped: () => {
       void incrementSkips();
     },
-    setSensitivity: (next) => {
-      settings = { ...settings, sensitivity: next };
+    setRule: (next) => {
+      settings = { ...settings, rule: next };
       void saveSettings(settings);
     },
     isBlocked: () => pointerDown || typing() || menuOpen(),

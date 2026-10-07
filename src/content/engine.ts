@@ -1,4 +1,4 @@
-import { decide, lowerSensitivity, type ItemKind, type Metrics, type Platform, type Sensitivity, type Settings, type Surface } from "../lib/score";
+import { decide, lowerRule, type Decision, type ItemKind, type Metric, type Metrics, type Platform, type Rule, type Settings, type Surface } from "../lib/score";
 
 export interface EngineItem {
   id: string;
@@ -9,10 +9,9 @@ export interface EngineItem {
   kind: ItemKind;
 }
 
-export interface ChipModel {
-  mode: "skipped" | "paused";
-  canLower: boolean;
-}
+export type ChipModel =
+  | { mode: "skipped"; metric: Metric; value: number }
+  | { mode: "paused"; canLower: boolean };
 
 export interface EngineDeps {
   getSettings: () => Settings;
@@ -20,7 +19,7 @@ export interface EngineDeps {
   advance: () => Promise<boolean>;
   retreat: () => Promise<boolean>;
   onSkipped: () => void;
-  setSensitivity: (next: Sensitivity) => void;
+  setRule: (next: Rule) => void;
   isBlocked: () => boolean;
   render: (chip: ChipModel | null) => void;
   schedule: (fn: () => void, ms: number) => number;
@@ -49,18 +48,29 @@ export function createEngine(deps: EngineDeps) {
   let lastAdvanceAt = Number.NEGATIVE_INFINITY;
   let seenAt = Number.NEGATIVE_INFINITY;
 
+  function judge(item: EngineItem): Decision {
+    return decide({
+      settings: deps.getSettings(),
+      platform: item.platform,
+      surface: item.surface,
+      creatorId: item.creatorId,
+      metrics: item.metrics,
+      kind: item.kind,
+    });
+  }
+
   function clearWait() {
     if (waitTimer != null) deps.cancel(waitTimer);
     waitTimer = null;
   }
 
-  function showSkipped() {
+  function showSkipped(decision: Decision) {
     if (chipTimer != null) deps.cancel(chipTimer);
-    if (!deps.getSettings().showSkipChip) {
+    if (!deps.getSettings().showSkipChip || decision.action !== "skip") {
       deps.render(null);
       return;
     }
-    deps.render({ mode: "skipped", canLower: false });
+    deps.render({ mode: "skipped", metric: decision.metric, value: decision.value });
     chipTimer = deps.schedule(() => {
       chipTimer = null;
       if (!paused) deps.render(null);
@@ -68,13 +78,15 @@ export function createEngine(deps: EngineDeps) {
   }
 
   function showPaused() {
-    deps.render({ mode: "paused", canLower: lowerSensitivity(deps.getSettings().sensitivity) != null });
+    deps.render({ mode: "paused", canLower: lowerRule(deps.getSettings().rule) != null });
   }
 
   async function performSkip(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
     if (advancing) return;
     if (deps.isBlocked()) return;
+    const decision = judge(item);
+    if (decision.action !== "skip") return;
     const gap = ADVANCE_GAP_MS - (deps.now() - lastAdvanceAt);
     if (gap > 0) {
       if (skipQueuedFor === item.id) return;
@@ -119,21 +131,14 @@ export function createEngine(deps: EngineDeps) {
       showPaused();
       return;
     }
-    showSkipped();
+    showSkipped(decision);
   }
 
   function evaluate(item: EngineItem) {
     if (item.id !== current?.id || sessionKeep.has(item.id) || finished.has(item.id)) return;
-    const decision = decide({
-      settings: deps.getSettings(),
-      platform: item.platform,
-      surface: item.surface,
-      creatorId: item.creatorId,
-      metrics: item.metrics,
-      kind: item.kind,
-    });
+    const decision = judge(item);
     if (decision.action === "keep") {
-      const waiting = decision.reason === "no-metrics" || decision.reason === "no-views" || decision.reason === "unscored";
+      const waiting = decision.reason === "no-metrics" || decision.reason === "unscored";
       if (waiting && deps.now() - seenAt < METRIC_GRACE_MS) return;
       finished.add(item.id);
       consecutive = 0;
@@ -208,9 +213,9 @@ export function createEngine(deps: EngineDeps) {
       evaluate(current);
     },
     lower() {
-      const next = lowerSensitivity(deps.getSettings().sensitivity);
+      const next = lowerRule(deps.getSettings().rule);
       if (!next) return;
-      deps.setSensitivity(next);
+      deps.setRule(next);
       paused = false;
       consecutive = 0;
       if (!current) return;
@@ -230,3 +235,4 @@ export function createEngine(deps: EngineDeps) {
     },
   };
 }
+

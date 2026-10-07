@@ -3,25 +3,37 @@
     "message": "Kept"
   },
   "extDesc": {
-    "message": "Skip low-response YouTube Shorts, TikTok videos, and Instagram Reels."
+    "message": "Skip Shorts, Reels, and TikToks with too few likes. On from the moment you install."
   },
-  "on": {
-    "message": "On"
+  "powerOn": {
+    "message": "Kept is on"
   },
-  "off": {
-    "message": "Off"
+  "powerOff": {
+    "message": "Kept is off"
   },
-  "lenient": {
+  "presetLenient": {
     "message": "Lenient"
   },
-  "balanced": {
+  "presetBalanced": {
     "message": "Balanced"
   },
-  "strict": {
+  "presetStrict": {
     "message": "Strict"
+  },
+  "custom": {
+    "message": "Custom"
+  },
+  "skippedToday": {
+    "message": "skipped today"
   },
   "keepCreator": {
     "message": "Keep this creator"
+  },
+  "creatorKept": {
+    "message": "Creator kept"
+  },
+  "settings": {
+    "message": "Settings"
   },
   "star": {
     "message": "Star on GitHub"
@@ -29,64 +41,98 @@
   "signedOut": {
     "message": "Instagram is signed out. Nothing is hidden."
   },
-  "privacy": {
-    "message": "Kept stores settings and today's skip count on this device. It does not collect or transmit data."
+  "rulesTitle": {
+    "message": "Rules"
+  },
+  "rulesLead": {
+    "message": "Skip a video when any rule falls short."
+  },
+  "likes": {
+    "message": "Likes"
+  },
+  "comments": {
+    "message": "Comments"
+  },
+  "views": {
+    "message": "Views"
+  },
+  "amount": {
+    "message": "Minimum $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Likes"
+      }
+    }
+  },
+  "moreAria": {
+    "message": "More"
+  },
+  "lessAria": {
+    "message": "Fewer"
+  },
+  "appliesTo": {
+    "message": "Works on $SITES$",
+    "placeholders": {
+      "sites": {
+        "content": "$1",
+        "example": "TikTok, Reels"
+      }
+    }
+  },
+  "sitesTitle": {
+    "message": "Sites"
+  },
+  "behaviorTitle": {
+    "message": "Behavior"
   },
   "filterGrids": {
-    "message": "Filter grids"
+    "message": "Also filter lists and grids"
   },
   "showChip": {
-    "message": "Show skip chip"
+    "message": "Show the skip chip"
   },
-  "reset": {
-    "message": "Reset"
-  },
-  "allowlist": {
+  "allowTitle": {
     "message": "Creators to keep"
   },
-  "sampleFloor": {
-    "message": "Minimum plays"
-  },
-  "cutoff": {
-    "message": "Like count"
-  },
-  "conditions": {
-    "message": "Conditions"
-  },
-  "reactions": {
-    "message": "Reactions"
-  },
-  "reactionNote": {
-    "message": "Only selected reactions count. A missing count is not treated as zero."
-  },
-  "presetNote": {
-    "message": "Fewer plays than the minimum are left alone. If the like count is missing, the video stays."
-  },
-  "lead": {
-    "message": "It is already on. Set the like count here."
-  },
-  "useDefault": {
-    "message": "Use the preset for this site"
-  },
   "allowEmpty": {
-    "message": "None yet."
-  },
-  "signalLikes": { "message": "Likes" },
-  "signalComments": { "message": "Comments" },
-  "signalShares": { "message": "Shares" },
-  "signalSaves": { "message": "Saves" },
-  "liveRule": {
-    "message": "Past $FLOOR$ plays, skip under $LIKES$ likes.",
-    "placeholders": {
-      "floor": { "content": "$1", "example": "2,000" },
-      "likes": { "content": "$2", "example": "1,000" }
-    }
+    "message": "None yet. Add one from the popup while you watch."
   },
   "remove": {
     "message": "Remove"
   },
-  "skipped": {
-    "message": "Skipped"
+  "reset": {
+    "message": "Reset to defaults"
+  },
+  "privacy": {
+    "message": "Settings and today's count stay on this device. Kept collects and sends nothing."
+  },
+  "chipLikes": {
+    "message": "Skipped · $COUNT$ likes",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "312"
+      }
+    }
+  },
+  "chipComments": {
+    "message": "Skipped · $COUNT$ comments",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "chipViews": {
+    "message": "Skipped · $COUNT$ views",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4.2K"
+      }
+    }
   },
   "undo": {
     "message": "Undo"
@@ -100,12 +146,18 @@
   "lowerBar": {
     "message": "Lower the bar"
   },
-  "skippedToday": {
-    "message": "$COUNT$ skipped today",
+  "statusOn": {
+    "message": "On"
+  },
+  "statusOff": {
+    "message": "Off"
+  },
+  "presetTitle": {
+    "message": "Skips videos under $COUNT$ likes",
     "placeholders": {
       "count": {
         "content": "$1",
-        "example": "18"
+        "example": "5K"
       }
     }
   }

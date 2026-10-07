@@ -21,7 +21,7 @@ test("fixture skips, pauses, undoes, and fails open without console errors", asy
 
   await page.evaluate((metrics) => window.__kept.show({ id: "low", metrics }), low);
   await expect(page.locator("#advances")).toHaveText("1");
-  await expect(page.locator("#kept-chip-host")).toContainText("Skipped");
+  await expect(page.locator("#kept-chip-host")).toContainText("Skipped · 10 likes");
   await page.getByRole("button", { name: "Undo" }).click();
   await expect(page.locator("#retreats")).toHaveText("1");
   await page.evaluate((metrics) => window.__kept.show({ id: "low", metrics }), low);

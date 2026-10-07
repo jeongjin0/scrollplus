@@ -1,19 +1,19 @@
-# Calibration
+# Preset basis
 
-Date: 2026-10-06
+Date: 2026-10-07
 
-YouTube eligible sample: 19. TikTok eligible sample: 0. Instagram was not sampled.
+The rule is a like count, so the presets are round numbers a person can read at a glance: 1K, 5K, and 20K. They were picked by looking at how many sampled videos each would skip. These are small logged-out samples, not a study. They show the order of magnitude, nothing more.
 
-Neither platform reached 40 items at or above its sample floor, so Balanced stays on the provisional cutoffs: YouTube 2,000 views and 0.8%, TikTok 3,000 plays and 3.0%, Instagram 2,000 plays and 1.0%. Lenient remains half of Balanced and Strict remains double.
+Samples are public ids and counts only, in qa/samples/. Like counts were read from what the page itself loaded.
 
-On this 19-item YouTube sample, weighted scores ran from 0.82% to 2.74%, median 1.09%. None fell under the provisional 0.8% cutoff. That sample is too small to move the cutoff.
+| Preset | Likes under | YouTube Shorts (39 with a like count) | TikTok (23) |
+| --- | --- | --- | --- |
+| Lenient | 1,000 | 5% | 0% |
+| Balanced | 5,000 | 13% | 17% |
+| Strict | 20,000 | 18% | 43% |
 
-## 2026-10-07
+Balanced skips roughly one video in six to eight in these samples, which is enough to notice and light enough not to empty a feed. Lenient is a safety net. Strict is for people who want only popular videos.
 
-A second logged-out pass read the counts the extension published.
+Instagram was not sampled because no signed-in session was available. Its default is the same 5,000.
 
-YouTube: 42 shorts, 39 eligible. With comments, shares, and saves missing, scores ran from 0.26% to 4.20%, median 1.04%. Nine of the 39 were under 0.8%, which is 23%. That is inside the 20–30% band, so Balanced stays at 0.8%.
-
-TikTok: 24 videos, 23 eligible. Scores ran from 0.15% to 18.0%. Four were under 3.0%. The sample is still under 40, so Balanced stays at 3.0%.
-
-Instagram was not sampled.
+The rule has no minimum number of plays. That is deliberate: a brand-new video with a handful of likes is skipped like any other. The Lenient preset and the stepper are there for people who would rather give new videos room.

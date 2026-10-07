@@ -8,7 +8,7 @@ export default defineConfig({
     name: '__MSG_extName__',
     description: '__MSG_extDesc__',
     default_locale: 'en',
-    version: '0.1.0',
+    version: "0.2.0",
     permissions: ['storage'],
     host_permissions: [
       'https://www.youtube.com/*',
