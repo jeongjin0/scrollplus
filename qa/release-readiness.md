@@ -1,6 +1,6 @@
 # Release readiness · 0.3.5
 
-Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. Exact-ZIP real YouTube checks pass in isolated Chrome for Testing and official Chrome 154; historical signed-in 0.3.3/0.3.4 checks below are not new 0.3.5 evidence. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
+Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. Exact-ZIP real YouTube checks pass in isolated Chrome for Testing and official Chrome 154. Bounded signed-in 0.3.5 default filtering was also observed in Aside Chromium 153; the broader historical 0.3.3/0.3.4 paths below retain their original versions. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
@@ -20,6 +20,8 @@ Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 pa
 | TikTok custom comments/views, Undo and kept creator | Pass for recorded 0.3.2 signed-out paths | [Live boundary checks](live-smoke.md); 686 comments and 3.6M views, equal minimum stays, below minimum skips, Undo restores, kept creator survives fresh page. Active-player code unchanged in 0.3.3 |
 | TikTok runtime error | Reproduced without extension | `a.init is not a function` at the same TikTok login-bundle location in a fresh 90-second no-extension control. It does not require the extension to occur; the site overlay still limits signed-out QA |
 | Instagram signed out | Pass for fail-open | Reels redirected to login; no filtering was claimed |
+| Instagram signed-in default, exact 0.3.5 | Observed in a bounded native check | [Current-version observations](signed-in-smoke.md#version-035--2026-10-08): 4,778-like reel advanced automatically to 526K; a separate 60-like reason chip captured. Count 1 → 9 includes unsampled outcomes. Native Undo/restoration, page errors and day-use not established |
+| TikTok signed-in default and preview exclusion, exact 0.3.5 | Observed in a bounded native check | [Current-version observations](signed-in-smoke.md#version-035--2026-10-08): 3,366-like ordinary video advanced automatically, count 9 → 10; Following recommendation cards left count 9 unchanged. No new native Undo, page-error or genuine Following-feed pass |
 | Instagram signed in | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): default, counts/navigation, Undo, persisted creator, Reset, away/back and missing views; actual Aside Chromium 153 |
 | TikTok signed-in For You | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): 2,639-like default skip, Undo, creator, identified Strict skip and low-like ads kept; actual Aside Chromium 153 |
 | TikTok preview exclusion and video-page skip/Undo | Pass for recorded 0.3.4 paths | [Preview regression and live check](tiktok-previews.md): actual Following recommendation preview has no current creator and no skips; 2,660-like video skips at default, Undo restores the same video |
