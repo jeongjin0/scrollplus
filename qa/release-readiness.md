@@ -1,6 +1,6 @@
 # Release readiness · 0.3.5
 
-Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. Exact-ZIP real YouTube checks pass in isolated Chrome for Testing and official Chrome 154. Bounded signed-in 0.3.5 default filtering was also observed in Aside Chromium 153; the broader historical 0.3.3/0.3.4 paths below retain their original versions. Broader compatibility, exact-version long QA and ordinary day-use remain open. Chrome Web Store submission has not occurred.
+Checked on 2026-10-09 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 package fixes session-wide Undo and Reset. Exact-ZIP real YouTube checks pass in isolated Chrome for Testing and official Chrome 154. Bounded signed-in 0.3.5 filtering and TikTok Undo/reload/Reset were also observed in Aside Chromium 153. The exact-version automated 24-hour YouTube run completed with two reviewed page-reload recoveries. The broader historical 0.3.3/0.3.4 paths below retain their original versions; broader compatibility and ordinary day-use remain open. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
@@ -21,12 +21,12 @@ Checked on 2026-10-08 KST, macOS ARM64, built Chrome MV3 extension. The 0.3.5 pa
 | TikTok runtime error | Reproduced without extension | `a.init is not a function` at the same TikTok login-bundle location in a fresh 90-second no-extension control. It does not require the extension to occur; the site overlay still limits signed-out QA |
 | Instagram signed out | Pass for fail-open | Reels redirected to login; no filtering was claimed |
 | Instagram signed-in default, exact 0.3.5 | Observed in a bounded native check | [Current-version observations](signed-in-smoke.md#version-035--2026-10-08): 4,778-like reel advanced automatically to 526K; a separate 60-like reason chip captured. Count 1 → 9 includes unsampled outcomes. Native Undo/restoration, page errors and day-use not established |
-| TikTok signed-in default and preview exclusion, exact 0.3.5 | Observed in a bounded native check | [Current-version observations](signed-in-smoke.md#version-035--2026-10-08): 3,366-like ordinary video advanced automatically, count 9 → 10; Following recommendation cards left count 9 unchanged. No new native Undo, page-error or genuine Following-feed pass |
+| TikTok signed-in default, Undo/reload/Reset and preview exclusion, exact 0.3.5 | Observed in bounded native checks | [Current-version observations](signed-in-smoke.md#version-035--2026-10-08): 3,366-like default skip and unchanged Following recommendation count. A separate identified 2,715-like video skipped with a 2.7K reason chip; actual Undo restored it, normal exact-video reload retained it with count 2 and no saved creators, then Reset resumed filtering with count 3. No native page-error collector or genuine Following-feed pass |
 | Instagram signed in | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): default, counts/navigation, Undo, persisted creator, Reset, away/back and missing views; actual Aside Chromium 153 |
 | TikTok signed-in For You | Pass for recorded 0.3.3 paths | [Signed-in QA](signed-in-smoke.md): 2,639-like default skip, Undo, creator, identified Strict skip and low-like ads kept; actual Aside Chromium 153 |
 | TikTok preview exclusion and video-page skip/Undo | Pass for recorded 0.3.4 paths | [Preview regression and live check](tiktok-previews.md): actual Following recommendation preview has no current creator and no skips; 2,660-like video skips at default, Undo restores the same video |
 | TikTok signed-in Following feed | Not established live | The existing account showed creator recommendations instead of a video feed. Positive feed paths are covered by built-script fixtures; no account engagement was used to create a feed |
-| 24-hour YouTube default-rule QA | Exact 0.3.5 result pending | [Long feed QA](soak.md); historical 0.3.4 worker was stopped as superseded after about 2h1m, with explicit interrupted-report annotations. Its midnight rollover was observed. The exact 0.3.5 successor started October 8 at 00:11 KST and ends October 9 at 00:11 KST. No 24-hour pass or ordinary day-use claimed |
+| 24-hour YouTube default-rule QA | Completed and reviewed with two recoveries | [Long feed QA](soak.md): 86,400,533ms, 3,352 sampled videos, 1,437 default-check checkpoints, zero collected page errors; 28 failed manual attempts and two normal page reloads. Local-date counter rollover reviewed. Separate no-extension six-hour control also completed. Whole-page memory grows in both; extension cost and stall cause are unresolved. This is not uninterrupted stability or ordinary human day-use |
 | Chrome Web Store | Not submitted | [Listing and submission checklist](../store/submission-checklist.md) prepared |
 
 ## Artifact
@@ -39,9 +39,11 @@ This identifies the local tested package. A separately built CI artifact can dif
 
 ## Remaining release gates
 
-1. Run and review the exact 0.3.5 [24-hour YouTube check](soak.md), including errors, counters and continued movement. The older version cannot establish stability for changed runtime scripts. Duration alone is not a pass.
+The exact-version 24-hour automated check and its final review are complete, with the recovery and performance limits above. The remaining gates are:
+
+1. Recheck current-version Instagram Undo/reload and broader signed-in Google Chrome paths; native default filtering and the separate TikTok check do not establish those paths.
 2. Check a genuine signed-in Following video feed when available; the recommendation-card check does not establish automatic skipping on that feed.
-3. Install this ZIP in a clean Chrome profile and use it on an ordinary feed for a day. Short signed-in runs in Aside establish working paths, not long-term reliability or signed-in Google Chrome compatibility with every experiment the sites run.
+3. Install this ZIP in a clean Chrome profile and use it on an ordinary feed for a day. Short signed-in runs in Aside and automated long QA establish working paths within their recorded scope; they do not explain the two feed stalls or establish long-term reliability across site experiments.
 4. After these checks, update this report and the listing's experimental-support wording. Store submission remains an owner decision.
 
 Detailed live observations and local recording locations are in [live-smoke.md](live-smoke.md). Fresh profiles and recordings under `qa/tmp/` are local QA evidence and are not committed or served wholesale.
