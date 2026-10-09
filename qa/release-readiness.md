@@ -7,7 +7,7 @@ Checked on 2026-10-09 KST, macOS ARM64. This candidate removes repeated TikTok/I
 | TypeScript | Pass | `npm run compile` |
 | Unit tests | 45 passed | `npm test` |
 | Built-script browser tests | 28 passed, no skips or flaky results | `npm run test:e2e`; includes two bridge/count-refresh regressions, three Instagram advertisement layouts (wide, compact, letterbox), existing adapter, grid, UI, storage, navigation and session Undo paths |
-| Minimum Chrome 120 | Pending CI for the final commit | An earlier commit of this PR ([run](https://github.com/jeongjin0/scrollplus/actions/runs/37873994663)) passed 25 tests on official Chrome for Testing 120.0.6099.109 before the advertisement guard existed; it is not a result for this package. Current signed-in websites and Chrome 120 on macOS 27 are separate checks |
+| Minimum Chrome 120 | 28 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/37882600089) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 45 unit tests and the current-Chrome suite. Current signed-in websites and Chrome 120 on macOS 27 are separate checks |
 | Feed-history bridge | Pass on controlled pages | [Before/after report](feed-cache-performance.md): unchanged 5,000-item history causes zero extra cache/player messages over 2.5 seconds; 500 new items send 500 rows |
 | Changed embedded counts | Pass on both adapters | Same-length/same-prefix likes change from 6,000 to 1,000 reaches the player and causes one default skip; exact published 0.3.5 fails the new regressions |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
