@@ -47,7 +47,7 @@ A later 0.3.4 [TikTok preview regression and focused live check](tiktok-previews
 
 ## Version 0.3.5 · 2026-10-08
 
-The exact [0.3.5 release ZIP](release-readiness.md#artifact) was installed in the existing authorized signed-in Aside Chromium 153 session on macOS ARM64. Normal native navigation and extension controls were used. Settings stayed at the shipped defaults: on, likes minimum 5,000, comments/views off, all three sites on, grids off, skip chip on and no saved creators. No account engagement or new account was used to prepare a feed.
+The exact [0.3.5 release ZIP](release-readiness-035.md#artifact) was installed in the existing authorized signed-in Aside Chromium 153 session on macOS ARM64. Normal native navigation and extension controls were used. Settings stayed at the shipped defaults: on, likes minimum 5,000, comments/views off, all three sites on, grids off, skip chip on and no saved creators. No account engagement or new account was used to prepare a feed.
 
 | Path | Actual observation | Scope |
 | --- | --- | --- |
