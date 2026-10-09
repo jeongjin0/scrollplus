@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
+    ignore:
+      # Tooling majors are taken one at a time, by hand, after a full e2e run.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       dev-tooling:
         patterns: ["*"]
