@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.7 – 2026-10-09
+
+- Pages no longer list all of their links every 400 ms while grid filtering is off, the default. On a page with 20,000 links that was about 0.3 s of script time per 3 idle seconds; it is now near zero. Cards hidden by optional grid filtering are still restored immediately when filtering is lowered or turned off.
+- A browser regression covers the idle cost. Defaults, rules, UI and permissions are unchanged. Evidence and limits are in [idle cost](qa/idle-cost.md) and [release readiness](qa/release-readiness.md).
+
 ## 0.3.6 – 2026-10-09
 
 - TikTok and Instagram no longer resend their whole observed feed history on every idle poll, and unchanged embedded JSON is not reparsed. With 5,000 loaded items an idle 2.5-second probe went from 30,000 TikTok and 15,000 Instagram rows to zero extra messages.

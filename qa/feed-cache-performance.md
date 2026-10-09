@@ -1,6 +1,6 @@
 # Feed-history bridge and count refresh · 0.3.6
 
-2026-10-09 KST. Real built extension scripts in isolated Chrome for Testing, on routed controlled TikTok and Instagram pages. Before: immutable published 0.3.5 ZIP, SHA-256 `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`. After: [0.3.6 candidate](release-readiness.md#artifact). These are finite browser probes, not signed-in site or endurance results.
+2026-10-09 KST. Real built extension scripts in isolated Chrome for Testing, on routed controlled TikTok and Instagram pages. Before: immutable published 0.3.5 ZIP, SHA-256 `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`. After: [0.3.6 candidate](release-readiness-036.md#artifact). These are finite browser probes, not signed-in site or endurance results.
 
 ## Reproduced behavior
 
