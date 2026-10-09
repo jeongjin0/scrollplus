@@ -24,13 +24,19 @@ The default is simple: **skip anything under 5,000 likes**. Pick a different lev
 
 In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `5k`, `2만`, `1,000`.
 
-If a count is missing, the video stays. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
+If a count is missing, the video stays. Ads and photo posts stay too. It never skips on a guess, never hides a feed, and stops after six skips in a row so you can decide to keep going or lower the bar.
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
-The 0.3.6 beta sends only changed TikTok/Reels counts, avoids repeatedly parsing unchanged embedded data, and keeps disclosed Instagram advertisements and non-video cards. The built-script suite passes 28 tests; see [the regression report](qa/feed-cache-performance.md), [the advertisement report](qa/instagram-ads.md) and [current release readiness](qa/release-readiness.md). The advertisement fix has not yet been seen on a live advertisement.
+## Status
 
-The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo through a reload, and in short TikTok For You runs. Signed-in TikTok Undo, reload retention and Reset were observed in Aside Chromium 153; signed-in Instagram default filtering was also observed. A 24-hour automated YouTube run completed with two page-reload recoveries and no collected page errors. Broader compatibility and ordinary day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope. Session retention checks are in [session Undo QA](qa/session-undo.md).
+ScrollPlus is a public beta, installed from a GitHub release for now (see below).
+
+- Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
+- Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
+- Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
+
+Each claim is scoped in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).
 
 ## Install
 
@@ -63,8 +69,6 @@ node scripts/capture-ui.mjs  # capture English and Korean UI
 ```
 
 The product rules are in [SPEC.md](SPEC.md). QA notes are in [qa/](qa). Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-For a longer real-feed check in an isolated profile, see [long feed QA](qa/soak.md).
 
 ## Privacy
 
