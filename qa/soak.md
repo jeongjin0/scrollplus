@@ -35,13 +35,38 @@ The authorized stop used tmux Ctrl-C, and the run ended with status 130 before f
 
 The 0.3.3/0.3.4 ZIP comparison found identical YouTube MAIN/isolated scripts and background counter, but the interrupted earlier run is retained only as partial evidence. The successor tests the full 0.3.4 package; it still does not replace ordinary human day-use.
 
-## 0.3.5 successor, 2026-10-08 KST — running
+## 0.3.5 successor, 2026-10-08–09 KST — completed with two recoveries
 
-The old process group was verified ended before starting this single successor. The new isolated profile loads the exact tested 0.3.5 ZIP, SHA-256 `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`, from an immutable extracted directory. The runtime fix already passed 44 units, 23 browser tests, package checks and a short actual YouTube Undo/reload run.
+The single fresh-profile successor loaded the exact tested 0.3.5 ZIP, SHA-256 `2404780bd90de021f335551c35c03b8476ed6be214945ca21f553cc864f966fa`. Started `2026-10-07T15:11:18.241Z` (October 8, 00:11 KST), finished naturally `2026-10-08T15:11:18.774Z` (October 9, 00:11 KST): 86,400,533ms against the unchanged 86,400,000ms gate. The original launch harness and extension remained unchanged; no signal, restart or duplicate run was used. Its 20 unpacked files still match the release ZIP.
 
-Started `2026-10-07T15:11:18.241Z` (October 8, 00:11 KST); expected end `2026-10-08T15:11:18.241Z` (October 9, 00:11 KST). The full 86,400,000ms gate is unchanged. Actual Node70428 is running in tmux socket `scrollplus-qa`, session `soak-035`; raw evidence is `qa/tmp/soak-035-20261008` and only the sanitized `soak-035.json` is served for review. The harness fingerprints are retained and unchanged.
+| Observation | Final result |
+| --- | --- |
+| Sampled videos | 3,352 distinct item IDs; 3,219 with known likes; 1,083 sampled below 5,000 |
+| Movement | 1,113 observed transitions with a skip chip; 2,773 successful manual transitions from 2,801 attempts; 28 failed attempts; seven Continue actions |
+| Collected page errors | 0; no fatal report error or navigation retry |
+| Checkpoints and defaults | 1,437 minute checkpoints; maximum gap 60.366 seconds. Exact shipped settings asserted initially, at every checkpoint and finally |
+| Last movement | 24.515 seconds before the finished timestamp |
+| Daily counter | Monotonic within each local date. Last October 8 checkpoint: 1,119; first October 9 checkpoint: 1; final: 3 |
+| Whole-page JS heap | Initially 33.1 MiB; peak 1,091.9 MiB; last checkpoint 217.8 MiB. Includes YouTube and resets after page reloads |
 
-This active worker started from the original harness before the signal fix below. Its script and fingerprints remain unchanged, and it is being allowed to finish naturally. If an unavoidable stop is needed, first preserve the current evidence and label the run interrupted; neither Ctrl-C nor Node-only SIGTERM guarantees its final screenshot/report on that older harness. Do not restart or duplicate the run for a tool timeout. Audit its final report, movement, errors, counters, recoveries and performance before calling it passed. This automated signed-out check does not replace ordinary human day-use or signed-in Instagram/TikTok compatibility.
+Two manual attempts failed to change the feed before each recovery: normal page reload at `2026-10-08T02:27:04.755Z`, then at `2026-10-08T09:36:21.518Z`. The before/after checkpoints kept counters at 835 and 1,009 respectively, defaults stayed unchanged and movement resumed afterward. Both pre-reload screenshots and the final public Shorts frame were inspected. The first reload followed substantial whole-page heap/DOM growth; this observation does not establish the cause of either stall.
+
+This is reviewed automated completion with two recoveries, **not uninterrupted 24-hour scrolling**. The sampled low-video count, chip movements and storage counter measure different things and are not interchangeable. Minute checkpoints do not supply a complete per-video history. The exact zero at midnight and native popup rollover were not observed. Page-error collection is not a claim that every browser, worker or console error was absent.
+
+The final report/process output agree on completion. All 13 recorded worker/browser processes and task-profile processes were absent after natural shutdown; raw profile/evidence remain local. Evidence: `qa/tmp/soak-035-20261008`, with the manual final audit in `qa/tmp/long-qa-final-audit-035.json` in the original checkout. Only the sanitized summary is served for review. Ordinary human day-use and signed-in platform endurance remain separate checks.
+
+## Six-hour no-extension control, 2026-10-08 KST
+
+A separate fresh signed-out Chrome for Testing 153 profile ran without any extension for 21,600,685ms and finished naturally at `2026-10-08T03:36:15.610Z`. It sampled 1,007 distinct public Shorts IDs, with 1,074 manual attempts and 1,074 transitions; zero collected page errors and zero extension workers. All 1,435 checkpoints had zero ScrollPlus chip hosts. Only the first checkpoint was loading; all 1,434 subsequent checkpoints recorded an active playing video and a Shorts ID. Maximum checkpoint gap was 15.162 seconds. The final frame was inspected and all 12 recorded own processes were absent afterward.
+
+| Whole-page metric, first six elapsed hours | Exact 0.3.5 | No extension |
+| --- | --- | --- |
+| JS heap, initial → last checkpoint | 33.1 → 562.5 MiB | 42.8 → 531.3 MiB |
+| Peak JS heap | 575.3 MiB | 578.8 MiB |
+| CDP metric Nodes, last checkpoint | 465,411 | 481,315 |
+| Cumulative page script/task time | 883.506 / 1,334.121 seconds | 743.098 / 1,076.372 seconds |
+
+Both runs showed whole-page heap and DOM growth. Feeds, video counts, movement schedules and checkpoint cadence differ: the extension run combines automatic skips with 30-second manual advances; the control uses 20-second manual advances. These are comparable elapsed windows, not a paired experiment for subtracting extension overhead or excluding leaks. The shorter control does not explain the two later stalls in the 24-hour run. Local evidence: `qa/tmp/youtube-memory-control-6h-035` and the same final audit; no new product version was built for this comparison.
 
 ## Signal shutdown regression, 2026-10-08 KST
 
@@ -49,4 +74,4 @@ The runner registered its own SIGINT/SIGTERM handlers, but Playwright also close
 
 New launches disable Playwright's SIGINT/SIGTERM handlers so the runner owns the shutdown order. Two independent fresh-profile checks on the same unchanged extension ZIP then passed: Node-only SIGTERM and Node-only SIGINT each produced `stopped`, a final daily count, a finished timestamp and a visibly valid final screenshot, exited with code 0, and left none of their recorded browser descendants running. Each had sampled one actual known-count YouTube Short; neither is a long-duration pass. Local before/after reports and signal/process journals are retained separately. Whole-group interruption and SIGKILL are not covered by these checks.
 
-The fix was developed and tested in an isolated worktree. Node70428's ongoing 24-hour run kept its original script checksum `37e5c3a627069ef629c7219d80f0b1b2227e551f075982a166d7ab0620f3422c`, profile, extension, settings and timer; it was not stopped or restarted. Extension code, version, permissions and the published ZIP are unchanged.
+The fix was developed and tested in an isolated worktree. Node70428's subsequently completed 24-hour run kept its original script checksum `37e5c3a627069ef629c7219d80f0b1b2227e551f075982a166d7ab0620f3422c`, profile, extension, settings and timer; it was not stopped or restarted. Extension code, version, permissions and the published ZIP are unchanged.
