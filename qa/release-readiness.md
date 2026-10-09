@@ -8,7 +8,7 @@ Checked on 2026-10-09 KST, macOS ARM64. This candidate removes a constant idle c
 | Unit tests | 45 passed | `npm test` |
 | Built-script browser tests | 29 passed, no skips or flaky results | `npm run test:e2e`; adds the idle-cost regression to the 28 existing tests, including all grid, adapter, Undo, UI and storage paths |
 | Idle-cost regression | Fails on published 0.3.6, passes now | A page with 20,000 links costs 0.29 s of script time per 3 idle seconds on 0.3.6 against a 0.1 s limit; this candidate uses under 0.01 s. See [idle cost](idle-cost.md) |
-| Minimum Chrome 120 | Pending CI for the final commit | Official Chrome for Testing 120.0.6099.109 on Linux runs the same suite in PR CI |
+| Minimum Chrome 120 | 29 passed on Linux | [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/37887335116) on the final code commit; official Chrome for Testing 120.0.6099.109, actual built scripts on controlled fixtures. The same run passed 45 unit tests and the current-Chrome suite |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
 | Package scope | 16 of 20 extracted files identical to published 0.3.6 | Only the manifest and the three isolated site scripts changed (the shared controller is bundled into each). Both MAIN bundles, background, popup/settings, locales and icons are byte-identical |
 | Native signed-in TikTok / Instagram | Not repeated on 0.3.7 | The [0.3.6 sampling](signed-in-smoke.md#version-036-candidate--2026-10-09) stays scoped to that package. The code change touches only the periodic grid scan, which the shipped defaults leave off |
