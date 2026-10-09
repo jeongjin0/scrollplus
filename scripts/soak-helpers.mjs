@@ -64,3 +64,50 @@ export class FeedProgress {
     this.failures = 0;
   }
 }
+
+// Evidence for a feed that stopped answering the keyboard. Every probe is bounded and
+// failure is recorded rather than thrown, so a hung page cannot stop the run.
+export async function collectStallDiagnostics(page, cdp, now = () => Date.now()) {
+  const diagnostics = { at: new Date().toISOString() };
+  const bounded = async (name, probe) => {
+    try { diagnostics[name] = await Promise.race([probe(), new Promise((_, reject) => setTimeout(() => reject(new Error('probe timed out')), 8000))]); }
+    catch (error) { diagnostics[name + 'Error'] = String(error).slice(0, 200); }
+  };
+  await bounded('evaluateRoundTripMs', async () => { const start = now(); await page.evaluate(() => 1); return now() - start; });
+  await bounded('page', () => page.evaluate(async () => {
+    const playing = () => [...document.querySelectorAll('video')].find(video => !video.paused && !video.ended);
+    const first = playing()?.currentTime ?? null;
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const second = playing()?.currentTime ?? null;
+    const active = document.activeElement;
+    const down = document.querySelector('#navigation-button-down button');
+    const box = down?.getBoundingClientRect();
+    return {
+      path: location.pathname,
+      visibility: document.visibilityState,
+      hasFocus: document.hasFocus(),
+      activeElement: active ? active.tagName + (active.id ? '#' + active.id : '') : null,
+      videoAdvancedSeconds: first !== null && second !== null ? Number((second - first).toFixed(2)) : null,
+      elements: document.querySelectorAll('*').length,
+      reelRenderers: document.querySelectorAll('ytd-reel-video-renderer').length,
+      downControls: document.querySelectorAll('#navigation-button-down').length,
+      downDisabled: down ? down.disabled || down.getAttribute('aria-disabled') === 'true' : null,
+      downVisible: box ? box.width > 0 && box.height > 0 : null,
+    };
+  }));
+  if (cdp) await bounded('metrics', async () => {
+    const metrics = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(metric => [metric.name, metric.value]));
+    return { heapBytes: metrics.JSHeapUsedSize, nodes: metrics.Nodes, scriptDurationSeconds: metrics.ScriptDuration, taskDurationSeconds: metrics.TaskDuration };
+  });
+  // Does the page's own on-screen control still move the feed when the keyboard does not?
+  await bounded('ownControl', async () => {
+    const before = await page.evaluate(() => location.pathname);
+    const control = page.locator('#navigation-button-down button').first();
+    if (!await control.count()) return { clicked: false, reason: 'no control' };
+    await control.click({ timeout: 2000 });
+    await page.waitForTimeout(2500);
+    const after = await page.evaluate(() => location.pathname);
+    return { clicked: true, moved: after !== before };
+  });
+  return diagnostics;
+}
