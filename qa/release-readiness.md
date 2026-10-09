@@ -1,32 +1,32 @@
 # Release readiness · 0.3.6
 
-Checked on 2026-10-09 KST, macOS ARM64. This candidate removes repeated TikTok/Instagram feed-history messages and repeated parsing of unchanged embedded JSON. It also fixes missed Instagram count changes when a replacement payload has the same length and prefix. Defaults, filtering rules, UI, permissions and dependencies are unchanged. Chrome Web Store submission has not occurred.
+Checked on 2026-10-09 KST, macOS ARM64. This candidate removes repeated TikTok/Instagram feed-history messages and repeated parsing of unchanged embedded JSON. It also fixes missed Instagram count changes when a replacement payload has the same length and prefix, and keeps visibly disclosed Instagram advertisements and non-video feed cards (see [Instagram advertisement exclusion](instagram-ads.md)). Defaults, filtering rules, UI, permissions and dependencies are unchanged. Chrome Web Store submission has not occurred.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
 | TypeScript | Pass | `npm run compile` |
-| Unit tests | 44 passed | `npm test` |
-| Built-script browser tests | 25 passed, no skips or flaky results | `npm run test:e2e`; includes two new bridge/count-refresh regressions, existing adapter, grid, UI, storage, navigation and session Undo paths |
-| Minimum Chrome 120 | Pending candidate CI | The [previous 0.3.5 report](release-readiness-035.md) records 23 tests on Linux Chrome 120.0.6099.109; it is not a result for this candidate |
+| Unit tests | 45 passed | `npm test` |
+| Built-script browser tests | 28 passed, no skips or flaky results | `npm run test:e2e`; includes two bridge/count-refresh regressions, three Instagram advertisement layouts (wide, compact, letterbox), existing adapter, grid, UI, storage, navigation and session Undo paths |
+| Minimum Chrome 120 | Pending CI for the final commit | An earlier commit of this PR ([run](https://github.com/jeongjin0/scrollplus/actions/runs/37873994663)) passed 25 tests on official Chrome for Testing 120.0.6099.109 before the advertisement guard existed; it is not a result for this package. Current signed-in websites and Chrome 120 on macOS 27 are separate checks |
 | Feed-history bridge | Pass on controlled pages | [Before/after report](feed-cache-performance.md): unchanged 5,000-item history causes zero extra cache/player messages over 2.5 seconds; 500 new items send 500 rows |
 | Changed embedded counts | Pass on both adapters | Same-length/same-prefix likes change from 6,000 to 1,000 reaches the player and causes one default skip; exact published 0.3.5 fails the new regressions |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
-| Package scope | 17 of 20 extracted files identical to published 0.3.5 | Only the manifest and TikTok/Instagram MAIN bundles changed. YouTube, isolated scripts, background, popup/settings, locales and icons are byte-identical. This does not upgrade earlier native or endurance evidence to exact-0.3.6 evidence |
+| Package scope | 14 of 20 extracted files identical to published 0.3.5 | The manifest, the TikTok/Instagram MAIN bundles and the three isolated site scripts changed (the shared engine and controller are bundled into each). Background, popup/settings, locales and icons are byte-identical. A YouTube Short is always a video, so the added same-id rule has no new YouTube behavior, but the YouTube bundle is not byte-identical. This does not upgrade earlier native or endurance evidence to exact-0.3.6 evidence |
 | Current signed-in TikTok / Instagram | Pending exact-candidate native check | Existing [0.3.5 native observations](signed-in-smoke.md#version-035--2026-10-08) and earlier versions remain scoped to their original packages |
 | Real YouTube and long-feed QA | Historical 0.3.5 result retained | [24-hour report](soak.md) completed with two reviewed page-reload recoveries; no exact-0.3.6 24-hour run or ordinary human day-use result |
 | Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) prepared |
 
 ## Artifact
 
-`scrollplus-0.3.6-chrome.zip`, 126,352 bytes.
+`scrollplus-0.3.6-chrome.zip`, 127,157 bytes.
 
-SHA-256: `47fa9365119c1348c7435fc0b8bd205272a3237f87f1e7911c1fbb975982782c`.
+SHA-256: `3d6325f8ab76539e791a52e9b6f31f4e577b9c1743d33ddabc510cc4ee71a994`.
 
 This identifies the tested local candidate. CI ZIP metadata can differ. The previous exact-package checksum and its QA remain in [0.3.5 release readiness](release-readiness-035.md#artifact).
 
 ## Remaining release gates
 
-1. Complete the current and minimum-Chrome CI suite and native checks of the changed TikTok/Instagram adapters. Broader signed-in Google Chrome, Instagram Undo/reload and a genuine Following video feed remain separate checks.
+1. Complete native checks of the changed TikTok/Instagram adapters. The current and minimum-Chrome suites pass on the runtime change in [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/37873994663). Broader signed-in Google Chrome, Instagram Undo/reload and a genuine Following video feed remain separate checks.
 2. Investigate ordinary day-use and the unresolved long-feed stalls. The bridge improvement measures message/parse work on controlled TikTok/Instagram pages; it does not establish a CPU percentage, memory-leak fix or a cause for the earlier YouTube stalls.
 3. Update the listing only to match verified support. Store submission remains an owner decision.
 

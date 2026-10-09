@@ -107,7 +107,7 @@ The earlier 0.3.3 long run ended after 3h7m: its QA runner treated a normal refr
 
 ## 2026-10-08, version 0.3.5
 
-Fresh, signed-out Chrome for Testing profile using the exact 0.3.5 ZIP identified in [release readiness](release-readiness.md). Shipped defaults were verified: likes minimum 5,000, comments/views off, all sites enabled and no saved creators.
+Fresh, signed-out Chrome for Testing profile using the exact 0.3.5 ZIP identified in [release readiness](release-readiness-035.md#artifact). Shipped defaults were verified: likes minimum 5,000, comments/views off, all sites enabled and no saved creators.
 
 - TikTok For You: six items with known likes were sampled. The 3,827-like video advanced automatically to an 8,429-like video, with the reason chip showing `넘김 · 좋아요 3.8천` and Undo. No page errors were collected.
 - A signup Terms dialog blocked further useful feed scrolling after about 30 seconds. The 90-second recording does not establish 90 seconds of unobstructed feed use. No terms were accepted, no account was created and no Undo action was performed.

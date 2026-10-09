@@ -1,8 +1,10 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { startFilter } from "../content/controller";
 import { gridAnchors, instagramReelId, moveUntilIdChanges, visibleVideo } from "../content/page";
+import { instagramHasVisibleAd } from "../platforms/instagram-player";
 
 function requestMove(key: "ArrowDown" | "ArrowUp"): boolean {
+  if (key === "ArrowDown" && (!visibleVideo() || instagramHasVisibleAd())) return false;
   if (!visibleVideo() && !instagramReelId()) return false;
   window.postMessage({ source: "scrollplus", type: "advance", key }, "*");
   return true;
@@ -21,7 +23,11 @@ export default defineContentScript({
       platform: "instagram",
       readActive: () => {
         const id = instagramReelId();
-        return id ? { id, creatorId: null } : null;
+        if (!id) return null;
+        // Keep non-video feed cards, including image advertisements. Preserve an
+        // active identity so a preceding skip's Undo chip survives this card.
+        const kind = !visibleVideo() ? "carousel" as const : instagramHasVisibleAd() ? "ad" as const : undefined;
+        return { id, creatorId: null, kind };
       },
       advance: () => moveUntilIdChanges(() => requestMove("ArrowDown"), instagramReelId),
       retreat: () => moveUntilIdChanges(() => requestMove("ArrowUp"), instagramReelId),

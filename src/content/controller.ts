@@ -7,7 +7,7 @@ import type { ExtractedItem } from "../platforms/extract";
 
 export interface Adapter {
   platform: Platform;
-  readActive: () => { id: string; creatorId: string | null } | null;
+  readActive: () => { id: string; creatorId: string | null; kind?: ItemKind } | null;
   advance: () => Promise<boolean>;
   retreat: () => Promise<boolean>;
   listGrid: () => Array<{ id: string; element: HTMLElement }>;
@@ -94,7 +94,7 @@ export function startFilter(adapter: Adapter): void {
       surface: "player",
       creatorId: cached?.creatorId ?? active.creatorId,
       metrics: cached?.metrics ?? null,
-      kind: cached?.kind ?? "video",
+      kind: active.kind ?? cached?.kind ?? "video",
     };
     engine.onItem(item);
   }

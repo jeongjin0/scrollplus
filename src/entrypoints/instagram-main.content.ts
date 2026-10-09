@@ -1,7 +1,8 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { instagramReelId } from "../content/page";
+import { instagramReelId, visibleVideo } from "../content/page";
 import { extractInstagram } from "../platforms/extract";
 import { createEmbeddedReader, createItemBridge } from "../platforms/item-bridge";
+import { instagramHasVisibleAd } from "../platforms/instagram-player";
 import { observeJsonResponses } from "../platforms/observe";
 
 export default defineContentScript({
@@ -48,6 +49,7 @@ const PREV = { label: /previous|prev|이전/i, key: "ArrowUp", code: 38 };
 // Click the reel navigation control from the page script, because a click sent from the
 // extension's isolated world is ignored on the other two sites. Press the key only as a last resort.
 function moveReel(direction: "next" | "prev"): void {
+  if (direction === "next" && (!visibleVideo() || instagramHasVisibleAd())) return;
   const target = direction === "next" ? NEXT : PREV;
   for (const node of document.querySelectorAll("button, [role='button']")) {
     if (target.label.test(node.getAttribute("aria-label") || "") && node instanceof HTMLElement) {
