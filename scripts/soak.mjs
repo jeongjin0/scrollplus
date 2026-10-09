@@ -2,11 +2,13 @@
 import { chromium, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { FeedProgress, readDuringNavigation } from './soak-helpers.mjs';
+import { collectStallDiagnostics, FeedProgress, readDuringNavigation } from './soak-helpers.mjs';
 
 const output = path.resolve(process.argv[2] || `qa/tmp/soak-${Date.now()}`);
 const duration = Number(process.argv[3] || 86400000);
-const extension = path.resolve(process.argv[4] || '.output/chrome-mv3');
+// The literal 'none' runs the same schedule without any extension: a control for stalls the page itself causes.
+const noExtension = process.argv[4] === 'none';
+const extension = noExtension ? null : path.resolve(process.argv[4] || '.output/chrome-mv3');
 const statusFile = process.argv[5] && path.resolve(process.argv[5]);
 if (!Number.isFinite(duration) || duration < 1000 || duration > 86400000) throw new Error('Duration must be 1 second to 24 hours');
 if (fs.existsSync(path.join(output, 'profile'))) throw new Error('Use a new output directory; do not start a second run on an existing profile');
@@ -14,9 +16,9 @@ fs.mkdirSync(output, { recursive: true });
 const started = Date.now();
 const report = {
   state: 'starting', startedAt: new Date(started).toISOString(), expectedEndAt: new Date(started + duration).toISOString(), duration,
-  version: JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'))).version,
-  scope: 'Automated YouTube Shorts on a fresh signed-out profile, shipped defaults; complements ordinary day-use and does not verify Instagram/TikTok sign-in',
-  pid: process.pid, samples: 0, knownLikes: 0, belowMinimum: 0, movesWithSkipChip: 0, manualMoves: 0, manualAttempts: 0, failedManualAttempts: 0, continues: 0, navigationRetries: 0, recoveries: [], checkpoints: [], pageErrors: [],
+  version: noExtension ? 'none' : JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'))).version,
+  scope: noExtension ? 'Automated YouTube Shorts on a fresh signed-out profile with no extension; the schedule control for the extension runs' : 'Automated YouTube Shorts on a fresh signed-out profile, shipped defaults; complements ordinary day-use and does not verify Instagram/TikTok sign-in',
+  pid: process.pid, samples: 0, knownLikes: 0, belowMinimum: 0, movesWithSkipChip: 0, manualMoves: 0, manualAttempts: 0, failedManualAttempts: 0, continues: 0, navigationRetries: 0, recoveries: [], checkpoints: [], pageErrors: [], consoleMessages: [],
 };
 let stop = false, context;
 process.on('SIGINT', () => { stop = true; });
@@ -40,19 +42,25 @@ try {
   context = await chromium.launchPersistentContext(path.join(output, 'profile'), {
     headless: false, handleSIGINT: false, handleSIGTERM: false,
     viewport: { width: 1280, height: 800 },
-    args: ['--disable-extensions-except=' + extension, '--load-extension=' + extension, '--no-first-run'],
+    args: noExtension ? ['--disable-extensions', '--no-first-run'] : ['--disable-extensions-except=' + extension, '--load-extension=' + extension, '--no-first-run'],
   });
-  const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
-  await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings?.enabled)).toBe(true);
-  const settingsPage = await context.newPage();
-  await settingsPage.goto('chrome-extension://' + new URL(worker.url()).host + '/options.html'); await settingsPage.waitForSelector('.ready');
+  let settingsPage = null;
+  if (!noExtension) {
+    const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+    await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings?.enabled)).toBe(true);
+    settingsPage = await context.newPage();
+    await settingsPage.goto('chrome-extension://' + new URL(worker.url()).host + '/options.html'); await settingsPage.waitForSelector('.ready');
+  }
   const checkDefaults = async () => {
+    if (!settingsPage) return null;
     const data = await settingsPage.evaluate(() => chrome.storage.local.get(null));
     expect(data.settings).toEqual({ enabled: true, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, allowlist: [] });
     return data.dailySkips;
   };
   report.initialDailyCount = await checkDefaults();
   const page = await context.newPage();
+  page.on('console', message => { if (['error', 'warning'].includes(message.type()) && report.consoleMessages.length < 60) report.consoleMessages.push({ at: new Date().toISOString(), type: message.type(), text: message.text().slice(0, 200) }); });
+  page.on('crash', () => { report.pageCrashedAt = new Date().toISOString(); });
   page.on('pageerror', e => { if (report.pageErrors.length < 500) report.pageErrors.push({ at: new Date().toISOString(), message: e.message.slice(0, 300), extensionFrame: /chrome-extension:\/\//.test(e.stack || '') }); });
   await page.addInitScript(() => {
     window.__scrollplusSoakEvents = [];
@@ -80,6 +88,7 @@ try {
       if (typeof event.likes === 'number' && !known.has(event.id)) { known.add(event.id); report.knownLikes++; }
       if (typeof event.likes === 'number' && event.likes < 5000 && !low.has(event.id)) { low.add(event.id); report.belowMinimum++; }
     }
+    if (noExtension && snap.id && !seen.has(snap.id)) { seen.add(snap.id); report.samples++; }
     const movement = progress.observe(snap.id, Date.now());
     if (movement.changed) {
       if (movement.manualMoved) report.manualMoves++;
@@ -97,6 +106,7 @@ try {
       progress.recover(Date.now());
       const recovery = { at: new Date().toISOString(), videoId: snap.id, reason: 'Two manual attempts did not move the feed', state: 'started' };
       report.recoveries.push(recovery); write();
+      recovery.diagnostics = await collectStallDiagnostics(page, performance); write();
       await page.screenshot({ path: path.join(output, `before-reload-${progress.recoveries}.png`) });
       await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
       recovery.state = 'reloaded'; write();

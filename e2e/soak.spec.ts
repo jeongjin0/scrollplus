@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { FeedProgress, readDuringNavigation } from '../scripts/soak-helpers.mjs';
+import { collectStallDiagnostics, FeedProgress, readDuringNavigation } from '../scripts/soak-helpers.mjs';
 
 test('soak survives a real page reload but does not swallow other errors or a closed page', async ({ page }) => {
   await page.goto('/player.html');
@@ -38,4 +38,18 @@ test('soak counts actual movement and allows bounded recovery after two failed a
   expect(progress.recoveries).toBe(1);
   for (let i = 1; i < 12; i++) progress.recover(62500 + i * 600000);
   expect(() => progress.recover(62500 + 12 * 600000)).toThrow('Feed did not recover');
+});
+
+test('stall diagnostics are bounded, never throw and describe a page with no feed', async ({ page }) => {
+  await page.goto('/player.html');
+  const client = await page.context().newCDPSession(page);
+  await client.send('Performance.enable');
+  const diagnostics = await collectStallDiagnostics(page, client);
+  expect(diagnostics.evaluateRoundTripMs).toBeGreaterThanOrEqual(0);
+  expect(diagnostics.page).toMatchObject({ path: '/player.html', visibility: 'visible', reelRenderers: 0, downControls: 0, downDisabled: null, videoAdvancedSeconds: null });
+  expect(diagnostics.metrics.nodes).toBeGreaterThan(0);
+  expect(diagnostics.ownControl).toEqual({ clicked: false, reason: 'no control' });
+  await page.close();
+  const closed = await collectStallDiagnostics(page, null);
+  expect(closed.evaluateRoundTripMsError).toBeTruthy();
 });
