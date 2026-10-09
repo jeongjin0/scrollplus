@@ -12,7 +12,7 @@ Checked on 2026-10-09 KST, macOS ARM64. This candidate removes repeated TikTok/I
 | Changed embedded counts | Pass on both adapters | Same-length/same-prefix likes change from 6,000 to 1,000 reaches the player and causes one default skip; exact published 0.3.5 fails the new regressions |
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
 | Package scope | 14 of 20 extracted files identical to published 0.3.5 | The manifest, the TikTok/Instagram MAIN bundles and the three isolated site scripts changed (the shared engine and controller are bundled into each). Background, popup/settings, locales and icons are byte-identical. A YouTube Short is always a video, so the added same-id rule has no new YouTube behavior, but the YouTube bundle is not byte-identical. This does not upgrade earlier native or endurance evidence to exact-0.3.6 evidence |
-| Current signed-in TikTok / Instagram | Pending exact-candidate native check | Existing [0.3.5 native observations](signed-in-smoke.md#version-035--2026-10-08) and earlier versions remain scoped to their original packages |
+| Current signed-in TikTok / Instagram | Partial pass on the exact ZIP | [Native sampling](signed-in-smoke.md#version-036-candidate--2026-10-09): shipped defaults skipped low-like Reels with reason chips and kept the sampled 5,000+ reels; three sampled TikTok For You advertisements were still on screen when captured. No disclosed Instagram advertisement or image-style card appeared in those frames, so the advertisement fix itself is confirmed only on controlled pages. Earlier [0.3.5 observations](signed-in-smoke.md#version-035--2026-10-08) and earlier versions remain scoped to their original packages |
 | Real YouTube and long-feed QA | Historical 0.3.5 result retained | [24-hour report](soak.md) completed with two reviewed page-reload recoveries; no exact-0.3.6 24-hour run or ordinary human day-use result |
 | Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) prepared |
 
@@ -26,7 +26,7 @@ This identifies the tested local candidate. CI ZIP metadata can differ. The prev
 
 ## Remaining release gates
 
-1. Complete native checks of the changed TikTok/Instagram adapters. The current and minimum-Chrome suites pass on the runtime change in [PR CI](https://github.com/jeongjin0/scrollplus/actions/runs/37873994663). Broader signed-in Google Chrome, Instagram Undo/reload and a genuine Following video feed remain separate checks.
+1. Catch a disclosed Instagram advertisement and an image-style card on the exact package. The two earlier native failures were a labelled advertisement and an image-style advertisement skipped under the like minimum; controlled-page regressions now cover both, but a native pass is still open. Broader signed-in Google Chrome, Instagram Undo/reload and a genuine Following video feed remain separate checks.
 2. Investigate ordinary day-use and the unresolved long-feed stalls. The bridge improvement measures message/parse work on controlled TikTok/Instagram pages; it does not establish a CPU percentage, memory-leak fix or a cause for the earlier YouTube stalls.
 3. Update the listing only to match verified support. Store submission remains an owner decision.
 
