@@ -99,13 +99,19 @@ export function startFilter(adapter: Adapter): void {
     engine.onItem(item);
   }
 
+  // Grid filtering is off by default. Then the only work left is to restore cards
+  // this script hid earlier, so skip listing every page link once none remain.
+  let gridsMayBeHidden = true;
+
   function scanGrids(): void {
+    if (!settings.filterGrids && !gridsMayBeHidden) return;
     let cards: Array<{ id: string; element: HTMLElement }> = [];
     try {
       cards = adapter.listGrid();
     } catch {
       return;
     }
+    gridsMayBeHidden = settings.filterGrids;
     for (const card of cards) {
       const known = cache.get(card.id);
       if (!settings.filterGrids || !known) {
