@@ -201,6 +201,9 @@ export function createEngine(deps: EngineDeps) {
   return {
     onItem(item: EngineItem) {
       const changed = current?.id !== item.id;
+      // A player can mount after its URL/counts, or replace a non-video card.
+      // Reconsider that observation without clearing a user's session Undo.
+      if (!changed && current?.kind !== item.kind) finished.delete(item.id);
       current = item;
       if (changed) {
         seenAt = deps.now();

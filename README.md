@@ -28,6 +28,8 @@ If a count is missing, the video stays. It never skips on a guess, never hides a
 
 Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English and Korean.
 
+The 0.3.6 update sends only changed TikTok/Reels counts and avoids repeatedly parsing unchanged embedded data. The built-script suite passes 25 tests; see [the regression report](qa/feed-cache-performance.md) and [current release readiness](qa/release-readiness.md).
+
 The exact 0.3.5 ZIP has been checked on real YouTube Shorts, including Undo through a reload, and in short TikTok For You runs. Signed-in TikTok Undo, reload retention and Reset were observed in Aside Chromium 153; signed-in Instagram default filtering was also observed. A 24-hour automated YouTube run completed with two page-reload recoveries and no collected page errors. Broader compatibility and ordinary day-long use remain under review. See [release readiness](qa/release-readiness.md), [signed-in QA](qa/signed-in-smoke.md), [TikTok preview regression](qa/tiktok-previews.md), [live QA](qa/live-smoke.md), and the [UI audit](qa/ui-audit.md) for the exact scope. Session retention checks are in [session Undo QA](qa/session-undo.md).
 
 ## Install

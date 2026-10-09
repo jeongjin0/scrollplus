@@ -106,6 +106,24 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
 }
 
 describe("engine", () => {
+  it("reconsiders a mounted player at the same id and preserves its session Undo across kind changes", async () => {
+    const box = harness();
+    box.show({ ...low("mounted"), kind: "carousel" });
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.flush(500);
+    box.show(low("mounted"));
+    await box.drain();
+    expect(box.advances).toEqual(["mounted"]);
+    box.engine.undo();
+    await box.drain();
+    box.show({ ...low("mounted"), kind: "carousel" });
+    box.show(low("mounted"));
+    await box.drain();
+    expect(box.advances).toEqual(["mounted"]);
+    expect(box.skips).toBe(1);
+  });
+
   it("keeps a video when metrics never arrive", async () => {
     const box = harness();
     box.show({ ...low("a"), metrics: null });

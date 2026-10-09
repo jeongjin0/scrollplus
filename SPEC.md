@@ -2,7 +2,7 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
-Status: 0.3.5 beta. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded current-version signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-version automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
+Status: 0.3.6 candidate. TikTok/Instagram publish only changed rows and active-player data; unchanged embedded payloads are not reparsed. Undo now survives reloads and new tabs for the browser session; Reset clears those temporary choices. Bounded 0.3.5 signed-in default filtering and TikTok Undo/reload/Reset were observed in Aside Chromium 153; earlier 0.3.3/0.3.4 paths retain their own package scope. The exact-0.3.5 automated 24-hour YouTube run completed with two reviewed page-reload recoveries. Current Instagram Undo/reload, broader signed-in Google Chrome, positive-path live Following and ordinary human day-use remain open. See qa/session-undo.md and qa/release-readiness.md. Decisions below are locked.
 
 ## Product
 
@@ -33,7 +33,7 @@ The locale files hold two strings: extName is the manifest name and the store ti
 - Local directory: /Users/jeongjin/Developer/edgethink/kept (keeps its old name)
 - Public GitHub repo: github.com/jeongjin0/scrollplus
 - License: MIT
-- Version: 0.3.5
+- Version: 0.3.6
 - Do not put this project in the Obsidian vault
 - Do not submit it to the Chrome Web Store
 
@@ -111,12 +111,14 @@ Rule and power changes re-evaluate the current video immediately. Undo still kee
 
 There is a master switch. Default is on. Turning it off pauses every platform without deleting settings.
 
+Page data crosses the MAIN/isolated boundary only when an item or active-player observation changes. The isolated cache merges row updates. Embedded JSON is re-read when a script node's full text changes, including same-length/same-prefix replacements. Known metrics remain available for revisits; this is not a bounded-history policy. See [bridge QA](qa/feed-cache-performance.md).
+
 ## Skip behavior
 
 This applies to the active vertical player only.
 
 - Wait up to 700ms for metrics. If they arrive within 2 seconds of the video opening, judge them. On a freshly loaded page the first video gets until 6 seconds after load, because counts arrive late there. After that, keep the video. Never skip blind.
-- Advance with the site's own next control. On every site, click that control from the page script. A click or key event sent from the extension's isolated world does not move the feed on YouTube or TikTok. Historical [signed-in Reels QA](qa/signed-in-smoke.md) also confirmed page-script navigation through Instagram's own next-reel control on 0.3.3; it does not establish signed-in compatibility for the current 0.3.5 package. On TikTok that control is the button labelled Next video, or the feed navigation button; a key press is the last resort. The feed counts as moved when the video id changes or, while the next player is still empty, when a different feed item is most on screen. If the control is not ready, retry until 5 seconds after the video opened, then stop. Do not delete DOM nodes. Do not restyle the host page.
+- Advance with the site's own next control. On every site, click that control from the page script. A click or key event sent from the extension's isolated world does not move the feed on YouTube or TikTok. Historical [signed-in Reels QA](qa/signed-in-smoke.md) also confirmed page-script navigation through Instagram's own next-reel control on 0.3.3; it does not establish signed-in compatibility for the current 0.3.6 package. On TikTok that control is the button labelled Next video, or the feed navigation button; a key press is the last resort. The feed counts as moved when the video id changes or, while the next player is still empty, when a different feed item is most on screen. If the control is not ready, retry until 5 seconds after the video opened, then stop. Do not delete DOM nodes. Do not restyle the host page.
 - At least 450ms between automatic advances. Never advance in parallel.
 - Stop after 6 consecutive skips. Show a non-modal chip: "The next ones are under your bar." Korean: "다음 영상도 기준 아래입니다."
 - Actions on that chip: "Keep going" / "이어서 보기" resets the cap for another 6. "Lower the bar" / "기준 낮추기" moves every turned-on minimum down one step on the number ladder, then continues. If every turned-on minimum is already at the lowest step, only "Keep going" is shown.

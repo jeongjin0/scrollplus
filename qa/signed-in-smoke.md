@@ -45,9 +45,27 @@ These checks close the recorded signed-in Reels and For You core paths. Followin
 
 A later 0.3.4 [TikTok preview regression and focused live check](tiktok-previews.md) excludes creator recommendation previews and rechecks video-page skipping/Undo. The results above retain their original 0.3.3 package scope.
 
+## Version 0.3.6 candidate · 2026-10-09
+
+Existing authorized signed-in Aside Chromium 153 session on the Pro QA host (macOS ARM64), reached through the approved Screen Sharing route; no Air. The extension was an unpacked copy of the candidate ZIP in a task-owned directory. No account engagement, new account or private API request. Account identifiers and raw captures are excluded.
+
+| Package | Result | Actual observation |
+| --- | --- | --- |
+| First candidate (SHA-256 47fa9365…) | Fail | A clearly labelled Instagram advertisement with two likes was skipped under the default 5,000 minimum, and a reason chip followed it. Held; never released |
+| First advertisement guard (SHA-256 b5167ca6…) | Fail | A normal feed produced reason chips for 51 and 0 likes. With the extension off, going back identified the card before the zero-reason chip as a labelled image-style advertisement with no video and no like count. Held; never released |
+| Final candidate (SHA-256 3d6325f8…, 127,157 bytes; 20 files matched the ZIP) | Partial pass | After a normal extension reload and page reload, the extension was switched on at shipped defaults (likes 5,000; comments/views off; all sites on). The settings counter went from 12 to 77 across about 70 Instagram Reels frames and 16 TikTok frames |
+
+Final-candidate details:
+
+- Instagram Reels: frames were captured about three seconds apart while advancing with the keyboard. Reason chips with Undo appeared for 2.9K, 3.5K, 3, 10, 52, 60 and 350 likes, and the sampled reels at or above 5,000 stayed. A 40-like reel open when the extension was switched on advanced to an 11.9万-like reel.
+- TikTok For You: 16 frames. Three frames showed advertisement cards with a "Learn more" bar, each still on screen about three seconds after arrival. No page-error collector was attached to this sampling.
+- Not established: no disclosed Instagram advertisement or image-style card appeared in these frames, so the advertisement fix is confirmed only by the controlled-page regressions. Individual skip counts are not attributed per reel (the counter includes unsampled outcomes). Undo, reload recovery and a genuine Following feed were not exercised on this package.
+
+Local evidence: qa/tmp/pro-live-036/frames/ (screen captures, Git-ignored; raw captures are not published). A system permission prompt from an unrelated application was visible throughout and was left untouched.
+
 ## Version 0.3.5 · 2026-10-08
 
-The exact [0.3.5 release ZIP](release-readiness.md#artifact) was installed in the existing authorized signed-in Aside Chromium 153 session on macOS ARM64. Normal native navigation and extension controls were used. Settings stayed at the shipped defaults: on, likes minimum 5,000, comments/views off, all three sites on, grids off, skip chip on and no saved creators. No account engagement or new account was used to prepare a feed.
+The exact [0.3.5 release ZIP](release-readiness-035.md#artifact) was installed in the existing authorized signed-in Aside Chromium 153 session on macOS ARM64. Normal native navigation and extension controls were used. Settings stayed at the shipped defaults: on, likes minimum 5,000, comments/views off, all three sites on, grids off, skip chip on and no saved creators. No account engagement or new account was used to prepare a feed.
 
 | Path | Actual observation | Scope |
 | --- | --- | --- |

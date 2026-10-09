@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.6 – 2026-10-09
+
+- TikTok and Instagram no longer resend their whole observed feed history on every idle poll, and unchanged embedded JSON is not reparsed. With 5,000 loaded items an idle 2.5-second probe went from 30,000 TikTok and 15,000 Instagram rows to zero extra messages.
+- Instagram count changes whose replacement payload has the same length and prefix are now observed, so a reel whose likes drop from 6,000 to 1,000 is skipped by default.
+- Instagram keeps disclosed advertisements (visible Ad, Sponsored or Korean disclosure) and any feed card without a visible video, such as an image-style advertisement. Native QA of earlier candidates had skipped both under the 5,000-like minimum.
+- A player that mounts after its URL and counts is reconsidered without clearing a session Undo. Defaults, rules, UI and permissions are unchanged. Controlled-page and native evidence, including what is still open, is in [release readiness](qa/release-readiness.md).
+
 ## 0.3.5 – 2026-10-08
 
 - Undo keeps restored videos through page reloads and new tabs for the browser session. Choices stay in trusted-only Chrome session RAM and are committed before moving back; video ids are never written to disk.
