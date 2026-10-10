@@ -12,7 +12,7 @@ Checked on 2026-10-09 KST, macOS ARM64. This candidate removes a constant idle c
 | Package | Pass | `npm run zip` and `node scripts/check-package.mjs`; MV3, Chrome 120+, storage and the existing three host permissions |
 | Package scope | 16 of 20 extracted files identical to published 0.3.6 | Only the manifest and the three isolated site scripts changed (the shared controller is bundled into each). Both MAIN bundles, background, popup/settings, locales and icons are byte-identical |
 | Native signed-in TikTok / Instagram | Not repeated on 0.3.7 | The [0.3.6 sampling](signed-in-smoke.md#version-036-candidate--2026-10-09) stays scoped to that package. The code change touches only the periodic grid scan, which the shipped defaults leave off |
-| Real YouTube long feed | Completed with recoveries, not a clean pass | Exact 0.3.7: a 6-hour run (1 reload recovery) and a 12-hour run (4), fresh signed-out profiles, 0 page errors. Exact 0.3.6: 6 hours, 0 recoveries. The feed intermittently stops responding until a reload; see the [stall investigation](soak.md#youtube-shorts-feed-stalls-cause-not-established). Not ordinary human day-use |
+| Real YouTube long feed | Completed with recoveries, not a clean pass | Exact 0.3.7: a 6-hour run (1 reload recovery) and a 12-hour run (4), fresh signed-out profiles, 0 page errors. Exact 0.3.6: 6 hours, 0 recoveries. The feed intermittently stops responding until a reload; in the six instrumented stalls YouTube's request for more Shorts failed with HTTP 503 (also without ScrollPlus). See the [stall investigation](soak.md#youtube-shorts-feed-stalls-youtubes-feed-request-fails). Not ordinary human day-use |
 | Chrome Web Store | Not submitted | [Submission checklist](../store/submission-checklist.md) prepared |
 
 ## Artifact
@@ -26,5 +26,5 @@ This identifies the tested local candidate. CI ZIP metadata can differ. The prev
 ## Remaining gates
 
 1. See the Instagram advertisement guard on a live advertisement, and exercise Instagram Undo/reload and a genuine Following video feed natively. These need the signed-in QA browser on the Pro host, which was not reachable without a new screen-sharing login.
-2. Ordinary human day-use, and the cause of the YouTube feed stalls. They occurred about once per six hours of continuous automatic use with the extension on (10 in 61 hours) and rarely without it (1 in 32 hours, under fast navigation), so the cause is open; a 1.2 s minimum dwell did not remove them and was not released. The idle scan above is a measured, removable cost; it is not shown to affect them.
+2. Ordinary human day-use. YouTube Shorts feed stalls are explained by a failing YouTube request (see the investigation above) and are not fixed by ScrollPlus; whether to detect and report the stuck state is an owner decision outside SPEC.md. The idle scan above is a measured CPU saving unrelated to them.
 3. Update the listing only to match verified support. Store submission remains an owner decision.
