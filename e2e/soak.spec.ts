@@ -48,6 +48,8 @@ test('stall diagnostics are bounded, never throw and describe a page with no fee
   expect(diagnostics.evaluateRoundTripMs).toBeGreaterThanOrEqual(0);
   expect(diagnostics.page).toMatchObject({ path: '/player.html', visibility: 'visible', reelRenderers: 0, downControls: 0, downDisabled: null, videoAdvancedSeconds: null });
   expect(diagnostics.metrics.nodes).toBeGreaterThan(0);
+  expect(diagnostics.network).toEqual([]);
+  expect(diagnostics.shortsComponent).toBeNull();
   expect(diagnostics.ownControl).toEqual({ clicked: false, reason: 'no control' });
   await page.close();
   const closed = await collectStallDiagnostics(page, null);

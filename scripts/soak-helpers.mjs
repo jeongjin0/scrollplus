@@ -95,6 +95,19 @@ export async function collectStallDiagnostics(page, cdp, now = () => Date.now())
       downVisible: box ? box.width > 0 && box.height > 0 : null,
     };
   }));
+  // Did YouTube answer its recent feed requests? (recorded by networkRecorder from page load)
+  await bounded('network', () => page.evaluate(() => (window.__soakNet || []).slice(-14).map((entry) => ({ ...entry, secondsAgo: Math.round((Date.now() - entry.at) / 100) / 10 }))));
+  await bounded('shortsComponent', () => page.evaluate(() => {
+    const shorts = document.querySelector('ytd-shorts');
+    if (!shorts) return null;
+    const props = {};
+    for (const key of Object.keys(shorts)) {
+      const value = shorts[key];
+      if (typeof value === 'boolean' || typeof value === 'number' || (typeof value === 'string' && value.length < 60)) props[key] = value;
+      if (Object.keys(props).length >= 80) break;
+    }
+    return props;
+  }));
   if (cdp) await bounded('metrics', async () => {
     const metrics = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(metric => [metric.name, metric.value]));
     return { heapBytes: metrics.JSHeapUsedSize, nodes: metrics.Nodes, scriptDurationSeconds: metrics.ScriptDuration, taskDurationSeconds: metrics.TaskDuration };
@@ -110,4 +123,20 @@ export async function collectStallDiagnostics(page, cdp, now = () => Date.now())
     return { clicked: true, moved: after !== before };
   });
   return diagnostics;
+}
+
+// Page-side recorder for the feed requests, installed before the page loads. The page's own
+// resource-timing buffer fills after 250 entries, so a long-lived page would lose the recent ones.
+// Pass it to page.addInitScript.
+export function networkRecorder() {
+  window.__soakNet = [];
+  try {
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!/\/youtubei\/v1\/(reel|next|player)/.test(entry.name)) continue;
+        window.__soakNet.push({ at: Date.now(), endpoint: new URL(entry.name).pathname.replace('/youtubei/v1/', ''), durationMs: Math.round(entry.duration), status: entry.responseStatus ?? null, transferBytes: entry.transferSize });
+        if (window.__soakNet.length > 40) window.__soakNet.shift();
+      }
+    }).observe({ type: 'resource', buffered: true });
+  } catch { /* diagnostics only */ }
 }
