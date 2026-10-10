@@ -76,32 +76,33 @@ New launches disable Playwright's SIGINT/SIGTERM handlers so the runner owns the
 
 The fix was developed and tested in an isolated worktree. Node70428's subsequently completed 24-hour run kept its original script checksum `37e5c3a627069ef629c7219d80f0b1b2227e551f075982a166d7ab0620f3422c`, profile, extension, settings and timer; it was not stopped or restarted. Extension code, version, permissions and the published ZIP are unchanged.
 
-## YouTube Shorts feed stalls (cause not established)
+## YouTube Shorts feed stalls (YouTube's feed request fails)
 
-Runs of 2026-10-09 and 10 KST.
+Runs of 2026-10-09 to 11 KST. Long YouTube Shorts runs intermittently reach a state where the feed ignores Next and the keyboard until the page is reloaded. The soak runner treats two failed automatic presses as a stall, records diagnostics and reloads the public page, after which the run continues normally.
 
-Both 24-hour and 6-hour extension runs sometimes reach a point where the YouTube Shorts feed stops moving: two automatic presses fail and the runner reloads the public page, after which the run continues normally. Before reloading, the runner now records diagnostics. Eight of them exist; they were all taken on the exact packages named below, in fresh signed-out Chrome for Testing 153 profiles.
+**Cause.** Six stalls were diagnosed with a page-side recorder of YouTube's feed requests (three runs of 8 hours each: two with ScrollPlus 0.3.7 and one with no extension). All six look the same:
 
-In seven of the eight, the page was responsive (a round trip of 1 ms or less), focused and visible, the video was playing at normal speed, and the page's own Next control was present, enabled and visible. A click on that control through Playwright did not move the feed either, and neither did the keyboard. Memory was not unusual for these runs (heap 75–345 MiB and 28,700–274,400 DOM nodes across the eight, including pages shortly after a reload). The eighth, in a 0.3.8 candidate run, was a half-rendered page with no playing video. Every stall ended with a normal reload. No run recorded a page error or crash; console capture was limited to 60 mostly unrelated messages per run, so console errors are not ruled out.
+- `reel/reel_watch_sequence`, the request that loads more Shorts, returned **HTTP 503** 90–121 seconds before the diagnosis; every other recorded request was 200.
+- YouTube's `ytd-shorts` component reported `continuationRequestPending: true` and never left that state.
+- The page was otherwise healthy: responsive, focused and visible, the video playing at normal speed, the Next control present, enabled and visible. A click on the page's own Next control and the keyboard both did nothing.
+
+So YouTube's server rejected the request for more Shorts and its component then waits for that request forever; a reload is the only recovery. One of the six stalls was in the no-extension control, so ScrollPlus is not needed to produce it, and nothing in these recordings points at ScrollPlus's own clicks. Eight earlier stalls had page-level diagnostics only (no request recording): seven showed the same healthy page that ignored every navigation, and one was a half-rendered page with no video playing. They are consistent with the same failure but their requests were not recorded.
 
 | Arm (signed-out public Shorts) | Hours | Stalls |
 | --- | ---: | ---: |
-| Extension on, shipped skipping: 0.3.5 24 h, 0.3.6 6 h, 0.3.7 6 h and 12 h | 48 | 7 (2, 0, 1, 4) |
+| Extension on, 0.3.5 24 h, 0.3.6 6 h, 0.3.7 6 h and 12 h | 48 | 7 (2, 0, 1, 4) |
+| Extension on, 0.3.7, with request recording (two runs) | 16 | 5 (3, 2) |
 | Extension on, 1.2 s minimum dwell before every skip (unreleased 0.3.8 candidate, two runs stopped at 6 h 29 min) | 13 | 3 (2, 1) |
 | No extension, one manual press every 20–30 s (6 h and 12 h) | 18 | 0 |
-| No extension, first click 1.2–2.0 s after a video opens for about 40% of videos (`scripts/pacing-control.mjs` with `1200 2000`), 562 such moves | 8 | 0 |
-| No extension, first click 0.45–0.70 s after a video opens for about 40% of videos (the default of the same script), 432 such moves | 6 | 1, plus 12 transient failed presses |
+| No extension, first click 1.2–2.0 s after a video opens for about 40% of videos | 8 | 0 |
+| No extension, first click 0.45–0.70 s after a video opens for about 40% of videos (`scripts/pacing-control.mjs`, two runs) | 14 | 2 (1, 1) |
 | Extension loaded but switched off (`SOAK_EXTENSION_OFF=1`), one press every 30 s | 6 | 0 |
 
-What this does and does not show:
+**Why it appears more with ScrollPlus.** With the extension on there were 15 stalls in 77 hours; with no extension 2 in 40, both under fast navigation. Two things plausibly explain the gap, and neither is measured: skipping works through about 1.5 times as many videos per hour (for example 1,979 sampled videos in 12 hours against 1,275 for the slow no-extension run), so it triggers more feed requests, and 503s cluster in time. Fourteen of the 15 stalls with the extension on occurred between 05:00 and 16:00 UTC and nine of them between 12:57 and 15:39 UTC on two different days, while the 12-hour slow no-extension control that spanned the first of those windows did not stall (it also viewed fewer videos). The arms ran at different times against different recommendation feeds, so no rate comparison here is a controlled measurement.
 
-- With the extension on there were 10 stalls in 61 hours; with no extension 1 in 32 hours. Under a simple Poisson model that gap has a probability of roughly 0.03–0.05 if both rates were equal, but the arms ran at different times against different recommendation feeds, so this is a hint and not a measurement.
-- The no-extension burst arm stalled with the same signature, so a stuck feed does not need ScrollPlus. It also had 12 failed presses that later recovered on their own, against one in 1,410 for the slow no-extension run. Faster navigation may make YouTube more likely to stop responding. A 1.2–2.0 s control did not stall in 8 hours.
-- The 1.2 s dwell candidate did not help (3 stalls in 13 hours against 7 in 48), so it was not released. Its engine change and tests are kept on the unmerged branch `codex/skip-min-dwell` as evidence, and it would have made every skip visibly slower.
-- A loaded but switched-off extension did not stall in 6 hours, which is too short to say its presence is harmless.
-- The 0.3.7 change that stops rescanning page links (see [idle cost](idle-cost.md)) is a measured CPU saving; none of these runs show it affects the stall.
+**What was tried.** The 0.3.7 change that stops rescanning page links is a measured CPU saving and is unrelated. A 1.2 s minimum dwell before every skip was built and soaked (3 stalls in 13 hours against 7 in 48); it did not change the outcome, which fits a server-side cause, so it was not released. Its engine change and tests stay on the unmerged branch `codex/skip-min-dwell` as evidence.
 
-The cause is open. For a person using YouTube Shorts the effect is that the feed can stop responding to scroll and Next until the page is reloaded, about once per six hours of continuous automatic use at the rate measured here; ordinary use is much lighter. This section does not cover TikTok or Instagram, signed-in sessions, or other browsers.
+**For a person using YouTube Shorts**, the feed can occasionally stop responding to scroll and Next while the video keeps playing; reloading the page fixes it. About once per five hours of continuous automatic use here; ordinary use is much lighter. ScrollPlus could detect the stuck state and say so, but that is a new feature outside SPEC.md and is left as an owner decision. This section does not cover TikTok or Instagram, signed-in sessions or other browsers.
 
 Reproduce (each uses a new output directory and a fresh profile):
 
@@ -112,4 +113,4 @@ node scripts/soak.mjs qa/tmp/run-none 21600000 none                             
 node scripts/pacing-control.mjs qa/tmp/run-burst 21600000 450 700                  # no extension, fast pacing
 ```
 
-Raw reports, screenshots taken before each reload and the diagnostics stay under `qa/tmp/` and are not published. Both new modes and the control script are exercised by short real-browser smoke runs; `e2e/soak.spec.ts` covers the diagnostics collector.
+Each recovery entry in `report.json` holds the diagnostics (`network`, `shortsComponent`, `page`, `metrics`, `ownControl`). Raw reports and the screenshot taken before each reload stay under `qa/tmp/` and are not published. `e2e/soak.spec.ts` covers the diagnostics collector.
