@@ -26,12 +26,17 @@ export interface EngineDeps {
   cancel: (id: number) => void;
   sessionKeep?: Set<string>;
   rememberUndo?: (id: string) => Promise<void>;
+  // Least time a video stays current before ScrollPlus moves on from it. Tests pass 0.
+  minDwellMs?: number;
 }
 
 const METRIC_WAIT_MS = 700;
 const METRIC_GRACE_MS = 2000;
 const STARTUP_GRACE_MS = 6000;
 const ADVANCE_GAP_MS = 450;
+// Navigating again within about a second of the last move has left YouTube's Shorts
+// feed unresponsive until a reload (see qa/soak.md); moves 1.2 s apart have not.
+const MIN_DWELL_MS = 1200;
 const CHIP_HOLD_MS = 2500;
 const SKIP_CAP = 6;
 const RETRY_GAP_MS = 400;
@@ -53,6 +58,7 @@ export function createEngine(deps: EngineDeps) {
   const finished = new Set<string>();
   let lastAdvanceAt = Number.NEGATIVE_INFINITY;
   let seenAt = Number.NEGATIVE_INFINITY;
+  let openedAt = Number.NEGATIVE_INFINITY;
 
   function judge(item: EngineItem): Decision {
     return decide({
@@ -117,7 +123,8 @@ export function createEngine(deps: EngineDeps) {
     if (deps.isBlocked()) return;
     const decision = judge(current);
     if (decision.action !== "skip") return;
-    const gap = ADVANCE_GAP_MS - (deps.now() - lastAdvanceAt);
+    const now = deps.now();
+    const gap = Math.max(ADVANCE_GAP_MS - (now - lastAdvanceAt), (deps.minDwellMs ?? MIN_DWELL_MS) - (now - openedAt));
     if (gap > 0) {
       if (skipQueuedFor === item.id) return;
       skipQueuedFor = item.id;
@@ -207,6 +214,7 @@ export function createEngine(deps: EngineDeps) {
       current = item;
       if (changed) {
         seenAt = deps.now();
+        openedAt = seenAt;
         metricsReady = false;
         clearGap();
       }

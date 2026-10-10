@@ -29,10 +29,26 @@ test("fixture skips, pauses, undoes, and fails open without console errors", asy
 
   for (let index = 1; index <= 6; index += 1) {
     await page.evaluate(({ metrics, index }) => window.__scrollplus.show({ id: "v" + index, metrics }), { metrics: low, index });
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1400);
   }
   await page.evaluate((metrics) => window.__scrollplus.show({ id: "v7", metrics }), low);
   await expect(page.locator("#advances")).toHaveText("7");
   await expect(page.locator("#scrollplus-chip-host")).toContainText("under your bar");
   expect(errors).toEqual([]);
+});
+
+// Moving on within about a second of the last move has left YouTube's Shorts feed
+// unresponsive until a reload (qa/soak.md), so a skip waits for the minimum dwell
+// even when the counts are known the moment the video opens.
+test("a skip waits for the minimum dwell instead of firing as the video opens", async ({ page }) => {
+  await page.goto("/player.html");
+  const elapsed = await page.evaluate((metrics) => {
+    const node = document.querySelector("#advances")!;
+    const started = performance.now();
+    const moved = new Promise<number>((resolve) => new MutationObserver(() => resolve(performance.now() - started)).observe(node, { childList: true, characterData: true, subtree: true }));
+    window.__scrollplus.show({ id: "paced", metrics });
+    return moved;
+  }, low);
+  expect(elapsed).toBeGreaterThanOrEqual(1100);
+  expect(elapsed).toBeLessThan(2500);
 });

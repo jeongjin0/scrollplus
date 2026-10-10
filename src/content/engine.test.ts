@@ -13,7 +13,7 @@ function low(id: string): EngineItem {
   };
 }
 
-function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep"> = {}) {
+function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "minDwellMs"> = {}) {
   const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
   let clock = 0;
   let seq = 1;
@@ -53,6 +53,7 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
       chips.push(chip ? chip.mode : "none");
       models.push(chip);
     },
+    minDwellMs: 0,
     schedule: (fn, ms) => {
       const id = seq;
       seq += 1;
@@ -106,6 +107,54 @@ function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAd
 }
 
 describe("engine", () => {
+  it("waits out the minimum dwell before skipping a video whose counts are already known", async () => {
+    const box = harness({}, true, undefined, { minDwellMs: 1200 });
+    box.show(low("a"));
+    await box.drain();
+    box.flush(1199);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("spaces a chain of skips by the dwell as well as the advance gap", async () => {
+    const box = harness({}, true, undefined, { minDwellMs: 1200 });
+    box.show(low("a"));
+    box.flush(1200);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.show(low("b"));
+    await box.drain();
+    box.flush(1199);
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+    box.flush(1);
+    await box.drain();
+    expect(box.advances).toEqual(["a", "b"]);
+  });
+
+  it("does not delay a video that has already been current longer than the dwell", async () => {
+    const box = harness({ enabled: false }, true, undefined, { minDwellMs: 1200 });
+    box.show(low("a"));
+    box.flush(5000);
+    box.settings.enabled = true;
+    box.engine.settingsChanged();
+    await box.drain();
+    expect(box.advances).toEqual(["a"]);
+  });
+
+  it("does not skip a video the user has already scrolled past during the dwell", async () => {
+    const box = harness({}, true, undefined, { minDwellMs: 1200 });
+    box.show(low("a"));
+    box.flush(600);
+    box.show({ ...low("b"), metrics: { views: 900000, likes: 40000, comments: 200, shares: 10, saves: null } });
+    box.flush(2000);
+    await box.drain();
+    expect(box.advances).toEqual([]);
+  });
+
   it("reconsiders a mounted player at the same id and preserves its session Undo across kind changes", async () => {
     const box = harness();
     box.show({ ...low("mounted"), kind: "carousel" });
