@@ -7,7 +7,7 @@
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { collectStallDiagnostics } from './soak-helpers.mjs';
+import { collectStallDiagnostics, networkRecorder } from './soak-helpers.mjs';
 
 const output = path.resolve(process.argv[2] || '');
 if (!process.argv[2]) throw new Error('Usage: node scripts/pacing-control.mjs <output-dir> [duration-ms] [fast-dwell-min-ms] [fast-dwell-max-ms]');
@@ -36,6 +36,7 @@ try {
   context = await chromium.launchPersistentContext(profile, { headless: false, viewport: { width: 1280, height: 800 }, args: ['--disable-extensions', '--no-first-run'], handleSIGINT: false, handleSIGTERM: false });
   const page = await context.newPage();
   page.on('pageerror', (e) => { if (report.pageErrors.length < 100) report.pageErrors.push({ at: new Date().toISOString(), message: e.message.slice(0, 300) }); });
+  await page.addInitScript(networkRecorder);
   await page.goto('https://www.youtube.com/shorts/', { waitUntil: 'domcontentloaded', timeout: 45000 });
   for (const name of ['Reject all', '모두 거부', 'Decline optional cookies']) { const button = page.getByRole('button', { name, exact: true }); if (await button.count()) await button.first().click({ timeout: 1500 }).catch(() => {}); }
   const cdp = await context.newCDPSession(page); await cdp.send('Performance.enable');

@@ -2,7 +2,7 @@
 import { chromium, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { collectStallDiagnostics, FeedProgress, readDuringNavigation } from './soak-helpers.mjs';
+import { collectStallDiagnostics, FeedProgress, networkRecorder, readDuringNavigation } from './soak-helpers.mjs';
 
 const output = path.resolve(process.argv[2] || `qa/tmp/soak-${Date.now()}`);
 const duration = Number(process.argv[3] || 86400000);
@@ -65,6 +65,7 @@ try {
   page.on('console', message => { if (['error', 'warning'].includes(message.type()) && report.consoleMessages.length < 60) report.consoleMessages.push({ at: new Date().toISOString(), type: message.type(), text: message.text().slice(0, 200) }); });
   page.on('crash', () => { report.pageCrashedAt = new Date().toISOString(); });
   page.on('pageerror', e => { if (report.pageErrors.length < 500) report.pageErrors.push({ at: new Date().toISOString(), message: e.message.slice(0, 300), extensionFrame: /chrome-extension:\/\//.test(e.stack || '') }); });
+  await page.addInitScript(networkRecorder);
   await page.addInitScript(() => {
     window.__scrollplusSoakEvents = [];
     window.addEventListener('message', e => {
