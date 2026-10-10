@@ -34,6 +34,7 @@ ScrollPlus is a public beta, installed from a GitHub release for now (see below)
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
+- Known issue: on YouTube Shorts the feed can occasionally stop responding to scroll and Next until you reload the page. Long automated runs hit this about once per six hours with ScrollPlus on and rarely without it; the cause is not found yet ([details](qa/soak.md#youtube-shorts-feed-stalls-cause-not-established)).
 - Not yet established: ordinary day-long use, and the Instagram advertisement guard on a live advertisement.
 
 Each claim is scoped in [release readiness](qa/release-readiness.md). More: [signed-in QA](qa/signed-in-smoke.md), [long feed QA](qa/soak.md), [UI audit](qa/ui-audit.md), [session Undo QA](qa/session-undo.md).

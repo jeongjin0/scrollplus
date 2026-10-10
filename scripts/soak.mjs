@@ -8,6 +8,8 @@ const output = path.resolve(process.argv[2] || `qa/tmp/soak-${Date.now()}`);
 const duration = Number(process.argv[3] || 86400000);
 // The literal 'none' runs the same schedule without any extension: a control for stalls the page itself causes.
 const noExtension = process.argv[4] === 'none';
+// SOAK_EXTENSION_OFF=1 loads the extension but switches it off, so only its presence is tested.
+const extensionOff = process.env.SOAK_EXTENSION_OFF === '1' && !noExtension;
 const extension = noExtension ? null : path.resolve(process.argv[4] || '.output/chrome-mv3');
 const statusFile = process.argv[5] && path.resolve(process.argv[5]);
 if (!Number.isFinite(duration) || duration < 1000 || duration > 86400000) throw new Error('Duration must be 1 second to 24 hours');
@@ -17,7 +19,7 @@ const started = Date.now();
 const report = {
   state: 'starting', startedAt: new Date(started).toISOString(), expectedEndAt: new Date(started + duration).toISOString(), duration,
   version: noExtension ? 'none' : JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'))).version,
-  scope: noExtension ? 'Automated YouTube Shorts on a fresh signed-out profile with no extension; the schedule control for the extension runs' : 'Automated YouTube Shorts on a fresh signed-out profile, shipped defaults; complements ordinary day-use and does not verify Instagram/TikTok sign-in',
+  scope: noExtension ? 'Automated YouTube Shorts on a fresh signed-out profile with no extension; the schedule control for the extension runs' : extensionOff ? 'Automated YouTube Shorts with the extension loaded but switched off; the same schedule, to separate its presence from its skipping' : 'Automated YouTube Shorts on a fresh signed-out profile, shipped defaults; complements ordinary day-use and does not verify Instagram/TikTok sign-in',
   pid: process.pid, samples: 0, knownLikes: 0, belowMinimum: 0, movesWithSkipChip: 0, manualMoves: 0, manualAttempts: 0, failedManualAttempts: 0, continues: 0, navigationRetries: 0, recoveries: [], checkpoints: [], pageErrors: [], consoleMessages: [],
 };
 let stop = false, context;
@@ -50,11 +52,12 @@ try {
     await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings?.enabled)).toBe(true);
     settingsPage = await context.newPage();
     await settingsPage.goto('chrome-extension://' + new URL(worker.url()).host + '/options.html'); await settingsPage.waitForSelector('.ready');
+    if (extensionOff) await settingsPage.evaluate(async () => { const data = await chrome.storage.local.get('settings'); await chrome.storage.local.set({ settings: { ...data.settings, enabled: false } }); });
   }
   const checkDefaults = async () => {
     if (!settingsPage) return null;
     const data = await settingsPage.evaluate(() => chrome.storage.local.get(null));
-    expect(data.settings).toEqual({ enabled: true, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, allowlist: [] });
+    expect(data.settings).toEqual({ enabled: !extensionOff, rule: { likes: { on: true, min: 5000 }, comments: { on: false, min: 100 }, views: { on: false, min: 100000 } }, platforms: { youtube: true, tiktok: true, instagram: true }, filterGrids: false, showSkipChip: true, allowlist: [] });
     return data.dailySkips;
   };
   report.initialDailyCount = await checkDefaults();
