@@ -7,7 +7,7 @@ npm run zip
 node scripts/soak.mjs qa/tmp/soak-new-run 86400000
 ```
 
-Use a new output directory for every run; the script refuses an existing profile. The optional third argument is an immutable unpacked extension directory, or the literal `none` to run the identical schedule with no extension as a control; the optional fourth is a summary JSON path. Output contains local QA evidence and is ignored by Git. A persistent task-owned tmux session can keep it running across terminal disconnects. To stop a newly launched runner, verify the Node pid from its report against the process command and send SIGTERM to that pid only. The runner handles that signal itself so it can save its final count, screenshot and stopped report before closing its own browser. Do not signal an entire tmux process group or assume older runners have this behavior; see the signal regression below.
+Use a new output directory for every run; the script refuses an existing profile. The optional third argument is an immutable unpacked extension directory, or the literal `none` to run the identical schedule with no extension as a control; the optional fourth is a summary JSON path. Set `SOAK_EXTENSION_OFF=1` to load the extension but switch it off. Output contains local QA evidence and is ignored by Git. A persistent task-owned tmux session can keep it running across terminal disconnects. To stop a newly launched runner, verify the Node pid from its report against the process command and send SIGTERM to that pid only. The runner handles that signal itself so it can save its final count, screenshot and stopped report before closing its own browser. Do not signal an entire tmux process group or assume older runners have this behavior; see the signal regression below.
 
 The runner now counts actual manual transitions separately from key attempts. After two attempts fail to change the video, it records a screenshot and reloads the same public page without resetting the profile, settings, daily count or duration. Recovery is bounded to twelve reloads, at least ten minutes apart; repeated failure after a reload stops the run for review. Page navigation can replace the execution context and is retried; unrelated errors and a closed page remain failures. Recoveries must be reviewed, never presented as uninterrupted scrolling. Before each reload the runner now records bounded diagnostics in the recovery entry: page responsiveness, focus and visibility, whether the playing video advances, element and reel-renderer counts, whether the page's own Next control still moves the feed, and Chrome's page metrics. Console errors and warnings (first 60) and a page crash are also recorded.
 
@@ -75,3 +75,41 @@ The runner registered its own SIGINT/SIGTERM handlers, but Playwright also close
 New launches disable Playwright's SIGINT/SIGTERM handlers so the runner owns the shutdown order. Two independent fresh-profile checks on the same unchanged extension ZIP then passed: Node-only SIGTERM and Node-only SIGINT each produced `stopped`, a final daily count, a finished timestamp and a visibly valid final screenshot, exited with code 0, and left none of their recorded browser descendants running. Each had sampled one actual known-count YouTube Short; neither is a long-duration pass. Local before/after reports and signal/process journals are retained separately. Whole-group interruption and SIGKILL are not covered by these checks.
 
 The fix was developed and tested in an isolated worktree. Node70428's subsequently completed 24-hour run kept its original script checksum `37e5c3a627069ef629c7219d80f0b1b2227e551f075982a166d7ab0620f3422c`, profile, extension, settings and timer; it was not stopped or restarted. Extension code, version, permissions and the published ZIP are unchanged.
+
+## YouTube Shorts feed stalls (cause not established)
+
+Runs of 2026-10-09 and 10 KST.
+
+Both 24-hour and 6-hour extension runs sometimes reach a point where the YouTube Shorts feed stops moving: two automatic presses fail and the runner reloads the public page, after which the run continues normally. Before reloading, the runner now records diagnostics. Eight of them exist; they were all taken on the exact packages named below, in fresh signed-out Chrome for Testing 153 profiles.
+
+In seven of the eight, the page was responsive (a round trip of 1 ms or less), focused and visible, the video was playing at normal speed, and the page's own Next control was present, enabled and visible. A click on that control through Playwright did not move the feed either, and neither did the keyboard. Memory was not unusual for these runs (heap 75–345 MiB and 28,700–274,400 DOM nodes across the eight, including pages shortly after a reload). The eighth, in a 0.3.8 candidate run, was a half-rendered page with no playing video. Every stall ended with a normal reload. No run recorded a page error or crash; console capture was limited to 60 mostly unrelated messages per run, so console errors are not ruled out.
+
+| Arm (signed-out public Shorts) | Hours | Stalls |
+| --- | ---: | ---: |
+| Extension on, shipped skipping: 0.3.5 24 h, 0.3.6 6 h, 0.3.7 6 h and 12 h | 48 | 7 (2, 0, 1, 4) |
+| Extension on, 1.2 s minimum dwell before every skip (unreleased 0.3.8 candidate, two runs stopped at 6 h 29 min) | 13 | 3 (2, 1) |
+| No extension, one manual press every 20–30 s (6 h and 12 h) | 18 | 0 |
+| No extension, first click 1.2–2.0 s after a video opens for about 40% of videos (`scripts/pacing-control.mjs` with `1200 2000`), 562 such moves | 8 | 0 |
+| No extension, first click 0.45–0.70 s after a video opens for about 40% of videos (the default of the same script), 432 such moves | 6 | 1, plus 12 transient failed presses |
+| Extension loaded but switched off (`SOAK_EXTENSION_OFF=1`), one press every 30 s | 6 | 0 |
+
+What this does and does not show:
+
+- With the extension on there were 10 stalls in 61 hours; with no extension 1 in 32 hours. Under a simple Poisson model that gap has a probability of roughly 0.03–0.05 if both rates were equal, but the arms ran at different times against different recommendation feeds, so this is a hint and not a measurement.
+- The no-extension burst arm stalled with the same signature, so a stuck feed does not need ScrollPlus. It also had 12 failed presses that later recovered on their own, against one in 1,410 for the slow no-extension run. Faster navigation may make YouTube more likely to stop responding. A 1.2–2.0 s control did not stall in 8 hours.
+- The 1.2 s dwell candidate did not help (3 stalls in 13 hours against 7 in 48), so it was not released. Its engine change and tests are kept on the unmerged branch `codex/skip-min-dwell` as evidence, and it would have made every skip visibly slower.
+- A loaded but switched-off extension did not stall in 6 hours, which is too short to say its presence is harmless.
+- The 0.3.7 change that stops rescanning page links (see [idle cost](idle-cost.md)) is a measured CPU saving; none of these runs show it affects the stall.
+
+The cause is open. For a person using YouTube Shorts the effect is that the feed can stop responding to scroll and Next until the page is reloaded, about once per six hours of continuous automatic use at the rate measured here; ordinary use is much lighter. This section does not cover TikTok or Instagram, signed-in sessions, or other browsers.
+
+Reproduce (each uses a new output directory and a fresh profile):
+
+```bash
+node scripts/soak.mjs qa/tmp/run-extension 21600000 .output/chrome-mv3            # extension on
+SOAK_EXTENSION_OFF=1 node scripts/soak.mjs qa/tmp/run-off 21600000 .output/chrome-mv3   # loaded, switched off
+node scripts/soak.mjs qa/tmp/run-none 21600000 none                                # no extension
+node scripts/pacing-control.mjs qa/tmp/run-burst 21600000 450 700                  # no extension, fast pacing
+```
+
+Raw reports, screenshots taken before each reload and the diagnostics stay under `qa/tmp/` and are not published. Both new modes and the control script are exercised by short real-browser smoke runs; `e2e/soak.spec.ts` covers the diagnostics collector.
