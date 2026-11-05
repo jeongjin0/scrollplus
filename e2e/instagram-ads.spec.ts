@@ -52,7 +52,7 @@ for (const layout of ["wide", "compact", "letterbox"] as const) {
     await page.waitForTimeout(1600);
     await worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...settings, enabled: true } });
+      await chrome.storage.local.set({ settings: { ...settings, enabled: true, showSkipChip: true } });
     });
     await page.waitForTimeout(3200);
     expect(await page.evaluate(() => (window as any).fixtureId), "advertisement must stay below the default 500 minimum while Skip ads is off").toBe("advert");

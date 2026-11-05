@@ -1,6 +1,6 @@
 # Chrome Web Store submission checklist
 
-Current update: [0.7.5](update-075.md), authorized 2026-10-25. Same Free/Public item, automatic publication after review, following the owner’s 2026-10-20 distribution decision. The older initial-review instructions below are historical where they mention Unlisted or deferred publication. Current package, listing and reviewer instructions must match the version being submitted.
+Current update: [0.7.6](update-076.md), authorized 2026-11-05. Same Free/Public item, automatic publication after review. The older initial-review instructions below are historical where they mention Unlisted or deferred publication.
 
 ## Before you start
 

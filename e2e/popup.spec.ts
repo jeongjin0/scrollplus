@@ -218,7 +218,7 @@ test("the time saved reads in Korean too", async () => {
   }
 });
 
-test("legacy notice positions normalize to the left gutter and Settings only toggles visibility", async () => {
+test("Settings can enable notifications, normalizes legacy positions, and resets notifications to off", async () => {
   const { context, id, worker } = await launch("en");
   try {
     await worker.evaluate(async () => {
@@ -227,12 +227,15 @@ test("legacy notice positions normalize to the left gutter and Settings only tog
     });
     const options = await open(context, id, "options.html");
     await expect(options.getByRole("radiogroup", { name: "Skip chip position" })).toHaveCount(0);
-    await options.getByRole("switch", { name: "Skip notifications" }).click();
-    await expect.poll(async () => (await stored(options)).showSkipChip).toBe(false);
+    const notifications = options.getByRole("switch", { name: "Skip notifications" });
+    await expect(notifications).not.toBeChecked();
+    await notifications.click();
+    await expect.poll(async () => (await stored(options)).showSkipChip).toBe(true);
     expect((await stored(options)).chipPosition).toBe("side");
     expect((await stored(options)).skipAds).toBe(false);
     await options.getByRole("button", { name: /Reset to defaults/ }).click();
-    await expect.poll(async () => (await stored(options)).showSkipChip).toBe(true);
+    await expect(notifications).not.toBeChecked();
+    await expect.poll(async () => (await stored(options)).showSkipChip).toBe(false);
   } finally {
     await context.close();
   }

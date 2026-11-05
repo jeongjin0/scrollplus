@@ -6,7 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { chromium, expect } from '@playwright/test';
-const [priorArg, candidateArg, outputArg] = process.argv.slice(2);
+const [priorArg, candidateArg, outputArg, notificationsArg = "off"] = process.argv.slice(2);
+if (!["on", "off"].includes(notificationsArg)) throw new Error("Notification choice must be on or off");
 if (!priorArg || !candidateArg || !outputArg) throw new Error('Provide prior ZIP, candidate ZIP and a new output directory');
 const output = path.resolve(outputArg);
 if (fs.existsSync(output)) throw new Error('Output must be new; never reuse a QA profile');
@@ -28,13 +29,13 @@ let browser;
 const report = { scope: 'Actual ZIPs, same unpacked path and browser profile across restart; not Store auto-update delivery', prior: null, candidate: null };
 try {
   unpack(priorArg); browser = await launch();
-  const before = await browser.worker.evaluate(async () => {
+  const before = await browser.worker.evaluate(async (showSkipChip) => {
     const { settings } = await chrome.storage.local.get('settings');
     const now = new Date(), day = [now.getFullYear(), String(now.getMonth()+1).padStart(2,'0'), String(now.getDate()).padStart(2,'0')].join('-');
-    const expected = { schema: 3, settings: { ...settings, enabled: false, skipAds: false, keepFollowed: false, showSkipChip: false, filterGrids: true, platforms: { youtube: true, tiktok: false, instagram: true }, rule: { likes: { on: true, min: 875 }, comments: { on: true, min: 23 }, views: { on: false, min: 39000 } }, allowlist: [{ platform: 'youtube', id: 'qa-update-creator' }] }, dailySkips: { day, count: 17 }, totalSkips: { since: '2026-10-13', count: 41, onScreenMs: 12000 } };
+    const expected = { schema: 3, settings: { ...settings, enabled: false, skipAds: false, keepFollowed: false, showSkipChip, filterGrids: true, platforms: { youtube: true, tiktok: false, instagram: true }, rule: { likes: { on: true, min: 875 }, comments: { on: true, min: 23 }, views: { on: false, min: 39000 } }, allowlist: [{ platform: 'youtube', id: 'qa-update-creator' }] }, dailySkips: { day, count: 17 }, totalSkips: { since: '2026-10-13', count: 41, onScreenMs: 12000 } };
     await chrome.storage.local.set(expected);
     return { version: chrome.runtime.getManifest().version, local: await chrome.storage.local.get(null) };
-  });
+  }, notificationsArg === "on");
   // A service worker cannot receive its own runtime message. Exercise the real
   // session broker from an extension page, just as the installed UI does.
   const app = await browser.context.newPage();
@@ -61,10 +62,9 @@ try {
   const options = await browser.context.newPage();
   await options.goto('chrome-extension://' + browser.id + '/options.html');
   await options.waitForSelector('.ready');
-  // Legacy settings have no noticeStyle; the new UI defaults compact while
-  // preserving an explicitly disabled notification and every stored value.
+  // An older package without noticeStyle still reads as Compact.
   assert.equal(await options.locator('input[name="notice-style"][value="compact"]').isChecked(), true);
-  assert.equal((await browser.worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings)).showSkipChip, false);
+  assert.equal((await browser.worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings)).showSkipChip, notificationsArg === "on");
   assert.deepEqual(await browser.worker.evaluate(() => chrome.storage.local.get(null)), before.local);
   assert.equal(after.session.undoKeeps, undefined); // RAM choices clear on restart.
   report.passed = true;

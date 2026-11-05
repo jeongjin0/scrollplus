@@ -20,7 +20,7 @@ const LANGS = {
     popup: ["Low-like videos <em>skip themselves.</em>", "Ready on install. Choose your minimum and keep the latest skip in reach."],
     options: ["Your numbers, <em>your rules.</em>", "Pick a preset or type your own. Likes, comments, views."],
     recovery: ["Paused? <em>Your next move.</em>", "Keep going, lower the bar or undo the latest skip from the popup."],
-    chip: ["Skipped. <em>Undo</em> in one tap.", "A compact notice in the left gutter. Open its count for details."],
+    chip: ["Skipped. <em>Undo</em> in one tap.", "Turn on Skip notifications for a compact notice beside the video."],
     tile: "Skips Shorts, Reels &amp; TikToks <em>with too few likes.</em>",
   },
   ko: {
@@ -29,7 +29,7 @@ const LANGS = {
     popup: ["좋아요 적은 영상은 <em>알아서 넘어가요.</em>", "설치하면 바로 켜져요. 내 기준을 고르고, 최근 넘김도 되돌려요."],
     options: ["내 기준, <em>내 숫자.</em>", "프리셋을 고르거나 직접 입력하세요. 좋아요, 댓글, 조회수."],
     recovery: ["잠깐 멈춤. <em>다음은 내 선택.</em>", "팝업에서 이어서 보거나, 기준을 낮추거나, 최근 넘김을 되돌려요."],
-    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "왼쪽 여백에 작게 표시해요. 숫자를 누르면 자세히 볼 수 있어요."],
+    chip: ["넘김. <em>되돌리기</em>는 한 번에.", "넘김 알림을 켜면 영상 옆에 작게 표시해요."],
     tile: "좋아요 적은 쇼츠·릴스·틱톡을 <em>알아서 넘겨요.</em>",
   },
 };

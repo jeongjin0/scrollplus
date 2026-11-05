@@ -98,7 +98,7 @@ for (const platform of platforms) {
     await expect.poll(async () => (await send("scrollplus:context")).creatorId).toBe(platform.creator);
     await worker.evaluate(async () => {
       const data = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...data.settings, enabled: true } });
+      await chrome.storage.local.set({ settings: { ...data.settings, enabled: true, showSkipChip: true } });
     });
     await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
     await expect(page.locator("#scrollplus-chip-host")).toContainText(/10/);
@@ -121,15 +121,17 @@ for (const platform of platforms) {
     await expect.poll(async () => (await stored(app)).rule.likes.min).toBe(1000);
     await page.waitForTimeout(600);
     expect(await page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
-    // Observe the short-lived Undo while Reset is in flight, before action tracing returns.
-    await Promise.all([
-      app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click(),
-      (async () => {
-        await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
-        await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(2);
-        await page.getByRole("button", { name: /Undo|되돌리기/ }).click();
-      })(),
-    ]);
+    // Reset clears the session keep and turns notices off; the popup's broker can still undo.
+    await app.getByRole("button", { name: /Reset to defaults|기본값으로 되돌리기/ }).click();
+    await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[1]);
+    await expect.poll(() => app.evaluate(async () => (await chrome.storage.local.get("dailySkips")).dailySkips.count)).toBe(2);
+    const url = platform.url.split("/", 3).join("/") + "/*";
+    await expect.poll(() => send("scrollplus:context").then(state => state.controls?.canUndo)).toBe(true);
+    expect(await app.evaluate(async (url) => {
+      const [tab] = await chrome.tabs.query({ url });
+      const { documentKey, controls } = await chrome.tabs.sendMessage(tab.id!, { type: "scrollplus:context" });
+      return chrome.runtime.sendMessage({ type: "scrollplus:control", action: "undo", tabId: tab.id, documentKey, revision: controls.revision });
+    }, url)).toMatchObject({ ok: true });
     await expect.poll(() => page.evaluate(() => (window as any).fixtureId)).toBe(platform.ids[0]);
     expect(await send("scrollplus:allow")).toEqual({ ok: true });
     await expect.poll(async () => (await stored(app)).allowlist).toEqual([{ platform: platform.name, id: platform.creator }]);

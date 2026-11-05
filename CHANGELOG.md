@@ -1,6 +1,11 @@
 # Changelog
 
-## 0.7.5 – Store update candidate
+## 0.7.6 – Quiet by default
+
+- New installs and reset hide in-feed skip notifications by default. Updates keep your saved preference; use Skip notifications to turn them on.
+- Undo and the six-skip pause controls remain available in the popup with notifications off.
+
+## 0.7.5
 
 - Skip notifications start compact, with a count and Undo. Open the count for details when safe left-gutter space is available, or choose the detailed style in Settings. An existing off choice stays off.
 - The popup now offers Keep going and Lower the bar after six consecutive skips, plus Undo for the latest adjacent skipped video when the brief notification has gone or cannot fit.

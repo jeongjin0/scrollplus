@@ -78,7 +78,7 @@ async function start(extension: Awaited<ReturnType<typeof launch>>, site: Site, 
   const { context, worker } = extension;
   await worker.evaluate(async (skipAds) => {
     const { settings } = await chrome.storage.local.get("settings");
-    await chrome.storage.local.set({ settings: { ...settings, enabled: false, ...(skipAds === undefined ? {} : { skipAds }) } });
+    await chrome.storage.local.set({ settings: { ...settings, enabled: false, showSkipChip: true, ...(skipAds === undefined ? {} : { skipAds }) } });
   }, ads);
   await context.route("https://www." + HOSTS[site] + "/**", async (route) => {
     if (site === "tiktok" && new URL(route.request().url()).pathname === "/api/item_list") {
@@ -175,7 +175,7 @@ test("instagram: an ad known only by its visible disclosure is skipped when Skip
   expect(await fixtureId(tab), "ads stay while the switch is off").toBe(AD1);
   await worker.evaluate(async () => {
     const { settings } = await chrome.storage.local.get("settings");
-    await chrome.storage.local.set({ settings: { ...settings, skipAds: true } });
+    await chrome.storage.local.set({ settings: { ...settings, skipAds: true, showSkipChip: true } });
   });
   await expect.poll(() => fixtureId(tab)).toBe(NORMAL1);
   await expect(tab.locator("#scrollplus-chip-host")).toContainText(/Skipped · ad|넘김 · 광고/);

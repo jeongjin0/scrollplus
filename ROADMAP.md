@@ -1,16 +1,10 @@
 # ScrollPlus launch roadmap
 
-Updated 2026-10-25. The public [Store listing](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja) showed **0.7.4**, updated 2026-10-20. The owner chose **Free/Public with automatic publication after review** on 2026-10-20, superseding the earlier Unlisted/deferred launch plan. GitHub's downloadable beta remains 0.7.2.
+Updated 2026-11-05. The public [Store listing](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja) and Chrome update service both serve **0.7.5**. The owner chose Free/Public distribution with automatic publication after review.
 
 ## Current update
 
-The owner approved continuing after the compact-notice/popup-recovery source change merged in [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). **0.7.5 was submitted for review on 2026-10-25 with automatic publication on**, through the same Store item; published 0.7.4 remains available until approval/publication. [Update checkpoint](store/update-075.md) records actual submission/delivery state; [candidate QA](qa/release-readiness-075.md) separates current checks from historical evidence.
-
-- Compact count/Undo notifications default on, with Detailed available in Settings. An explicitly disabled notification stays off during upgrade.
-- Popup Keep going/Lower the bar after six skips, plus latest adjacent Undo when the notice expires or cannot fit.
-- No new permissions, server, analytics, persistent video identifiers or schema change. Existing local data declarations remain applicable.
-- Freeze the checked ZIP, verify the actual 0.7.4 → 0.7.5 upgrade, refresh English/Korean Store metadata/screenshots and reviewer instructions, and submit with Public/automatic publication preserved.
-- After review/publication, verify the public version and actual Store delivery. A local unpacked upgrade does not establish Store delivery.
+The owner approved a quieter default and a new Store update on 2026-11-05. Version **0.7.6** turns off in-feed skip notifications on new installs and on reset, preserves saved choices, and retains popup Undo and six-skip recovery. See the [update checkpoint](store/update-076.md) for the submission and delivery state.
 
 ## Remaining product validation
 
