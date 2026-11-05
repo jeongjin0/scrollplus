@@ -62,8 +62,7 @@ try {
   const options = await browser.context.newPage();
   await options.goto('chrome-extension://' + browser.id + '/options.html');
   await options.waitForSelector('.ready');
-  // Legacy settings have no noticeStyle; the new UI defaults compact while
-  // preserving the saved notification choice and every stored value.
+  // An older package without noticeStyle still reads as Compact.
   assert.equal(await options.locator('input[name="notice-style"][value="compact"]').isChecked(), true);
   assert.equal((await browser.worker.evaluate(async () => (await chrome.storage.local.get('settings')).settings)).showSkipChip, notificationsArg === "on");
   assert.deepEqual(await browser.worker.evaluate(() => chrome.storage.local.get(null)), before.local);
