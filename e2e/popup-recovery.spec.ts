@@ -3,7 +3,7 @@ import { launch, open, stored } from "./extension";
 
 function feed(passingAfterFirst = false) {
   return `<!doctype html><meta charset="utf-8"><title>Popup recovery fixture</title>
-  <style>body{margin:0}video{position:absolute;left:20px;top:64px;width:320px;height:600px;background:#222}button{height:40px}</style>
+  <style>body{margin:0}video{position:absolute;left:240px;top:64px;width:320px;height:600px;background:#222}button{height:40px}</style>
   <video muted></video><div id="navigation-button-down"><button aria-label="Next video">Next</button></div><div id="navigation-button-up"><button aria-label="Previous video">Previous</button></div>
   <script>window.fixtureIndex=0;window.fixtureBacks=0;
   function show(index){window.fixtureIndex=Math.max(0,Math.min(15,index));const i=window.fixtureIndex;
@@ -14,12 +14,12 @@ function feed(passingAfterFirst = false) {
   document.querySelector('[aria-label="Previous video"]').onclick=()=>{if(window.blockRetreat)return;window.fixtureBacks++;show(window.fixtureIndex-1)};show(0);</script>`;
 }
 
-async function setup(language: "en" | "ko", passingAfterFirst = false, notifications = false) {
+async function setup(language: "en" | "ko", passingAfterFirst = false, notifications?: true) {
   const extension = await launch(language);
   const { context, worker, id } = extension;
   await worker.evaluate(async notifications => {
     const { settings } = await chrome.storage.local.get("settings");
-    await chrome.storage.local.set({ settings: { ...settings, enabled: false, showSkipChip: notifications } });
+    await chrome.storage.local.set({ settings: { ...settings, enabled: false, ...(notifications ? { showSkipChip: true } : {}) } });
   }, notifications);
   await context.route("https://www.youtube.com/**", route => route.fulfill({ contentType: "text/html", body: feed(passingAfterFirst) }));
   // An extension page stands in for the toolbar popup. Its active-tab query is
@@ -53,11 +53,11 @@ for (const language of ["en", "ko"] as const) {
     const ext = await setup(language);
     try {
       await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(6);
+      await expect(ext.tab.locator("#scrollplus-chip-host .chip")).toHaveCount(0);
       const popup = await ext.popup();
       await expect(popup.getByText(language === "ko" ? "6회 연속 넘겨 잠시 멈췄습니다." : "Paused after six consecutive skips.")).toBeVisible();
       await popup.getByRole("switch", { name: language === "ko" ? "넘김 알림 표시" : "Skip notifications" }).click();
       await expect.poll(() => stored(popup).then(s => s.showSkipChip)).toBe(true);
-      await expect(ext.tab.locator("#scrollplus-chip-host")).toBeHidden();
       expect(await ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(6);
       await popup.getByRole("button", { name: language === "ko" ? "이어서 보기" : "Keep going", exact: true }).click();
       await expect.poll(() => popup.evaluate(() => (window as any).lastControlResult)).toMatchObject({ ok: true });
@@ -77,8 +77,9 @@ test("popup Undo works after notification expiry and keeps the same video across
   const ext = await setup("en", true, true);
   try {
     await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(1);
-    await ext.tab.waitForTimeout(2800);
-    await expect(ext.tab.locator("#scrollplus-chip-host .chip")).toHaveCount(0);
+    const notice = ext.tab.locator("#scrollplus-chip-host .chip");
+    await expect(notice).toBeVisible();
+    await expect(notice).toHaveCount(0);
     const popup = await ext.popup();
     await popup.getByRole("button", { name: "Undo", exact: true }).click();
     await expect.poll(() => popup.evaluate(() => (window as any).lastControlResult)).toMatchObject({ ok: true });
@@ -90,6 +91,19 @@ test("popup Undo works after notification expiry and keeps the same video across
     expect(await ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(0);
     const local = await ext.worker.evaluate(() => chrome.storage.local.get(null));
     expect(Object.keys(local).sort()).toEqual(["dailySkips", "schema", "settings", "totalSkips"]);
+  } finally { await ext.context.close(); }
+});
+
+test("a fresh install skips quietly and can undo from the popup", async () => {
+  const ext = await setup("en", true);
+  try {
+    await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(1);
+    await expect(ext.tab.locator("#scrollplus-chip-host .chip")).toHaveCount(0);
+    const popup = await ext.popup();
+    await expect(popup.getByRole("switch", { name: "Skip notifications" })).not.toBeChecked();
+    await popup.getByRole("button", { name: "Undo", exact: true }).click();
+    await expect.poll(() => popup.evaluate(() => (window as any).lastControlResult)).toMatchObject({ ok: true });
+    await expect.poll(() => ext.tab.evaluate(() => (window as any).fixtureIndex)).toBe(0);
   } finally { await ext.context.close(); }
 });
 

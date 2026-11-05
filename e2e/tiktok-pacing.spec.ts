@@ -129,6 +129,10 @@ test("TikTok: a skip the site never offers a move for is given up after 5 s with
 });
 
 test("TikTok: a skip that follows a skip changes the words of the chip instead of showing a new one", async ({ extension }) => {
+  await extension.worker.evaluate(async () => {
+    const { settings } = await chrome.storage.local.get("settings");
+    await chrome.storage.local.set({ settings: { ...settings, showSkipChip: true } });
+  });
   const tab = await open(extension, { likes: [40000, 10, 20, 30, 40000], moveMs: 200 });
   await tab.waitForTimeout(2200);
   await personPressesNext(tab);
@@ -143,6 +147,10 @@ test("TikTok: a skip that follows a skip changes the words of the chip instead o
 });
 
 test("TikTok: Undo still works while the next skip waits for the site", async ({ extension }) => {
+  await extension.worker.evaluate(async () => {
+    const { settings } = await chrome.storage.local.get("settings");
+    await chrome.storage.local.set({ settings: { ...settings, showSkipChip: true } });
+  });
   const tab = await open(extension, { likes: [40000, 10, 20, 40000], disabledFor: { 2: 4000 } });
   await tab.waitForTimeout(2200);
   // The person scrolls to the 10-like video; the extension skips it, and the 20-like video that follows has to wait for TikTok.
@@ -169,6 +177,10 @@ test("TikTok: a person who scrolls on while the skip waits is not pressed past",
 });
 
 test("TikTok: six skips in a row still pause the extension when the player is missing for a moment between videos", async ({ extension }) => {
+  await extension.worker.evaluate(async () => {
+    const { settings } = await chrome.storage.local.get("settings");
+    await chrome.storage.local.set({ settings: { ...settings, showSkipChip: true } });
+  });
   const tab = await open(extension, { likes: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10], moveMs: 100, noPlayerMs: 120 });
   await expect(tab.locator("#scrollplus-chip-host")).toContainText(/under your bar|기준 아래/, { timeout: 15000 });
   await tab.waitForTimeout(1500);

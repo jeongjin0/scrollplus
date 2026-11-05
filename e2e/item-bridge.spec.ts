@@ -92,7 +92,7 @@ for (const platform of ["tiktok", "instagram"] as const) {
     await expect.poll(() => page.evaluate(() => document.hidden)).toBe(true);
     await worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...settings, enabled: true } });
+      await chrome.storage.local.set({ settings: { ...settings, enabled: true, showSkipChip: true } });
     });
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => (window as any).fixtureMoves), "hidden tabs must not advance after settings change").toBe(0);

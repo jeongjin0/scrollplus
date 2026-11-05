@@ -28,7 +28,7 @@ function disclosedReel(labelStyle = ""): string {
 test("Reels recognises a wide disclosure span: ads off keeps it, on skips it, Undo survives reload", async ({ extension }) => {
   await extension.worker.evaluate(async () => {
     const { settings } = await chrome.storage.local.get("settings");
-    await chrome.storage.local.set({ settings: { ...settings, skipAds: false, rule: { ...settings.rule, likes: { on: true, min: 100000 } } } });
+    await chrome.storage.local.set({ settings: { ...settings, skipAds: false, showSkipChip: true, rule: { ...settings.rule, likes: { on: true, min: 100000 } } } });
   });
   await extension.context.route("https://www.instagram.com/**", route => route.fulfill({ contentType: "text/html", body: disclosedReel() }));
   const tab = await extension.context.newPage();
@@ -54,7 +54,7 @@ for (const style of ["visibility:hidden", "transform:translateX(-2000px)"]) {
   test(`Reels ignores an invisible disclosure (${style})`, async ({ extension }) => {
     await extension.worker.evaluate(async () => {
       const { settings } = await chrome.storage.local.get("settings");
-      await chrome.storage.local.set({ settings: { ...settings, skipAds: false, rule: { ...settings.rule, likes: { on: true, min: 100000 } } } });
+      await chrome.storage.local.set({ settings: { ...settings, skipAds: false, showSkipChip: true, rule: { ...settings.rule, likes: { on: true, min: 100000 } } } });
     });
     await extension.context.route("https://www.instagram.com/**", route => route.fulfill({ contentType: "text/html", body: disclosedReel(style) }));
     const tab = await extension.context.newPage();

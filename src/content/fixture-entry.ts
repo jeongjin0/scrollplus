@@ -9,6 +9,8 @@ let settings: Settings = {
   platforms: { ...DEFAULT_SETTINGS.platforms },
   rule: presetRule("balanced"),
   allowlist: [],
+  // The visual fixtures exercise the optional notification controls.
+  showSkipChip: true,
 };
 let advances = 0;
 let retreats = 0;

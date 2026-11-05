@@ -261,7 +261,9 @@ describe("moving settings from 0.5.x and 0.6.x to the chip beside the video", ()
   });
 });
 
-it("defaults to compact notices without re-enabling an explicitly disabled notice", () => {
+it("keeps notifications off without a saved choice and preserves saved choices", () => {
+  expect(normalizeSettings({}).showSkipChip).toBe(false);
+  expect(normalizeSettings({ showSkipChip: true }).showSkipChip).toBe(true);
   expect(normalizeSettings(undefined).noticeStyle).toBe("compact");
   expect(normalizeSettings({ showSkipChip: false }).showSkipChip).toBe(false);
   expect(normalizeSettings({ noticeStyle: "detailed" }).noticeStyle).toBe("detailed");

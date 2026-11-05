@@ -2,11 +2,15 @@
 
 This file is the product spec. Implement it. Do not add features that are not written here. If a rule is missing, leave the behavior out and record the gap in qa/gaps.md. Read this file before coding and again before calling the work done.
 
+## Quiet notification default — 2026-11-05
+
+New installs and Reset to defaults start with in-feed skip notifications off. An update preserves a stored on or off choice. People can turn notifications on from the popup or Settings; Compact is still the default style when enabled. When notifications are off, the popup still offers Undo for the latest adjacent skip and the six-skip pause controls.
+
 ## Authorized notice and popup recovery update — 2026-10-25
 
 The owner approved implementing the high-confidence notice improvements after a code/controlled-screen review. This section supersedes the older notice presentation rules below. On 2026-10-25, after the source change merged, the owner authorized continuing the remaining next steps: prepare the 0.7.5 update and submit it through the existing Store item, retaining Free/Public distribution and automatic publication after review. This supersedes the older deferred/unlisted launch instructions below.
 
-- Notifications remain on by default. A compact count/Undo notice is the default; Settings offers compact or detailed presentation and preserves an explicitly saved off choice. Clicking or keyboard-activating the count reveals details when a full card fits safely on the left. Never place a notice over the video or to its right.
+- A compact count/Undo notice is the default style when enabled; Settings offers compact or detailed presentation and preserves an explicitly saved off choice. Clicking or keyboard-activating the count reveals details when a full card fits safely on the left. Never place a notice over the video or to its right.
 - Settings calls this “Skip notifications”, explains the brief left-gutter display, lack-of-space hiding and separate six-skip safety pause, and includes a representative preview.
 - The popup shows the active feed's six-skip pause and provides Keep going and Lower the bar. It also offers Undo for the latest adjacent skipped video after the 2.5-second notification expires or is hidden. Do not offer Undo after navigating beyond that next video, leaving the feed or reloading. Session keep choices still use the existing memory-only broker.
 - Popup actions target the tab/document whose state was displayed and reject stale or unavailable actions. Show a retryable error when an action fails. No new host permission, persistence of video identifiers, backend or analytics.
@@ -131,7 +135,7 @@ On install, write these defaults and apply them immediately. The extension must 
       },
       "platforms": { "youtube": true, "tiktok": true, "instagram": true },
       "filterGrids": false,
-      "showSkipChip": true,
+      "showSkipChip": false,
       "noticeStyle": "compact",
       "chipPosition": "side",
       "skipAds": true,
@@ -139,7 +143,7 @@ On install, write these defaults and apply them immediately. The extension must 
       "allowlist": []
     }
 
-Settings from 0.1.x that hold a sensitivity map to the matching preset. A setting that is missing reads as its default: Skip ads on, Keep accounts I follow on, compact notifications on the left. An explicitly saved notification-off choice stays off; noticeStyle accepts compact or detailed without changing the schema marker. Anything unreadable falls back to the defaults. An install that already has schema 2 and no keepFollowed key reads the switch as on; that does not rewrite storage and does not run the 0.4.x move again.
+Settings from 0.1.x that hold a sensitivity map to the matching preset. A setting that is missing reads as its default: Skip ads on, Keep accounts I follow on, skip notifications off (Compact on the left when enabled). A saved notification choice is preserved; noticeStyle accepts compact or detailed without changing the schema marker. Anything unreadable falls back to the defaults. An install that already has schema 2 and no keepFollowed key reads the switch as on; that does not rewrite storage and does not run the 0.4.x move again.
 
 ### Updating from 0.4.x
 

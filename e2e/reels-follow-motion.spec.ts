@@ -59,6 +59,10 @@ function scrollingReels(): string {
 }
 
 test("Reels shows one settled notice after a scrolling skip burst, with no interim width jumps", async ({ extension }) => {
+  await extension.worker.evaluate(async () => {
+    const { settings } = await chrome.storage.local.get("settings");
+    await chrome.storage.local.set({ settings: { ...settings, showSkipChip: true } });
+  });
   await extension.context.route("https://www.instagram.com/**", route => route.fulfill({ contentType: "text/html", body: scrollingReels() }));
   const tab = await extension.context.newPage();
   await tab.goto("https://www.instagram.com/reels/motion0/");

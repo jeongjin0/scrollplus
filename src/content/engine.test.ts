@@ -14,7 +14,7 @@ function low(id: string): EngineItem {
 }
 
 function harness(partial: Partial<Settings> = {}, advanceResult = true, duringAdvance?: (show: (item: EngineItem) => void) => void, undoDeps: Partial<Pick<EngineDeps, "rememberUndo" | "sessionKeep" | "advanceGapMs" | "settleMs" | "ready" | "retreat" | "getActiveId">> = {}) {
-  const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], ...partial };
+  const settings: Settings = { ...DEFAULT_SETTINGS, platforms: { ...DEFAULT_SETTINGS.platforms }, rule: presetRule("balanced"), allowlist: [], showSkipChip: true, ...partial };
   let clock = 0;
   let seq = 1;
   const tasks: Array<{ id: number; at: number; fn: () => void }> = [];

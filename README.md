@@ -12,7 +12,7 @@ Installed means on. No account, no setup.</p>
 
 ## What it does
 
-Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus moves to the next one and tells you why. The Undo button appears for a few seconds; a video you restore stays for the browser session, including reloads and new tabs.
+Scroll like you always do. When a video has fewer likes than your minimum, ScrollPlus quietly moves to the next one. You can undo the latest skip from the extension popup while you are still on the next video. A video you restore stays for the browser session, including reloads and new tabs.
 
 The default is simple: **skip anything under 500 likes**. Pick a different level in the popup, or set your own numbers in Settings.
 
@@ -24,15 +24,15 @@ The default is simple: **skip anything under 500 likes**. Pick a different level
 
 In Settings you can also turn on a minimum for comments or views, switch a site off, and keep creators you like. Numbers can be typed the way you say them: `500`, `5k`, `2만`, `1,000`.
 
-**Skip ads** is a switch in the popup, on by default. ScrollPlus moves past an ad as soon as the site marks it as one, whatever its like count, with the same reason chip ("Skipped · ad") and Undo. Turn the switch off and ads stay. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
+**Skip ads** is a switch in the popup, on by default. ScrollPlus moves past an ad as soon as the site marks it as one, whatever its like count, and offers Undo. Turn the switch off and ads stay. It only moves past the ad that fills the player. It does not block ad requests or hide anything in lists.
 
 **Keep accounts I follow** is on in Settings. A video from a channel you subscribe to, or an account you follow, stays even under the like bar. ScrollPlus reads that from the page. It does not keep a list. If the page does not say, the video is judged by its likes. An ad is still skipped when Skip ads is on.
 
 **Time saved.** The popup shows a clock and a time value under today's count. Settings also shows the total number of skips and the same time value, with the date counting began. The figure is calculated on your device: each skip counts as about 3 seconds you would have spent on the video before swiping it away yourself, minus the time it stayed on screen. The formula is documented here rather than explained in the interface. The figures are counted from the day you installed or updated to 0.5.0.
 
-**The skip chip** stays in the video's left gutter and follows it when a comments panel opens or closes. If no safe space exists on the left, the notice stays hidden. Reels waits for scrolling to settle before showing it. Notifications can be turned off without disabling the six-skip safety pause.
+**Skip notifications** are off on new installs. Turn them on in the popup or Settings for a compact count and Undo next to the video. Open the count for details, or choose Detailed in Settings. A notice only appears when there is room to the left; Reels waits for scrolling to settle. Hover or focus the controls to keep them visible. Updates preserve your saved preference.
 
-**0.7.5 update candidate (2026-10-25):** skip notifications start compact, with count and Undo; open the count for details when safe space exists, or choose Detailed in Settings. Hover/focus keeps controls available. The popup offers Keep going/Lower the bar after six skips, and Undo for the latest adjacent skip after its notice expires or cannot fit. Moving further, leaving the feed or reloading clears that Undo target; a video already restored stays kept for the browser session. See the [update checkpoint](store/update-075.md) for Store delivery state.
+**Popup recovery** works with notifications off. Undo restores the latest adjacent skip. Moving further, leaving the feed or reloading clears the Undo target. If six videos are skipped in a row, use Keep going or Lower the bar in the popup.
 
 A skip is the site's own Next control, pressed for you, so you see the usual slide to the next video. On YouTube Shorts a skipped video is on screen for about half a second, and it is muted meanwhile. That half second is YouTube's own pace between moves ([timing](qa/skip-timing.md)). On TikTok a skipped video is on screen for about 0.4 s, with its sound on: TikTok takes a mute made by a script as your own choice, so ScrollPlus leaves it alone ([timing](qa/skip-timing-tiktok.md)). On Instagram Reels it is about 0.3 s, measured signed in with the built scripts run in the page ([timing](qa/skip-timing-instagram.md)).
 
@@ -44,9 +44,7 @@ Supported: YouTube Shorts, TikTok, and Instagram Reels on the web, in English an
 
 ## Status
 
-ScrollPlus is a free beta on the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). The public listing showed **0.7.4**, updated 2026-10-20, when checked on 2026-10-25. The owner chose Free/Public distribution and automatic publication after review on 2026-10-20; this supersedes the earlier unlisted/deferred launch instructions.
-
-**0.7.5 was submitted for Store review on 2026-10-25 with automatic publication on.** It contains compact notifications and popup recovery from [PR #56](https://github.com/jeongjin0/scrollplus/pull/56). Approval/public delivery remains pending: [update checkpoint](store/update-075.md), [candidate QA](qa/release-readiness-075.md), [roadmap](ROADMAP.md).
+ScrollPlus is a free beta on the [Chrome Web Store](https://chromewebstore.google.com/detail/bpiliaicdpeflblgjneilaphgjkgfmja). Version **0.7.5** was confirmed public on 2026-11-05. The [0.7.6 update checkpoint](store/update-076.md) tracks the quiet default release.
 
 - Tested on controlled pages for all three sites, including Chrome 120, the oldest supported version.
 - Tried on real feeds: YouTube Shorts (a 24-hour automated run on 0.3.5, with two page-reload recoveries), TikTok For You, and Instagram Reels in a signed-in browser. Instagram Reels is the newest and least exercised site.
