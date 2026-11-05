@@ -911,8 +911,13 @@ describe("popup recovery state and notification engagement", () => {
       box.show(low("cap" + i)); await box.drain(); box.flush(450);
     }
     expect(box.engine.getState()).toMatchObject({ paused: true, canLower: true, canUndo: true });
+    expect(box.models.at(-1)).toBeNull();
     box.settings.showSkipChip = true;
     box.engine.appearanceChanged();
+    expect(box.models.at(-1)).toMatchObject({ mode: "paused" });
+    box.settings.showSkipChip = false;
+    box.engine.appearanceChanged();
+    expect(box.models.at(-1)).toBeNull();
     expect(box.engine.getState().paused).toBe(true);
     expect(box.skips).toBe(6);
     box.engine.keepGoing();

@@ -4,7 +4,7 @@ This file is the product spec. Implement it. Do not add features that are not wr
 
 ## Quiet notification default — 2026-11-05
 
-New installs and Reset to defaults start with in-feed skip notifications off. An update preserves a stored on or off choice. People can turn notifications on from the popup or Settings; Compact is still the default style when enabled. When notifications are off, the popup still offers Undo for the latest adjacent skip and the six-skip pause controls.
+New installs and Reset to defaults start with in-feed skip notifications off. An update preserves a stored on or off choice. People can turn notifications on from the popup or Settings; Compact is still the default style when enabled. When notifications are off, the feed shows no notice, including at the six-skip pause. The popup still offers Undo for the latest adjacent skip and the pause controls.
 
 ## Authorized notice and popup recovery update — 2026-10-25
 

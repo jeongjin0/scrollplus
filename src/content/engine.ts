@@ -181,7 +181,12 @@ export function createEngine(deps: EngineDeps) {
   }
 
   function showPaused() {
-    deps.render({ mode: "paused", canLower: lowerRule(deps.getSettings().rule) != null });
+    const settings = deps.getSettings();
+    if (!settings.showSkipChip) {
+      clearChip();
+      return;
+    }
+    deps.render({ mode: "paused", canLower: lowerRule(settings.rule) != null });
   }
 
   async function performSkip(item: EngineItem) {
